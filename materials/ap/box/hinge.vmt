@@ -1,0 +1,5 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "ap/box/hinge"
+	"$bumpmap" "ap/box/hinge"
+}

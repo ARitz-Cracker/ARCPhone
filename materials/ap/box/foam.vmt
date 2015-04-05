@@ -1,0 +1,6 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "ap/box/foam"
+	"$bumpmap" "ap/box/foam_bump"
+	"$reflectivity"	"[ .5 .5 .5 ]"
+}

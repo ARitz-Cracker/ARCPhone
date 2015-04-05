@@ -1,0 +1,6 @@
+"UnlitGeneric"
+{
+	"$basetexture" "ap/phone/menu"
+	"$translucent" 1
+	"$selfillum"	1
+}

@@ -1,0 +1,11 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "ap/phone/body13"
+	"$basemapalphaphongmask" "1"
+	"$phong"	"1"
+	"$phongexponent"	"3"
+	"$phongboost"	"1"
+	"$phongfresnelranges"	"[0.1 0.1 5]"
+	"$halflambert" "1"
+	"$rimlight" "1"
+}

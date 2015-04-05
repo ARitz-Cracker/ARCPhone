@@ -1,0 +1,7 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "ap/phone/lens"
+	"$envmap"	"env_cubemap"
+	"$envmaptint"	"[ .3 .3 .3  ]"
+	"$normalmapalphaenvmapmask"	"1"
+}

@@ -1,0 +1,9 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "ap/box/red"
+	"$phongboost"	"1"
+	"$phong"	"1"
+	"$phongexponent"	"4"
+	"$phongfresnelranges"	"[0.05 0.05 0.05]"
+	"$reflectivity"	"[ .5 .5 .5 ]"
+}

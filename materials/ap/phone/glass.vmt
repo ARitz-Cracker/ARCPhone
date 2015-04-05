@@ -1,0 +1,5 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "ap/phone/glass"
+	"$translucent" "1"
+}
