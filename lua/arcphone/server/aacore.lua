@@ -316,6 +316,18 @@ function ARCPhone.AddToCall(caller,reciever)
 		plyrec.ARCPhone_Status = ARCPHONE_ERROR_RINGING
 	end
 end
+
+function ARCPhone.SendTextMsg(tonum,fromnum,msg)
+	local hash = ARCLib.md5(msg)
+	if !ARCPhone.Disk.Texts[tonum] then
+		ARCPhone.Disk.Texts[tonum] = {}
+	end
+	ARCPhone.Disk.Texts[tonum][hash] = {}
+	ARCPhone.Disk.Texts[tonum][hash].msg = msg
+	ARCPhone.Disk.Texts[tonum][hash].number = fromnum
+	ARCPhone.Disk.Texts[tonum][hash].place = -1
+end
+
 local refr = -15
 local trefr = -2
 function ARCPhone.Think()

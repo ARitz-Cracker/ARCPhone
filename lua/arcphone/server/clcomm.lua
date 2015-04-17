@@ -85,26 +85,28 @@ end)
 util.AddNetworkString( "arcphone_comm_text" )
 
 
-
 net.Receive( "arcphone_comm_text", function(length,ply)
 	local succ = net.ReadInt(8)
 	local part = net.ReadUInt(32)
 	local whole = net.ReadUInt(32)
 	local hash = net.ReadString()
 	local str = net.ReadString()
+	local vnum = ARCPhone.GetPhoneNumber(v)
+	
+	local len = #ARCPhone.Disk.Texts[vnum][hash].msg
 	
 	if succ == -1 then
-		local progr = string.Explode("/",string.Replace(steamid,"RECIEVED DUH FOOKING CHUNK ||||",""))
-		if tonumber(progr[2]) == #ARCLoad.ClientChunkDownload then
-			if tonumber(progr[1]) == ply._ARCLoad_LuaDL_Place then
-				ply._ARCLoad_LuaDL_Place = ply._ARCLoad_LuaDL_Place + 1
-				MsgN("ARCPhone: Sending Chunk "..ply._ARCLoad_LuaDL_Place.."/"..#ARCLoad.ClientChunkDownload.." of text"..hash.." to "..tostring(ply))
+		
+		if part == len then
+			if part == ARCPhone.Disk.Texts[vnum][hash].place then
+				ARCPhone.Disk.Texts[vnum][hash].place = ARCPhone.Disk.Texts[vnum][hash].place + 1
+				MsgN("ARCPhone: Sending Chunk "..ARCPhone.Disk.Texts[vnum][hash].place.."/"..len.." of text"..hash.." to "..tostring(ply))
 				net.Start("arcload_lua_transfer")
 				net.WriteInt(0,8)
-				net.WriteUInt(ply._ARCLoad_LuaDL_Place,32)
-				net.WriteUInt(#ARCLoad.ClientChunkDownload,32)
+				net.WriteUInt(ARCPhone.Disk.Texts[vnum][hash].place,32)
+				net.WriteUInt(len,32)
 				net.WriteString(hash)
-				net.WriteString(tostring(ARCLoad.ClientChunkDownload[ply._ARCLoad_LuaDL_Place]))
+				net.WriteString(tostring(ARCPhone.Disk.Texts[vnum][hash].msg[ARCPhone.Disk.Texts[vnum][hash].place]))
 				net.Send(ply)
 			else
 				MsgN("ARCLoad Client mismatched in part")
@@ -127,7 +129,8 @@ net.Receive( "arcphone_comm_text", function(length,ply)
 			net.Send(ply)
 		end
 	elseif succ == -2 then
-		--Done Sending
+		ARCPhone.Disk.Texts[vnum][hash] = nil
+		-- Done sending
 	else
 		MsgN("ARCLoad: Failure Sending text to "..tostring(ply))
 	end
