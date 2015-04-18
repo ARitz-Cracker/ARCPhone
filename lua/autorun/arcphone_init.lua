@@ -9,7 +9,7 @@ function ARCPhoneMsg(msg)
 	Msg("ARCPhone: "..tostring(msg).."\n")
 	if !ARCPhone then return end
 	if ARCPhone.LogFileWritten then
-		file.Append(ARCPhone.LogFile, os.date("%d-%m-%Y %H:%M:%S").." > "..tostring(msg).."\n")
+		file.Append(ARCPhone.LogFile, os.date("%d-%m-%Y %H:%M:%S").." > "..tostring(msg).."\r\n")
 	end
 end
 ARCPhoneMsg("Running...\n ____ ____ _ ___ ___     ____ ____ ____ ____ _  _ ____ ____    ___  _  _ ____ _  _ ____ \n |__| |__/ |  |    /     |    |__/ |__| |    |_/  |___ |__/    |__] |__| |  | |\\ | |___ \n |  | |  \\ |  |   /__    |___ |  \\ |  | |___ | \\_ |___ |  \\    |    |  | |__| | \\| |___ \n")
@@ -17,8 +17,8 @@ ARCPhoneMsg(table.Random({"RIIING RIIIING!!!","ARitz Cracker's NEXT BIG PROJECT!
 ARCPhoneMsg("© Copyright 2014 Aritz Beobide-Cardinal (ARitz Cracker) All rights reserved.")
 
 ARCPhone = ARCPhone or {}
-ARCPhone.Update = "February 8th 2015"
-ARCPhone.Version = "0.2.1"
+ARCPhone.Update = "April 17th 2015"
+ARCPhone.Version = "0.2.2"
 
 -- STATUSES
 ARCPHONE_ERRORSTRINGS = {}

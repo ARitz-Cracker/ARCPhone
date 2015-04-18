@@ -103,6 +103,7 @@ net.Receive( "arcphone_comm_text", function(length)
 			end
 		end
 	else
+		msgchunks[hash] = nil
 		MsgN("ARCPhone: Server sent error on text "..hash)
 	end
 end)

@@ -323,7 +323,7 @@ function ARCPhone.SendTextMsg(tonum,fromnum,msg)
 		ARCPhone.Disk.Texts[tonum] = {}
 	end
 	ARCPhone.Disk.Texts[tonum][hash] = {}
-	ARCPhone.Disk.Texts[tonum][hash].msg = msg
+	ARCPhone.Disk.Texts[tonum][hash].msg = ARCLib.SplitString(msg,16384)
 	ARCPhone.Disk.Texts[tonum][hash].number = fromnum
 	ARCPhone.Disk.Texts[tonum][hash].place = -1
 end
@@ -346,6 +346,10 @@ function ARCPhone.Think()
 		local vnum = ARCPhone.GetPhoneNumber(v)
 		if trefr > 1 then
 			if v.ARCPhone_Reception > 10 then
+				if !ARCPhone.Disk.Texts[vnum] then
+					ARCPhone.Disk.Texts[vnum] = {}
+				end
+				PrintTable(ARCPhone.Disk.Texts[vnum])
 				for kk,vv in pairs(ARCPhone.Disk.Texts[vnum]) do
 					if vv.place == -1 then
 						vv.place = 0
@@ -536,14 +540,15 @@ function ARCPhone.Load()
 		timer.Create( "ARCPHONE_TAKRCOST", ARCPhone.Settings["cost_time"]*3600, 0, ARCPhone.TakeCosts )
 		timer.Start( "ARCPHONE_TAKRCOST" ) 
 		]]
+		ARCPhone.Calls = {}
 		for k,v in pairs(player.GetAll()) do
-				v.ARCPhone_Reception = 0
-				v.ARCPhone_Status = ARCPHONE_ERROR_CALL_DROPPED
-				net.Start("arcphone_comm_status")
-				net.WriteInt(v.ARCPhone_Reception,8)
-				net.WriteInt(v.ARCPhone_Status,ARCPHONE_ERRORBITRATE)
-				net.WriteTable({on = {},pending = {}})
-				net.Send(v)
+			v.ARCPhone_Reception = 0
+			v.ARCPhone_Status = ARCPHONE_ERROR_CALL_DROPPED
+			net.Start("arcphone_comm_status")
+			net.WriteInt(v.ARCPhone_Reception,8)
+			net.WriteInt(v.ARCPhone_Status,ARCPHONE_ERRORBITRATE)
+			net.WriteTable({on = {},pending = {}})
+			net.Send(v)
 		end
 		if timer.Exists( "ARCPHONE_SAVEDISK" ) then
 			ARCPhoneMsg("Stopping current savedisk timer...")
@@ -576,7 +581,25 @@ function ARCPhone.Load()
 			ARCPhoneMsg("Stopping current think timer...")
 			timer.Destroy( "ARCPHONE_THINK" )
 		end
-		timer.Create( "ARCPHONE_THINK", 1.337, 0, ARCPhone.Think)
+		timer.Create( "ARCPHONE_THINK", 1.337, 0, function()
+			succ, err = pcall(ARCPhone.Think)
+			if !succ then
+				for k,v in pairs(player.GetAll()) do
+					v.ARCPhone_Reception = 0
+					v.ARCPhone_Status = ARCPHONE_ERROR_NOT_LOADED
+					net.Start("arcphone_comm_status")
+					net.WriteInt(v.ARCPhone_Reception,8)
+					net.WriteInt(v.ARCPhone_Status,ARCPHONE_ERRORBITRATE)
+					net.WriteTable({on = {},pending = {}})
+					net.Send(v)
+				end
+				ARCPhone.Calls = {}
+				ARCPhoneMsg("CRITICAL ERROR: Think function has errored!\r\n"..err)
+				ARCLib.NotifyBroadcast("ARCPhone experienced a critical error! You must type \"arcphone reset\" in console to re-start it!",NOTIFY_ERROR,30,true)
+				ARCLib.NotifyBroadcast("Please look in garrysmod/data/"..ARCPhone.LogFile.." to see why the error occured.",NOTIFY_ERROR,30,true)
+				timer.Destroy( "ARCPHONE_THINK" ) 
+			end
+		end)
 		timer.Start( "ARCPHONE_THINK" ) 
 		ARCPhoneMsg("ARCPhone is ready!")
 		ARCPhone.Loaded = true

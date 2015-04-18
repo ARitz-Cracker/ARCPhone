@@ -91,17 +91,18 @@ net.Receive( "arcphone_comm_text", function(length,ply)
 	local whole = net.ReadUInt(32)
 	local hash = net.ReadString()
 	local str = net.ReadString()
-	local vnum = ARCPhone.GetPhoneNumber(v)
+	local vnum = ARCPhone.GetPhoneNumber(ply)
 	
+	MsgN(ARCPhone.Disk.Texts[vnum][hash])
 	local len = #ARCPhone.Disk.Texts[vnum][hash].msg
 	
 	if succ == -1 then
 		
-		if part == len then
+		if whole == len then
 			if part == ARCPhone.Disk.Texts[vnum][hash].place then
 				ARCPhone.Disk.Texts[vnum][hash].place = ARCPhone.Disk.Texts[vnum][hash].place + 1
 				MsgN("ARCPhone: Sending Chunk "..ARCPhone.Disk.Texts[vnum][hash].place.."/"..len.." of text"..hash.." to "..tostring(ply))
-				net.Start("arcload_lua_transfer")
+				net.Start("arcphone_comm_text")
 				net.WriteInt(0,8)
 				net.WriteUInt(ARCPhone.Disk.Texts[vnum][hash].place,32)
 				net.WriteUInt(len,32)
@@ -109,24 +110,26 @@ net.Receive( "arcphone_comm_text", function(length,ply)
 				net.WriteString(tostring(ARCPhone.Disk.Texts[vnum][hash].msg[ARCPhone.Disk.Texts[vnum][hash].place]))
 				net.Send(ply)
 			else
-				MsgN("ARCLoad Client mismatched in part")
-				net.Start("arcload_lua_transfer")
+				MsgN("ARCPhone: Client mismatched in part")
+				net.Start("arcphone_comm_text")
 				net.WriteInt(1,8)
 				net.WriteUInt(1,32)
 				net.WriteUInt(1,32)
 				net.WriteString(hash)
 				net.WriteString("")
 				net.Send(ply)
+				ARCPhone.Disk.Texts[vnum][hash].place = -1
 			end
 		else
-			MsgN("ARCLoad Client mismatched on whole")
-			net.Start("arcload_lua_transfer")
+			MsgN("ARCPhone: Client mismatched on whole")
+			net.Start("arcphone_comm_text")
 			net.WriteInt(1,8)
 			net.WriteUInt(1,32)
 			net.WriteUInt(1,32)
 			net.WriteString(hash)
 			net.WriteString("")
 			net.Send(ply)
+			ARCPhone.Disk.Texts[vnum][hash].place = -1
 		end
 	elseif succ == -2 then
 		ARCPhone.Disk.Texts[vnum][hash] = nil
@@ -135,7 +138,7 @@ net.Receive( "arcphone_comm_text", function(length,ply)
 		MsgN("ARCLoad: Failure Sending text to "..tostring(ply))
 	end
 end)
-
+--[[
 net.Receive( "arcphone_comm_text", function(length,ply)
 	local number = net.ReadString()
 	local message = net.ReadString()
@@ -169,3 +172,4 @@ net.Receive( "arcphone_comm_text", function(length,ply)
 		end
 	end
 end)
+]]
