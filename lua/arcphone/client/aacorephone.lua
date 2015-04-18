@@ -8,6 +8,7 @@ ARCPhone.PhoneSys.OldStatus = ARCPHONE_ERROR_CALL_ENDED
 ARCPhone.PhoneSys.HideWhatsOffTheScreen = true
 ARCPhone.PhoneSys.ValidKeys = {KEY_UP,KEY_DOWN,KEY_LEFT,KEY_RIGHT,KEY_ENTER,KEY_BACKSPACE,KEY_RCONTROL}
 ARCPhone.PhoneSys.KeyDelay = {}
+ARCPhone.PhoneSys.OutgoingTexts = ARCPhone.PhoneSys.OutgoingTexts or {}
 for k,v in pairs(ARCPhone.PhoneSys.ValidKeys) do
 	ARCPhone.PhoneSys.KeyDelay[v] = CurTime() - 1
 	MsgN(v)
@@ -401,6 +402,9 @@ function ARCPhone.PhoneSys:Init(wep)
 	if !file.IsDir( ARCPhone.ROOTDIR.."/appdata","DATA" ) then
 		file.CreateDir( ARCPhone.ROOTDIR.."/appdata")
 	end
+	if !file.IsDir( ARCPhone.ROOTDIR.."/messaging","DATA" ) then
+		file.CreateDir( ARCPhone.ROOTDIR.."/messaging")
+	end
 	for k,v in pairs(ARCPhone.Apps) do
 		if file.Exists(ARCPhone.ROOTDIR.."/appdata/"..k..".txt","DATA") then
 			local tab = util.JSONToTable(file.Read(ARCPhone.ROOTDIR.."/appdata/"..k..".txt","DATA"))
@@ -419,17 +423,28 @@ end
 		end
 		self.MsgsTab = ARCLib.FitText(self.Msgs,"ARCPhoneSmall",124)
 	end
+	function ARCPhone.PhoneSys:SendText(number,message)
+		if file.Exists(fil,"DATA") then
+			file.Append(fil,"\f\t".message) 
+		else
+			file.Write(fil,"\t".message) 
+		end
+		local hash = ARCLib.md5(msg)
+		ARCPhone.PhoneSys.OutgoingTexts[hash] = {}
+		ARCPhone.PhoneSys.OutgoingTexts[hash].msg = ARCLib.SplitString(msg,16384)
+		ARCPhone.PhoneSys.OutgoingTexts[hash].number = number
+		ARCPhone.PhoneSys.OutgoingTexts[hash].place = -1
+	end
 	function ARCPhone.PhoneSys:RecieveText(number,message)
-		self:Print("Text from "..number)
-		self:Print(message)
-		local texts
-		if file.Exists(ARCPhone.ROOTDIR.."/messaging/"..number..".txt","DATA") then
-			texts = util.JSONToTable(file.Read(ARCPhone.ROOTDIR.."/messaging/"..number..".txt","DATA"))
+		self:AddMsgBox("New Message","New Message from "..number,"comments",ARCPHONE_MSGBOX_REPLY,function()
+			
+		end)
+		local fil = ARCPhone.ROOTDIR.."/messaging/"..number..".txt"
+		if file.Exists(fil,"DATA") then
+			file.Append(fil,"\f\v".message) 
+		else
+			file.Write(fil,"\v".message) 
 		end
-		if !texts then
-			texts = {}
-		end
-		texts[#texts+1] = {false,message}
 		file.Write(ARCPhone.ROOTDIR.."/messaging/"..number..".txt",util.TableToJSON(texts))
 	end
 	function ARCPhone.PhoneSys:Call(number)

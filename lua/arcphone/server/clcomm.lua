@@ -85,6 +85,9 @@ end)
 util.AddNetworkString( "arcphone_comm_text" )
 
 
+local msgchunks = {}
+
+
 net.Receive( "arcphone_comm_text", function(length,ply)
 	local succ = net.ReadInt(8)
 	local part = net.ReadUInt(32)
@@ -134,8 +137,45 @@ net.Receive( "arcphone_comm_text", function(length,ply)
 	elseif succ == -2 then
 		ARCPhone.Disk.Texts[vnum][hash] = nil
 		-- Done sending
+	elseif succ == 0 then
+		MsgN("ARCPhone: Client sent chunk "..part.."/"..whole.." on text "..hash)
+		if part==0 then
+			msgchunks[hash] = {}
+			msgchunks[hash].prt = 0
+			msgchunks[hash].msg = ""
+		end
+		if part != msgchunks[hash].prt then
+			MsgN("ARCPhone: Chuck Mismatch Error. Possibly due to lag. "..hash)
+		else
+			msgchunks[hash].msg = msgchunks[hash].msg .. str
+			if part == whole then
+				MsgN(#msgchunks[hash].msg)
+				timer.Simple(1,function()
+					ARCPhone.SendTextMsg(string.Left( msgchunks[hash].msg, 10 ),vnum,string.Right( msgchunks[hash].msg, #msgchunks[hash].msg-10 ))
+					msgchunks[hash] = nil
+					net.Start("arcphone_comm_text")
+					net.WriteInt(-2,8)
+					net.WriteUInt(0,32)
+					net.WriteUInt(0,32)
+					net.WriteString(hash) --Hash
+					net.WriteString("") --Number
+					net.Send(ply)
+					
+				end)
+			else
+				net.Start("arcphone_comm_text")
+				net.WriteInt(-1,8)
+				net.WriteUInt(part,32)
+				net.WriteUInt(whole,32)
+				net.WriteString(hash) --Hash
+				net.WriteString("") --Number
+				net.Send(ply)
+				msgchunks[hash].prt = msgchunks[hash].prt + 1
+			end
+		end
 	else
-		MsgN("ARCLoad: Failure Sending text to "..tostring(ply))
+		msgchunks[hash] = nil
+		MsgN("ARCPhone: Client sent error on text "..hash)
 	end
 end)
 --[[

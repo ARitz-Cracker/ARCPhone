@@ -21,6 +21,20 @@ if CLIENT then
 			end
 			--ARCPhone.PhoneSys:GetActiveApp():BackgroundThink(phone)
 		end
+		for kk,vv in pairs(ARCPhone.PhoneSys.OutgoingTexts) do
+			if vv.place == -1 then
+				vv.place = 0
+				-- Send dummy message
+				net.Start("arcphone_comm_text")
+				net.WriteInt(0,8)
+				net.WriteUInt(0,32)
+				net.WriteUInt(#vv.msg,32)
+				net.WriteString(kk) --Hash
+				net.WriteString(vv.number) --Number
+				net.Send(v)
+			end
+		end
+		
 	end)
 	hook.Add("PostDrawOpaqueRenderables","ARCPhone Theatrics",function()
 		if ARCPhone.VideoDisplay then 

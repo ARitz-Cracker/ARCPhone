@@ -63,7 +63,45 @@ net.Receive( "arcphone_comm_text", function(length)
 	local hash = net.ReadString()
 	local str = net.ReadString()
 
-	if succ == 0 then
+	if succ == -1 then
+		
+		if whole == len then
+			if part == ARCPhone.PhoneSys.OutgoingTexts[hash].place then
+				ARCPhone.PhoneSys.OutgoingTexts[hash].place = ARCPhone.PhoneSys.OutgoingTexts[hash].place + 1
+				MsgN("ARCPhone: Sending Chunk "..ARCPhone.PhoneSys.OutgoingTexts[hash].place.."/"..len.." of text"..hash.." to the server")
+				net.Start("arcphone_comm_text")
+				net.WriteInt(0,8)
+				net.WriteUInt(ARCPhone.PhoneSys.OutgoingTexts[hash].place,32)
+				net.WriteUInt(len,32)
+				net.WriteString(hash)
+				net.WriteString(tostring(ARCPhone.PhoneSys.OutgoingTexts[hash].msg[ARCPhone.PhoneSys.OutgoingTexts[hash].place]))
+				net.SendToServer()
+			else
+				MsgN("ARCPhone: Server mismatched in part")
+				net.Start("arcphone_comm_text")
+				net.WriteInt(1,8)
+				net.WriteUInt(1,32)
+				net.WriteUInt(1,32)
+				net.WriteString(hash)
+				net.WriteString("")
+				net.SendToServer()
+				ARCPhone.PhoneSys.OutgoingTexts[hash].place = -1
+			end
+		else
+			MsgN("ARCPhone: Server mismatched on whole")
+			net.Start("arcphone_comm_text")
+			net.WriteInt(1,8)
+			net.WriteUInt(1,32)
+			net.WriteUInt(1,32)
+			net.WriteString(hash)
+			net.WriteString("")
+			net.SendToServer()
+			ARCPhone.PhoneSys.OutgoingTexts[hash].place = -1
+		end
+	elseif succ == -2 then
+		ARCPhone.PhoneSys.OutgoingTexts[hash] = nil
+		-- Done sending
+	elseif succ == 0 then
 		MsgN("ARCPhone: Server sent chunk "..part.."/"..whole.." on text "..hash)
 		if part==0 then
 			msgchunks[hash] = {}
