@@ -44,7 +44,7 @@ function ARCPhone.NewAppTextInputTile(txt,resize,w)
 	local tile = ARCPhone.NewAppTile()
 	tile.TextInput = txt or ""
 	tile.CanResize = resize
-	tile.w = tile.w or 100
+	tile.w = w or 100
 	if tile.CanResize then
 		tile._InputTable = ARCLib.FitText(tile.TextInput,"ARCPhoneSmall",tile.w - 2)
 		tile._MaxLines = #tile._InputTable

@@ -504,7 +504,7 @@ function APP:OpenConvo(num)
 	self.Tiles[len].OnUnPressed = function(phone,app)
 		self.Tiles[len].color = Color(75, 255, 75,255)
 		
-		self.Phone:SendText(num,self.Tiles[len-1].TextInput)
+		self.Phone:SendText(num,self.Tiles[self.SendIcon-1].TextInput)
 		self:OpenConvo(num)
 	end
 end
