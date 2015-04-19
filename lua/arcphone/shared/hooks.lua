@@ -6,8 +6,6 @@
 ARCPhone.Loaded = false
 
 hook.Add( "PlayerSay", "ARCPhone Debugone", function( loundmouth, text, public )
-	MsgN("ARCPHONE TESTING: PlayerSay("..tostring(ply)..",\""..text.."\","..tostring(public)..")")
-	
 	if !ARCPhone.Calls then return end
 	for k,v in pairs(ARCPhone.Calls) do
 		for _,otherguy in pairs(player.GetAll()) do
