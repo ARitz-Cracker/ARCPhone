@@ -40,17 +40,18 @@ function ARCPhone.NewAppInputTile(typ)
 end
 ]]
 
-function ARCPhone.NewAppTextInputTile(txt,resize)
+function ARCPhone.NewAppTextInputTile(txt,resize,w)
 	local tile = ARCPhone.NewAppTile()
 	tile.TextInput = txt or ""
 	tile.CanResize = resize
+	tile.w = tile.w or 100
 	if tile.CanResize then
 		tile._InputTable = ARCLib.FitText(tile.TextInput,"ARCPhoneSmall",tile.w - 2)
 		tile._MaxLines = #tile._InputTable
 		tile.h = tile._MaxLines * 12 + 2
 	end
 	tile.drawfunc = function(phone,app,xpos,ypos)
-		if tile.TextInput != tile.OldTextInput then
+		if tile.Editable && tile.TextInput != tile.OldTextInput then
 			if tile.CanResize then
 				tile._InputTable = ARCLib.FitText(tile.TextInput,"ARCPhoneSmall",tile.w - 2)
 				tile._MaxLines = #tile._InputTable

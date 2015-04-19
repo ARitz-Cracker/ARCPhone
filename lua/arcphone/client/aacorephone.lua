@@ -400,7 +400,7 @@ function ARCPhone.PhoneSys:Init(wep)
 				if self.LoadingPer < 0 then
 					draw.SimpleText("Loading...", "ARCPhone", self.HalfScreenResX, self.HalfScreenResY, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_CENTER  )
 				else	
-					draw.SimpleText("Loading... (".self.LoadingPer."%)", "ARCPhone", self.HalfScreenResX, self.HalfScreenResY, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_CENTER  )
+					draw.SimpleText("Loading... ("..self.LoadingPer.."%)", "ARCPhone", self.HalfScreenResX, self.HalfScreenResY, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_CENTER  )
 				end
 			end
 			surface.SetDrawColor( 255, 255, 255, 255 )
