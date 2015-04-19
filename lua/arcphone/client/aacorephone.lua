@@ -425,9 +425,9 @@ end
 	end
 	function ARCPhone.PhoneSys:SendText(number,message)
 		if file.Exists(fil,"DATA") then
-			file.Append(fil,"\f\t".message) 
+			file.Append(fil,"\f\t"..message) 
 		else
-			file.Write(fil,"\t".message) 
+			file.Write(fil,"\t"..message) 
 		end
 		local hash = ARCLib.md5(msg)
 		ARCPhone.PhoneSys.OutgoingTexts[hash] = {}
@@ -441,9 +441,9 @@ end
 		end)
 		local fil = ARCPhone.ROOTDIR.."/messaging/"..number..".txt"
 		if file.Exists(fil,"DATA") then
-			file.Append(fil,"\f\v".message) 
+			file.Append(fil,"\f\v"..message) 
 		else
-			file.Write(fil,"\v".message) 
+			file.Write(fil,"\v"..message) 
 		end
 		file.Write(ARCPhone.ROOTDIR.."/messaging/"..number..".txt",util.TableToJSON(texts))
 	end

@@ -452,21 +452,69 @@ APP.Name = "Messaging"
 APP.Author = "ARitz Cracker"
 APP.Purpose = "Messaging app for ARCPhone"
 
+function APP:OpenConvo(num)
+	local numdir = ARCPhone.ROOTDIR.."/messaging/"..num..".txt"
+	local len = 0
+	if file.Exists(numdir,"DATA") then
+	
+	end
+	len = len + 1
+end
+
+function APP:NewConvo()
+Derma_StringRequest("ARCPhone","Enter the phone number of the person you want to text","",
+	function( text ) 
+		if ARCPhone.IsValidPhoneNumber(text) then
+			self:OpenConvo(num)
+		else
+			ARCPhone.PhoneSys:AddMsgBox("Invalid phone number","The phone number you entered was invalid","warning")
+		end
+	end)
+end
 function APP:Init()
 	self.Tiles = {}
 	
 	
 	
 	
-	self.Tiles[1] = ARCPhone.NewAppTile()
-	self.Tiles[1].x = 8
-	self.Tiles[1].y = 32
-	self.Tiles[1].w = 122
-	self.Tiles[1].h = 18
-	self.Tiles[1].color = Color(0,0,64,255)
+	local files,_ = file.Find(ARCPhone.ROOTDIR.."/messaging/*", "DATA", "datedesc")
 	
-	self.Tiles[1].drawfunc = function(phone,app,x,y)
-		draw.SimpleText("**New Conversation**", "ARCPhone", x+self.Tiles[1].w*0.5, y+self.Tiles[1].h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+	local len = #files
+	for i=1,len do
+		local num = string.sub( files[i], 1, #files[i]-4 )
+		self.Tiles[i] = ARCPhone.NewAppTile()
+		self.Tiles[i].x = 8
+		self.Tiles[i].y = 10 + i*22
+		self.Tiles[i].w = 122
+		self.Tiles[i].h = 18
+		self.Tiles[i].color = Color(0,0,64,255)
+		self.Tiles[i].drawfunc = function(phone,app,x,y)
+			draw.SimpleText(num, "ARCPhone", x+self.Tiles[i].w*0.5, y+self.Tiles[i].h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+		end
+		self.Tiles[i].OnPressed = function(phone,app)
+			self.Tiles[i].color = Color(0,0,255,128)
+		end
+		self.Tiles[1].OnUnPressed = function(phone,app)
+			self.Tiles[1].color = Color(0,0,255,255)
+			self:OpenConvo(num)
+		end
+	end
+	len = len + 1
+	self.Tiles[len] = ARCPhone.NewAppTile()
+	self.Tiles[len].x = 8
+	self.Tiles[len].y = 10 + len*22
+	self.Tiles[len].w = 122
+	self.Tiles[len].h = 18
+	self.Tiles[len].color = Color(0,0,64,255)
+	self.Tiles[len].drawfunc = function(phone,app,x,y)
+		draw.SimpleText("**New Conversation**", "ARCPhone", x+self.Tiles[len].w*0.5, y+self.Tiles[len].h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+	end
+	self.Tiles[len].OnPressed = function(phone,app)
+		self.Tiles[len].color = Color(0,0,255,128)
+	end
+	self.Tiles[len].OnUnPressed = function(phone,app)
+		self.Tiles[len].color = Color(0,0,255,255)
+		self:NewConvo()
 	end
 	--[[
 	self.Tiles[1] = ARCPhone.NewAppTextInputTile("This is a text input tile, but it isn't editable because the Editable variable has been set to false")
