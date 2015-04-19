@@ -44,20 +44,29 @@ function ARCPhone.NewAppTextInputTile(txt,resize)
 	local tile = ARCPhone.NewAppTile()
 	tile.TextInput = txt or ""
 	tile.CanResize = resize
+	if tile.CanResize then
+		tile._InputTable = ARCLib.FitText(tile.TextInput,"ARCPhoneSmall",tile.w - 2)
+		tile._MaxLines = #tile._InputTable
+		tile.h = tile._MaxLines * 12 + 2
+	end
 	tile.drawfunc = function(phone,app,xpos,ypos)
-		if tile.CanResize then
-			tile._InputTable = ARCLib.FitText(tile.TextInput,"ARCPhoneSmall",tile.w - 2)
-			tile._MaxLines = #tile._InputTable
-			tile.h = tile._MaxLines * 12 + 2
-		else
-			tile._MaxLines = math.floor((tile.h-2)/12)
-			tile._InputTable = ARCLib.FitText(tile.TextInput,"ARCPhoneSmall",tile.w - 2)
+		if tile.TextInput != tile.OldTextInput then
+			if tile.CanResize then
+				tile._InputTable = ARCLib.FitText(tile.TextInput,"ARCPhoneSmall",tile.w - 2)
+				tile._MaxLines = #tile._InputTable
+				tile.h = tile._MaxLines * 12 + 2
+			else
+				tile._MaxLines = math.floor((tile.h-2)/12)
+				tile._InputTable = ARCLib.FitText(tile.TextInput,"ARCPhoneSmall",tile.w - 2)
+			end
+			tile.OldTextInput = tile.TextInput
 		end
 		for i=1,tile._MaxLines do
 			if tile._InputTable[i] then
 				draw.SimpleText( tile._InputTable[i], "ARCPhoneSmall", xpos+1, ypos-11 + i*12, Color(255,255,255,255),TEXT_ALIGN_LEFT , TEXT_ALIGN_BOTTOM )
 			end
 		end
+		
 	end
 	tile.Editable = true
 	tile.OnUnPressed = function(phone,app) 
@@ -162,29 +171,29 @@ function ARCPhone.NewAppObject()
 		end
 	end
 	app.ShowTaskbar = true
-	function app:ForegroundThink(phone) end
-	function app:BackgroundThink(phone) end
-	function app:Think(phone) end
-	function app:OnBack(phone) end
-	function app:OnEnter(phone) end
-	function app:OnUp(phone) end
-	function app:OnDown(phone) end
-	function app:OnLeft(phone) end
-	function app:OnRight(phone) end
+	function app:ForegroundThink() end
+	function app:BackgroundThink() end
+	function app:Think() end
+	function app:OnBack() end
+	function app:OnEnter() end
+	function app:OnUp() end
+	function app:OnDown() end
+	function app:OnLeft() end
+	function app:OnRight() end
 	
-	function app:OnBackUp(phone) end
-	function app:OnEnterUp(phone) end
-	function app:OnUpUp(phone) end
-	function app:OnDownUp(phone) end
-	function app:OnLeftUp(phone) end
-	function app:OnRightUp(phone) end
+	function app:OnBackUp() end
+	function app:OnEnterUp() end
+	function app:OnUpUp() end
+	function app:OnDownUp() end
+	function app:OnLeftUp() end
+	function app:OnRightUp() end
 	
-	function app:OnBackDown(phone) end
-	function app:OnEnterDown(phone) end
-	function app:OnUpDown(phone) end
-	function app:OnDownDown(phone) end
-	function app:OnLeftDown(phone) end
-	function app:OnRightDown(phone) end
+	function app:OnBackDown() end
+	function app:OnEnterDown() end
+	function app:OnUpDown() end
+	function app:OnDownDown() end
+	function app:OnLeftDown() end
+	function app:OnRightDown() end
 	
 	function app:_OnEnterDown(phone) 
 		self.Tiles[phone.SelectedAppTile].OnPressed(phone,self)

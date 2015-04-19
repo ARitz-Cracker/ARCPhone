@@ -21,9 +21,19 @@ end
 function ARCPhone.PhoneSys:GetActiveApp()
 	return ARCPhone.Apps[self.ActiveApp]
 end
+function ARCPhone.PhoneSys:SetLoading(loading,percent)
+	percent = percent or -0.01
+	if loading then
+		self.LoadingPer = math.floor(percent*100)
+	else
+		self.LoadingPer = -1
+	end
+	
+end
 function ARCPhone.PhoneSys:Think(wep)
 
-			if !self.ShowConsole then
+			
+			if !self.Loading && !self.ShowConsole then
 					if input.WasKeyReleased(KEY_LCONTROL) || input.WasKeyReleased(KEY_RCONTROL) then
 						MsgN("CTRL!")
 						self.ShowOptions = !self.ShowOptions
@@ -64,6 +74,7 @@ function ARCPhone.PhoneSys:Think(wep)
 						end
 					end
 			end
+
 		end
 		--[[
 		if self.OldStatus != self.Status then
@@ -98,6 +109,8 @@ function ARCPhone.PhoneSys:Init(wep)
 
 	self.ScreenResX = 138
 	self.ScreenResY = 250
+	self.HalfScreenResX = self.ScreenResX/2
+	self.HalfScreenResY = self.ScreenResY/2
 	self.LastWep = "weapon_physgun"
 	self.CurrentDir = "/"
 	self.CurrentFolderIcon = "phone"
@@ -227,7 +240,7 @@ function ARCPhone.PhoneSys:Init(wep)
 				end
 				local maxmsgbox = #self.MsgBoxs  
 				if maxmsgbox > 0 then -- ARITZ WORK HERE!
-					local halfxrez = self.ScreenResX/2
+					
 					local buttonwidth = self.ScreenResX - 8
 					local maxo = 1
 					local typ = self.MsgBoxs[maxmsgbox].Type 
@@ -265,19 +278,19 @@ function ARCPhone.PhoneSys:Init(wep)
 					surface.DrawRect( 4, 46 + 4 + 12*#txttab, buttonwidth, 20) 
 					
 					if typ == 1 || typ == 3 then
-						draw.SimpleText("OK","ARCPhone", halfxrez, 46 + 6 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+						draw.SimpleText("OK","ARCPhone", self.HalfScreenResX, 46 + 6 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
 					end
 					if typ == 2 || typ == 6 then
-						draw.SimpleText("Yes","ARCPhone", halfxrez, 46 + 6 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+						draw.SimpleText("Yes","ARCPhone", self.HalfScreenResX, 46 + 6 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
 					end
 					if typ == 4 || typ == 7 then
-						draw.SimpleText("Retry","ARCPhone", halfxrez, 46 + 6 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+						draw.SimpleText("Retry","ARCPhone", self.HalfScreenResX, 46 + 6 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
 					end
 					if typ == 5 then
-						draw.SimpleText("Reply","ARCPhone", halfxrez, 46 + 6 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+						draw.SimpleText("Reply","ARCPhone", self.HalfScreenResX, 46 + 6 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
 					end
 					if typ == 8 then
-						draw.SimpleText("Answer","ARCPhone", halfxrez, 46 + 6 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+						draw.SimpleText("Answer","ARCPhone", self.HalfScreenResX, 46 + 6 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
 					end
 					if self.MsgBoxOption == 1 then
 						surface.SetDrawColor( 255, 255, 255, 255 )
@@ -288,19 +301,19 @@ function ARCPhone.PhoneSys:Init(wep)
 						surface.SetDrawColor( 255, 75, 75, 255 )
 						surface.DrawRect( 4, 46 + 24 + 12*#txttab, buttonwidth, 20) 
 						if typ == 2 || typ == 6 then
-							draw.SimpleText("No","ARCPhone",halfxrez,46 + 26 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+							draw.SimpleText("No","ARCPhone",self.HalfScreenResX,46 + 26 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
 						end
 						if typ == 3 then
-							draw.SimpleText("Cancel","ARCPhone",halfxrez,46 + 26 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+							draw.SimpleText("Cancel","ARCPhone",self.HalfScreenResX,46 + 26 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
 						end
 						if typ == 4 || typ == 7 then
-							draw.SimpleText("Abort","ARCPhone",halfxrez,46 + 26 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+							draw.SimpleText("Abort","ARCPhone",self.HalfScreenResX,46 + 26 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
 						end
 						if typ == 5 then
-							draw.SimpleText("Close","ARCPhone",halfxrez,46 + 26 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+							draw.SimpleText("Close","ARCPhone",self.HalfScreenResX,46 + 26 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
 						end
 						if typ == 8 then
-							draw.SimpleText("Ignore","ARCPhone",halfxrez,46 + 26 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+							draw.SimpleText("Ignore","ARCPhone",self.HalfScreenResX,46 + 26 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
 						end
 						if self.MsgBoxOption == 2 then
 							surface.SetDrawColor( 255, 255, 255, 255 )
@@ -311,13 +324,13 @@ function ARCPhone.PhoneSys:Init(wep)
 						surface.SetDrawColor( 255, 255, 75, 255 )
 						surface.DrawRect( 4, 46 + 44 + 12*#txttab, buttonwidth, 20) 
 						if typ == 6 then
-							draw.SimpleText("Cancel","ARCPhone", halfxrez,  46 + 46 + 12*#txttab, Color(0,0,0,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+							draw.SimpleText("Cancel","ARCPhone", self.HalfScreenResX,  46 + 46 + 12*#txttab, Color(0,0,0,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
 						end
 						if typ == 7 then
-							draw.SimpleText("Ignore","ARCPhone", halfxrez,  46 + 46 + 12*#txttab, Color(0,0,0,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+							draw.SimpleText("Ignore","ARCPhone", self.HalfScreenResX,  46 + 46 + 12*#txttab, Color(0,0,0,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
 						end
 						if typ == 8 then
-							draw.SimpleText("Text Excuse","ARCPhone", halfxrez,  46 + 46 + 12*#txttab, Color(0,0,0,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+							draw.SimpleText("Text Excuse","ARCPhone", self.HalfScreenResX,  46 + 46 + 12*#txttab, Color(0,0,0,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
 						end
 						if self.MsgBoxOption == 3 then
 							surface.SetDrawColor( 255, 255, 255, 255 )
@@ -373,13 +386,24 @@ function ARCPhone.PhoneSys:Init(wep)
 				end
 			end
 			
-			surface.SetDrawColor( 255, 255, 255, 255 )
+		
 			--[[
 			surface.SetDrawColor( 255, 100, 100, 255 )
 			surface.SetMaterial( ARCLib.Icons16["cross"] )
 			--surface.DrawTexturedRect( -54, -98, 16, 16 )
 			]]
-			draw.SimpleText( os.date("%I:%M %p"), "ARCPhone", 84, 12, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_CENTER  )
+			
+			
+			if self.Loading then
+				surface.SetDrawColor( 0, 0, 0, 185 )
+				surface.DrawOutlinedRect( 0, 0, self.ScreenResX, self.ScreenResY ) 
+				if self.LoadingPer < 0 then
+					draw.SimpleText("Loading...", "ARCPhone", self.HalfScreenResX, self.HalfScreenResY, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_CENTER  )
+				else	
+					draw.SimpleText("Loading... (".self.LoadingPer."%)", "ARCPhone", self.HalfScreenResX, self.HalfScreenResY, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_CENTER  )
+				end
+			end
+			surface.SetDrawColor( 255, 255, 255, 255 )
 			render.SetStencilEnable( false )
 		end
 
@@ -414,6 +438,8 @@ function ARCPhone.PhoneSys:Init(wep)
 		end
 	end
 	self:OpenApp("home")
+	ARCPhone.PhoneSys:AddMsgBox("My excuse for a tutorial","Use the Arrow keys to move the cursor. Press BACKSPACE to go back, press CTRL to access the context menu, and press ENTER select.","info")
+	ARCPhone.PhoneSys:AddMsgBox("PROTOTYPE VERSION","This is the prototype version of ARCPhone (pre-alpha), and does not represent the final product. Everything is subject to change. (Press ENTER to close this window)","info")
 end
 
 	function ARCPhone.PhoneSys:Print(msg)

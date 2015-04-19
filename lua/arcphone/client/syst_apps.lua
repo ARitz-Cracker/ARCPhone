@@ -2,7 +2,6 @@
 -- This file is under copyright, and is bound to the agreement stated in the ELUA.
 -- Any 3rd party content has been used as either public domain or with permission.
 -- © Copyright 2014 Aritz Beobide-Cardinal All rights reserved.
---hsaaaasaaaa
 
 
 local APP = ARCPhone.NewAppObject()
@@ -282,27 +281,27 @@ function APP:EndCustomization()
 	self.Customize = false
 	self:SaveData()
 end
-function APP:OnBack(phone)
+function APP:OnBack()
 	if self.Customize then
 		self:EndCustomization()
 	end
 end
-function APP:OnLeft(phone)
+function APP:OnLeft()
 	if MovingTile && self.Disk[MovingTile].x > 0 then
 		self.Disk[MovingTile].x = self.Disk[MovingTile].x - 1
 	end
 end
-function APP:OnRight(phone)
+function APP:OnRight()
 	if MovingTile then
 		self.Disk[MovingTile].x = self.Disk[MovingTile].x + 1
 	end
 end
-function APP:OnUp(phone)
+function APP:OnUp()
 	if MovingTile && self.Disk[MovingTile].y > 0 then
 		self.Disk[MovingTile].y = self.Disk[MovingTile].y - 1
 	end
 end
-function APP:OnDown(phone)
+function APP:OnDown()
 	if MovingTile then
 		self.Disk[MovingTile].y = self.Disk[MovingTile].y + 1
 	end
@@ -452,18 +451,32 @@ APP.Name = "Messaging"
 APP.Author = "ARitz Cracker"
 APP.Purpose = "Messaging app for ARCPhone"
 
+
 function APP:OpenConvo(num)
 	local numdir = ARCPhone.ROOTDIR.."/messaging/"..num..".txt"
 	local len = 0
 	if file.Exists(numdir,"DATA") then
-	
+		local msgs = string.Explode( "\f", file.Read(numdir))
+		len = #msgs
+		for i=1,len do
+			self.Tiles[i] = ARCPhone.NewAppTextInputTile(string.sub( msgs[i], 2))
+			if (msgs[i][1] == "\t"
+				
+				self.Tiles[i].x = 8
+				self.Tiles[i].y = 154
+				self.Tiles[i].w = 122
+				self.Tiles[i].h = 40
+				self.Tiles[i].color = Color(0,0,255,255)
+				self.Tiles[i].Editable = false
+			end
+			
+		end
 	end
 	len = len + 1
 end
 
 function APP:NewConvo()
-Derma_StringRequest("ARCPhone","Enter the phone number of the person you want to text","",
-	function( text ) 
+	Derma_StringRequest("ARCPhone","Enter the phone number of the person you want to text","",function( text ) 
 		if ARCPhone.IsValidPhoneNumber(text) then
 			self:OpenConvo(num)
 		else
@@ -536,9 +549,8 @@ function APP:Init()
 	
 	
 end
-APP:Init()
+//APP:Init()
 ARCPhone.RegisterApp(APP,"messaging")
 
 --ARCPhone.PhoneSys:OpenApp("callscreen")
 
---u4dd'dasdad
