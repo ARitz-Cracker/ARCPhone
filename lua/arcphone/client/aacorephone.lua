@@ -473,7 +473,7 @@ end
 		else
 			file.Write(fil,"r"..message) 
 		end
-		file.Write(ARCPhone.ROOTDIR.."/messaging/"..number..".txt",util.TableToJSON(texts))
+		//file.Write(ARCPhone.ROOTDIR.."/messaging/"..number..".txt",util.TableToJSON(texts))
 	end
 	function ARCPhone.PhoneSys:Call(number)
 		if !number || !isstring(number) || number == "" then
