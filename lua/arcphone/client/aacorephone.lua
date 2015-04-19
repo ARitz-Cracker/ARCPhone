@@ -450,6 +450,7 @@ end
 		self.MsgsTab = ARCLib.FitText(self.Msgs,"ARCPhoneSmall",124)
 	end
 	function ARCPhone.PhoneSys:SendText(number,message)
+		local fil = ARCPhone.ROOTDIR.."/messaging/"..number..".txt"
 		if file.Exists(fil,"DATA") then
 			file.Append(fil,"\f\t"..message) 
 		else
