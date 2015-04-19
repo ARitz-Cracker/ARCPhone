@@ -456,9 +456,9 @@ end
 		else
 			file.Write(fil,"\t"..message) 
 		end
-		local hash = ARCLib.md5(msg)
+		local hash = ARCLib.md5(message)
 		ARCPhone.PhoneSys.OutgoingTexts[hash] = {}
-		ARCPhone.PhoneSys.OutgoingTexts[hash].msg = ARCLib.SplitString(msg,16384)
+		ARCPhone.PhoneSys.OutgoingTexts[hash].msg = ARCLib.SplitString(message,16384)
 		ARCPhone.PhoneSys.OutgoingTexts[hash].number = number
 		ARCPhone.PhoneSys.OutgoingTexts[hash].place = -1
 	end
