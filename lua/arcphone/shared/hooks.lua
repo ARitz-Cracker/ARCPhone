@@ -49,7 +49,7 @@ if CLIENT then
 					net.WriteUInt(#vv.msg,32)
 					net.WriteString(kk) --Hash
 					net.WriteString(vv.number) --Number
-					net.Send(v)
+					net.SendToServer()
 				end
 			end
 		end
