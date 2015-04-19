@@ -466,7 +466,7 @@ function APP:OpenConvo(num)
 			else
 				self.Tiles[i].y = 24
 			end
-			if msgs[i][1] == "\t" then
+			if msgs[i][1] == "s" then
 				self.Tiles[i].x = 12
 				self.Tiles[i].color = Color(0,0,255,255)
 			else
