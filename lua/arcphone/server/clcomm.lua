@@ -96,11 +96,11 @@ net.Receive( "arcphone_comm_text", function(length,ply)
 	local str = net.ReadString()
 	local vnum = ARCPhone.GetPhoneNumber(ply)
 	
-	MsgN(ARCPhone.Disk.Texts[vnum][hash])
-	local len = #ARCPhone.Disk.Texts[vnum][hash].msg
+	
 	
 	if succ == -1 then
-		
+		MsgN(ARCPhone.Disk.Texts[vnum][hash])
+		local len = #ARCPhone.Disk.Texts[vnum][hash].msg
 		if whole == len then
 			if part == ARCPhone.Disk.Texts[vnum][hash].place then
 				ARCPhone.Disk.Texts[vnum][hash].place = ARCPhone.Disk.Texts[vnum][hash].place + 1

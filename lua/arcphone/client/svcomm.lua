@@ -64,7 +64,7 @@ net.Receive( "arcphone_comm_text", function(length)
 	local str = net.ReadString()
 
 	if succ == -1 then
-		
+		local len = #ARCPhone.PhoneSys.OutgoingTexts[hash].msg
 		if whole == len then
 			if part == ARCPhone.PhoneSys.OutgoingTexts[hash].place then
 				ARCPhone.PhoneSys.OutgoingTexts[hash].place = ARCPhone.PhoneSys.OutgoingTexts[hash].place + 1
