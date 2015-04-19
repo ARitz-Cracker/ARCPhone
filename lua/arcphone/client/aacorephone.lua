@@ -463,7 +463,8 @@ end
 	end
 	function ARCPhone.PhoneSys:RecieveText(number,message)
 		self:AddMsgBox("New Message","New Message from "..number,"comments",ARCPHONE_MSGBOX_REPLY,function()
-			
+			self:OpenApp("messaging")
+			ARCPhone.Apps["messaging"]:OpenConvo(number)
 		end)
 		local fil = ARCPhone.ROOTDIR.."/messaging/"..number..".txt"
 		if file.Exists(fil,"DATA") then
