@@ -6,11 +6,11 @@
 ARCPhone.Loaded = false
 
 hook.Add( "PlayerSay", "ARCPhone Debugone", function( ply, text, public )
-	MsgN("ARCPHONE TESTING: PlayerSay("..tostring(ply)",\""..text.."\","..tostring(public)..")")
+	MsgN("ARCPHONE TESTING: PlayerSay("..tostring(ply)..",\""..text.."\","..tostring(public)..")")
 end )
 
 hook.Add( "OnPlayerChat", "ARCPhone Debugtwo", function( ply, text, teamchat, dead )
-	MsgN("ARCPHONE TESTING: OnPlayerChat("..tostring(ply)",\""..text.."\","..tostring(teamchat)..","..tostring(dead)..")")
+	MsgN("ARCPHONE TESTING: OnPlayerChat("..tostring(ply)..",\""..text.."\","..tostring(teamchat)..","..tostring(dead)..")")
 end )
 
 if CLIENT then
