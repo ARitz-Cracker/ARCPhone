@@ -9,7 +9,7 @@ hook.Add( "PlayerSay", "ARCPhone Debugone", function( loundmouth, text, public )
 	if !ARCPhone.Calls then return end
 	for k,v in pairs(ARCPhone.Calls) do
 		for _,otherguy in pairs(player.GetAll()) do
-			if table.HasValue(v.on,ARCPhone.GetPhoneNumber(otherguy)) && table.HasValue(v.on,ARCPhone.GetPhoneNumber(loundmouth)) then
+			if table.HasValue(v.on,ARCPhone.GetPhoneNumber(otherguy)) && table.HasValue(v.on,ARCPhone.GetPhoneNumber(loundmouth)) && otherguy != loundmouth then
 				otherguy:PrintMessage( HUD_PRINTTALK, "(Phone Call) "..loundmouth:Nick()..": "..text)
 			end
 		end
