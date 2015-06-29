@@ -530,7 +530,7 @@ function APP:Init()
 	
 	
 	local files,_ = file.Find(ARCPhone.ROOTDIR.."/messaging/*", "DATA", "datedesc")
-	
+	--ARCPhone.Apps["contacts"].Disk
 	local len = #files
 	for i=1,len do
 		local num = string.sub( files[i], 1, #files[i]-4 )
@@ -597,7 +597,6 @@ APP = ARCPhone.NewAppObject()
 APP.Name = "Contacts"
 APP.Author = "ARitz Cracker"
 APP.Purpose = "Contacts app for ARCPhone"
-APP.DiskPermissions[1] = "messaging"
 
 function APP:OpenConvo(num)
 	local numdir = ARCPhone.ROOTDIR.."/messaging/"..num..".txt"
@@ -666,16 +665,15 @@ function APP:Init()
 	
 	
 	
-	local files,_ = file.Find(ARCPhone.ROOTDIR.."/messaging/*", "DATA", "datedesc")
-	
-	local len = #files
+
+	local len = #self.Disk
 	for i=1,len do
 		local num = string.sub( files[i], 1, #files[i]-4 )
 		self.Tiles[i] = ARCPhone.NewAppTile()
 		self.Tiles[i].x = 8
-		self.Tiles[i].y = 10 + i*22
+		self.Tiles[i].y = 10 + i*32
 		self.Tiles[i].w = 122
-		self.Tiles[i].h = 18
+		self.Tiles[i].h = 28
 		self.Tiles[i].color = Color(0,0,255,255)
 		self.Tiles[i].drawfunc = function(phone,app,x,y)
 			draw.SimpleText(num, "ARCPhone", x+self.Tiles[i].w*0.5, y+self.Tiles[i].h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
@@ -691,12 +689,12 @@ function APP:Init()
 	len = len + 1
 	self.Tiles[len] = ARCPhone.NewAppTile()
 	self.Tiles[len].x = 8
-	self.Tiles[len].y = 10 + len*22
+	self.Tiles[len].y = 10 + len*32
 	self.Tiles[len].w = 122
-	self.Tiles[len].h = 18
+	self.Tiles[len].h = 28
 	self.Tiles[len].color = Color(0,0,64,255)
 	self.Tiles[len].drawfunc = function(phone,app,x,y)
-		draw.SimpleText("**New Conversation**", "ARCPhone", x+self.Tiles[len].w*0.5, y+self.Tiles[len].h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+		draw.SimpleText("**New contact**", "ARCPhone", x+self.Tiles[len].w*0.5, y+self.Tiles[len].h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 	end
 	self.Tiles[len].OnPressed = function(phone,app)
 		self.Tiles[len].color = Color(0,0,64,128)
@@ -705,7 +703,24 @@ function APP:Init()
 		self.Tiles[len].color = Color(0,0,64,255)
 		self:NewConvo()
 	end
-	
+
+	len = len + 1
+	self.Tiles[len] = ARCPhone.NewAppTile()
+	self.Tiles[len].x = 8
+	self.Tiles[len].y = 10 + len*32
+	self.Tiles[len].w = 122
+	self.Tiles[len].h = 28
+	self.Tiles[len].color = Color(0,0,64,255)
+	self.Tiles[len].drawfunc = function(phone,app,x,y)
+		draw.SimpleText("**People near by**", "ARCPhone", x+self.Tiles[len].w*0.5, y+self.Tiles[len].h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+	end
+	self.Tiles[len].OnPressed = function(phone,app)
+		self.Tiles[len].color = Color(0,0,64,128)
+	end
+	self.Tiles[len].OnUnPressed = function(phone,app)
+		self.Tiles[len].color = Color(0,0,64,255)
+		self:NewConvo()
+	end
 	
 end
 //APP:Init()

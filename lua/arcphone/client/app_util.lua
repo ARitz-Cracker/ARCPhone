@@ -91,7 +91,6 @@ function ARCPhone.NewAppObject()
 	app.DisableTileSwitching = false
 	app.Phone = ARCPhone.PhoneSys
 	app.Disk = {}
-	app.DiskPermissions = {}
 	app.Options = {}
 	app.Options[1] = {}
 	app.Options[1].text = "About"
