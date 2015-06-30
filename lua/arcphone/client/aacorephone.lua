@@ -488,6 +488,11 @@ end
 				net.SendToServer()
 			end
 		end
+		if (ARCPhone.PhoneSys:AppExists("callscreen")) then
+			phone:OpenApp("callscreen")
+		else
+			self:AddMsgBox("ARCPhone","The call progress screen doesn't seem to be installed! This means you cannot end your call in a nice GUI fasion!","cross")
+		end
 	end
 	function ARCPhone.PhoneSys:Answer()
 		if self.Status == ARCPHONE_ERROR_RINGING then
@@ -537,6 +542,9 @@ end
 		net.Start("arcphone_comm_call")
 		net.WriteInt(3,8)
 		net.SendToServer()
+	end
+	function ARCPhone.PhoneSys:AppExists(app)
+		return ARCPhone.Apps[app] != nil
 	end
 	function ARCPhone.PhoneSys:OpenApp(app)
 		if !app || !isstring(app) || app == "" || !ARCPhone.Apps[app] then

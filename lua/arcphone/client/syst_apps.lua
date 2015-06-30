@@ -404,13 +404,14 @@ function APP:Init()
 	self.Tiles[15].OnUnPressed = function(phone,app)
 		self.Tiles[15].color = Color(0,0,255,255)
 		phone:Call(self.Dialnum)
-		phone:OpenApp("callscreen")
 	end
 	self.Tiles[15].drawfunc = function(phone,app,x,y)
 		draw.SimpleText( "Call", "ARCPhone", x+self.Tiles[15].w*0.5, y+self.Tiles[15].h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 	end
 end
-APP:Init()
+function APP:OnBack()
+	self.Phone:OpenApp("home")
+end
 ARCPhone.RegisterApp(APP,"dialer")
 
 
@@ -442,7 +443,9 @@ function APP:Init()
 	end
 	
 end
-APP:Init()
+function APP:OnBack()
+	self.Phone:OpenApp("home")
+end
 ARCPhone.RegisterApp(APP,"callscreen")
 
 
@@ -452,6 +455,7 @@ APP.Author = "ARitz Cracker"
 APP.Purpose = "Messaging app for ARCPhone"
 
 function APP:OpenConvo(num)
+	self.Home = false
 	local numdir = ARCPhone.ROOTDIR.."/messaging/"..num..".txt"
 	local len = 0
 	if file.Exists(numdir,"DATA") then
@@ -524,6 +528,7 @@ function APP:NewConvo()
 	end)
 end
 function APP:Init()
+	self.Home = true
 	self.Tiles = {}
 	self.InConvo = false
 	
@@ -589,6 +594,13 @@ function APP:Init()
 	
 end
 //APP:Init()
+function APP:OnBack()
+	if self.Home then
+		self.Phone:OpenApp("home")
+	else
+		self:Init();
+	end
+end
 ARCPhone.RegisterApp(APP,"messaging")
 
 
@@ -658,11 +670,14 @@ end
 function APP:ForegroundThink()
 
 end
-
+local ARCPHONE_CONTACT_NUMBER = 1
+local ARCPHONE_CONTACT_NAME = 2
 function APP:Init()
-	self.Tiles = {}
-	self.InConvo = false
+	self.Home = true;
 	
+	self.Tiles = {}
+	self.ProfilePics = {}
+	self.ProfilePics[0] = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/contactphotos/0000000000.txt","jpg")
 	
 	
 
@@ -675,8 +690,19 @@ function APP:Init()
 		self.Tiles[i].w = 122
 		self.Tiles[i].h = 28
 		self.Tiles[i].color = Color(0,0,255,255)
+		if file.Exists(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[i][ARCPHONE_CONTACT_NUMBER]..".txt","DATA") then
+			self.ProfilePics[i] = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[i][ARCPHONE_CONTACT_NUMBER]..".txt","jpg");
+		end
 		self.Tiles[i].drawfunc = function(phone,app,x,y)
-			draw.SimpleText(num, "ARCPhone", x+self.Tiles[i].w*0.5, y+self.Tiles[i].h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+			surface.SetDrawColor(255,255,255,255)
+			if (self.ProfilePics[i]) then
+				surface.SetMaterial(self.ProfilePics[i])
+			else
+				surface.SetMaterial(self.ProfilePics[0])
+			end
+			surface.DrawTexturedRect( x + 2, y + 2, 24, 24 )
+			draw.SimpleText(self.Disk[i][ARCPHONE_CONTACT_NAME], "ARCPhone", x + 28, y+self.Tiles[len].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
+			draw.SimpleText(self.Disk[i][ARCPHONE_CONTACT_NUMBER], "ARCPhone", x + 28, y+self.Tiles[len].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
 		end
 		self.Tiles[i].OnPressed = function(phone,app)
 			self.Tiles[i].color = Color(0,0,255,128)
@@ -686,6 +712,29 @@ function APP:Init()
 			self:OpenConvo(num)
 		end
 	end
+	
+	len = len + 1
+	self.Tiles[len] = ARCPhone.NewAppTile()
+	self.Tiles[len].x = 8
+	self.Tiles[len].y = 10 + len*32
+	self.Tiles[len].w = 122
+	self.Tiles[len].h = 28
+	self.Tiles[len].color = Color(0,0,128,255)
+	self.Tiles[len].drawfunc = function(phone,app,x,y)
+		surface.SetDrawColor(255,255,255,255)
+		surface.SetMaterial(self.ProfilePics[0])
+		surface.DrawTexturedRect( x + 2, y + 2, 24, 24 )
+		draw.SimpleText("ARitz Cracker", "ARCPhone", x + 28, y+self.Tiles[len].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
+		draw.SimpleText("0027745146", "ARCPhone", x + 28, y+self.Tiles[len].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
+	end
+	self.Tiles[len].OnPressed = function(phone,app)
+		self.Tiles[len].color = Color(0,0,128,128)
+	end
+	self.Tiles[len].OnUnPressed = function(phone,app)
+		self.Tiles[len].color = Color(0,0,128,255)
+		self:NewConvo()
+	end
+	
 	len = len + 1
 	self.Tiles[len] = ARCPhone.NewAppTile()
 	self.Tiles[len].x = 8
@@ -724,6 +773,14 @@ function APP:Init()
 	
 end
 //APP:Init()
+function APP:OnBack()
+	if self.Home then
+		self.Phone:OpenApp("home")
+	else
+		self:Init();
+	end
+end
+
 ARCPhone.RegisterApp(APP,"contacts")
 
 
