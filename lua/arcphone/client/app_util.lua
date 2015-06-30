@@ -7,6 +7,7 @@ ARCPhone.Apps = {}
 
 function ARCPhone.NewAppTile()
 	local tile = {}
+	tile.tile = true
 	tile.x = 48
 	tile.y = 48
 	tile.w = 16
@@ -98,6 +99,15 @@ function ARCPhone.NewAppObject()
 	app.Options[1].func = function(phone,app) phone:AddMsgBox("About",tostring(app.Name).."\nby: "..tostring(app.Author).."\n\n"..tostring(app.Purpose),"box") end
 	app.Tiles = {ARCPhone.NewAppTile()}
 	function app:Init() end
+	function app:GetSelectedTile()
+		return self.Tiles[self.Phone.SelectedAppTile]
+	end
+	function app:SetSelectedTileID(id)
+		self.Phone.SelectedAppTile = id
+	end
+	function app:GetSelectedTileID()
+		return self.Phone.SelectedAppTile
+	end
 	function app:AddMenuOption(name,func)
 		self.Options[#self.Options+1] = {}
 		self.Options[#self.Options].text = name
@@ -112,6 +122,16 @@ function ARCPhone.NewAppObject()
 	end
 	function app:SaveData()
 		file.Write(ARCPhone.ROOTDIR.."/appdata/"..self.sysname..".txt",util.TableToJSON(self.Disk))
+	end
+	function app:AddTile(tile)
+		assert( tile.tile, "ARCPHONE_APP.AddTile: Bad argument #1; Invalid tile object" )
+		self.Tiles[#self.Tiles + 1] = tile
+	end
+	function app:RemoveTile(tileid)
+		self.Tiles[tileid] = nil
+	end
+	function app:ResetTiles(tileid)
+		self.Tiles = {}
 	end
 	function app:BackgroundDraw(phone) end
 	function app:ForegroundDraw(phone) end

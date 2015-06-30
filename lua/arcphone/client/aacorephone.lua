@@ -277,7 +277,7 @@ function ARCPhone.PhoneSys:Init(wep)
 					surface.SetDrawColor( 75, 255, 75, 255 )
 					surface.DrawRect( 4, 46 + 4 + 12*#txttab, buttonwidth, 20) 
 					
-					if typ == 1 || typ == 3 then
+					if typ == 1 || typ == 3 then -- Case statements would work really nice here :/
 						draw.SimpleText("OK","ARCPhone", self.HalfScreenResX, 46 + 6 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
 					end
 					if typ == 2 || typ == 6 then
@@ -300,7 +300,7 @@ function ARCPhone.PhoneSys:Init(wep)
 					if maxo > 1 then
 						surface.SetDrawColor( 255, 75, 75, 255 )
 						surface.DrawRect( 4, 46 + 24 + 12*#txttab, buttonwidth, 20) 
-						if typ == 2 || typ == 6 then
+						if typ == 2 || typ == 6 then -- Case statements would work really nice here :/
 							draw.SimpleText("No","ARCPhone",self.HalfScreenResX,46 + 26 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
 						end
 						if typ == 3 then
@@ -323,7 +323,7 @@ function ARCPhone.PhoneSys:Init(wep)
 					if maxo > 2 then
 						surface.SetDrawColor( 255, 255, 75, 255 )
 						surface.DrawRect( 4, 46 + 44 + 12*#txttab, buttonwidth, 20) 
-						if typ == 6 then
+						if typ == 6 then -- Case statements would work really nice here :/
 							draw.SimpleText("Cancel","ARCPhone", self.HalfScreenResX,  46 + 46 + 12*#txttab, Color(0,0,0,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
 						end
 						if typ == 7 then
@@ -429,6 +429,17 @@ function ARCPhone.PhoneSys:Init(wep)
 	if !file.IsDir( ARCPhone.ROOTDIR.."/messaging","DATA" ) then
 		file.CreateDir( ARCPhone.ROOTDIR.."/messaging")
 	end
+	if !file.IsDir( ARCPhone.ROOTDIR.."/contactphotos","DATA" ) then
+		file.CreateDir( ARCPhone.ROOTDIR.."/contactphotos")
+	end
+	if (ARCPhone.ClientFiles) then
+		for k,v in pairs(ARCPhone.ClientFiles) do
+			MsgN("WRITING "..ARCPhone.ROOTDIR..k)
+			file.Write(ARCPhone.ROOTDIR..k,util.Base64Decode(v))
+		end
+		ARCPhone.ClientFiles = nil
+	end
+	--contactphotos
 	for k,v in pairs(ARCPhone.Apps) do
 		if file.Exists(ARCPhone.ROOTDIR.."/appdata/"..k..".txt","DATA") then
 			local tab = util.JSONToTable(file.Read(ARCPhone.ROOTDIR.."/appdata/"..k..".txt","DATA"))
@@ -698,7 +709,7 @@ end
 	end
 		
 	-- KEY_UP,KEY_DOWN,KEY_LEFT,KEY_RIGHT,KEY_ENTER,KEY_BACKSPACE,KEY_RCONTROL
-	
+	local lastback = 0;
 	function ARCPhone.PhoneSys:OnButton(button)
 
 		local app = ARCPhone.Apps[self.ActiveApp]
@@ -752,6 +763,10 @@ if #self.MsgBoxs > 0 then
 				app:_SwitchTile(self,button)
 			end
 			if button == KEY_BACKSPACE then
+				if (CurTime() < lastback) then
+					self:Lock()
+				end
+				lastback = CurTime() + 0.1
 				app:OnBack(self)
 			elseif button == KEY_ENTER then
 				app:OnEnter(self)
