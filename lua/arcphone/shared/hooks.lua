@@ -5,17 +5,7 @@
 -- © Copyright 2014 Aritz Beobide-Cardinal All rights reserved.
 ARCPhone.Loaded = false
 
-hook.Add( "PlayerSay", "ARCPhone Debugone", function( loundmouth, text, public )
-	if !ARCPhone.Calls then return end
-	for k,v in pairs(ARCPhone.Calls) do
-		for _,otherguy in pairs(player.GetAll()) do
-			if table.HasValue(v.on,ARCPhone.GetPhoneNumber(otherguy)) && table.HasValue(v.on,ARCPhone.GetPhoneNumber(loundmouth)) && otherguy != loundmouth then
-				otherguy:PrintMessage( HUD_PRINTTALK, "(Phone Call) "..loundmouth:Nick()..": "..text)
-			end
-		end
-	end
-	
-end )
+
 --[[
 hook.Add( "OnPlayerChat", "ARCPhone Debugtwo", function( ply, text, teamchat, dead )
 	MsgN("ARCPHONE TESTING: OnPlayerChat("..tostring(ply)..",\""..text.."\","..tostring(teamchat)..","..tostring(dead)..")")
@@ -100,7 +90,7 @@ else
 	--ALL HAIL THE ALMISTHJY SKIRLLEX!!YTU!#%&^111
 
 
-	hook.Add("PlayerCanHearPlayersVoice","ARCPHONEDO THE VOICE SHIZ",function(otherguy,loundmouth)
+	hook.Add("PlayerCanHearPlayersVoice","ARCPhone CallAudio",function(otherguy,loundmouth)
 		if !ARCPhone.Calls then return end
 		for k,v in pairs(ARCPhone.Calls) do
 			if table.HasValue(v.on,ARCPhone.GetPhoneNumber(otherguy)) && table.HasValue(v.on,ARCPhone.GetPhoneNumber(loundmouth)) then
@@ -109,5 +99,15 @@ else
 		end
 	end)
 	
+	hook.Add( "PlayerSay", "ARCPhone CallText", function( loundmouth, text, t )
+		if !ARCPhone.Calls then return end
+		for k,v in pairs(ARCPhone.Calls) do
+			for _,otherguy in pairs(player.GetAll()) do
+				if table.HasValue(v.on,ARCPhone.GetPhoneNumber(otherguy)) && table.HasValue(v.on,ARCPhone.GetPhoneNumber(loundmouth)) && otherguy != loundmouth then
+					otherguy:PrintMessage( HUD_PRINTTALK, "(Phone Call) "..loundmouth:Nick()..": "..text)
+				end
+			end
+		end
+	end )
 end
 

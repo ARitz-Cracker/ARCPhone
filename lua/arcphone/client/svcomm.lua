@@ -29,16 +29,15 @@ net.Receive( "arcphone_comm_check", function(length)
 	ARCPhone_PingCallBack = {}
 end)
 ARCPhone.PhoneSys.Reception = 0
+ARCPhone.PhoneSys.OldStatus = ARCPHONE_ERROR_CALL_ENDED
 ARCPhone.PhoneSys.Status = ARCPHONE_ERROR_CALL_ENDED
 ARCPhone.PhoneSys.CurrentCall = {on = {},pending = {}}
 
-local oldstatus = ARCPHONE_ERROR_CALL_ENDED
 net.Receive( "arcphone_comm_status", function(length)
 	ARCPhone.PhoneSys.Reception = net.ReadInt(8)
 	ARCPhone.PhoneSys.Status = net.ReadInt(ARCPHONE_ERRORBITRATE)
-	ARCPhone.PhoneSys.CurrentCall = {}
-	ARCPhone.PhoneSys.CurrentCall.on = {}
-	ARCPhone.PhoneSys.CurrentCall.pending = {}
+	table.Empty(ARCPhone.PhoneSys.CurrentCall.on)
+	table.Empty(ARCPhone.PhoneSys.CurrentCall.pending)
 	local tab = net.ReadTable()
 	for k,v in pairs(tab.on) do
 		table.insert(ARCPhone.PhoneSys.CurrentCall.on,v)
@@ -47,9 +46,9 @@ net.Receive( "arcphone_comm_status", function(length)
 		table.insert(ARCPhone.PhoneSys.CurrentCall.pending,v)
 	end
 	ARCPhone.PhoneSys.CurrentCall = tab
-	if oldstatus != ARCPhone.PhoneSys.Status then
-		ARCPhone.OnStatusChanged(ARCPhone.PhoneSys.Status)
-		oldstatus = ARCPhone.PhoneSys.Status
+	if ARCPhone.PhoneSys.OldStatus != ARCPhone.PhoneSys.Status then
+		ARCPhone.OnStatusChanged()
+		ARCPhone.PhoneSys.OldStatus = ARCPhone.PhoneSys.Status
 	end
 end)
 

@@ -21,6 +21,9 @@ end
 function ARCPhone.PhoneSys:GetActiveApp()
 	return ARCPhone.Apps[self.ActiveApp]
 end
+function ARCPhone.PhoneSys:GetApp(id)
+	return ARCPhone.Apps[id]
+end
 function ARCPhone.PhoneSys:SetLoading(loading,percent)
 	percent = percent or -0.01
 	if loading then
@@ -30,52 +33,50 @@ function ARCPhone.PhoneSys:SetLoading(loading,percent)
 	end
 	
 end
-function ARCPhone.PhoneSys:Think(wep)
-
-			
-			if !self.Loading && !self.ShowConsole then
-					if input.WasKeyReleased(KEY_LCONTROL) || input.WasKeyReleased(KEY_RCONTROL) then
-						MsgN("CTRL!")
-						self.ShowOptions = !self.ShowOptions
-						if self.ShowOptions then
-							self.CurrentOption = 1
-							self.Options = table.Copy(ARCPhone.Apps[self.ActiveApp].Options)
-							self.Options[#self.Options+1] = {}
-							self.Options[#self.Options].text = "Lock"
-							self.Options[#self.Options].func = function(ph,ap)
-								ph:Lock()
-							end
-							
-							self.Options[#self.Options+1] = {}
-							self.Options[#self.Options].text = "Home"
-							self.Options[#self.Options].func = function(ph,ap)
-								ph:OpenApp("home")
-							end
-						end
-					end
-		
-			for k,v in pairs(self.ValidKeys) do
-
-					if (input.IsKeyDown(v) || input.WasKeyPressed(v)) && self.KeyDelay[v] <= CurTime() then -- The only reason why I merge IsKeyDown and WasKeyPressed is because of people with shitty computers
-						if self.KeyDelay[v] < CurTime() - 1 then
-							self:OnButtonDown(v)
-							self:OnButton(v)
-							self.KeyDelay[v] = CurTime() + 1
-						elseif self.KeyDelay[v] <= CurTime() then
-							self.KeyDelay[v] = CurTime() + 0.1
-							self:OnButton(v)
-						end
-						
-					end
-					if input.WasKeyReleased(v) then
-						if self.KeyDelay[v] >= CurTime() - 1 then
-							self:OnButtonUp(v)
-							self.KeyDelay[v] = CurTime() - 2
-						end
-					end
+function ARCPhone.PhoneSys:Think(wep)		
+	if !self.Loading && !self.ShowConsole then
+	if input.WasKeyReleased(KEY_LCONTROL) || input.WasKeyReleased(KEY_RCONTROL) then
+		MsgN("CTRL!")
+		self.ShowOptions = !self.ShowOptions
+		if self.ShowOptions then
+			self.CurrentOption = 1
+			self.Options = table.Copy(ARCPhone.Apps[self.ActiveApp].Options)
+			self.Options[#self.Options+1] = {}
+			self.Options[#self.Options].text = "Lock"
+			self.Options[#self.Options].func = function(ph,ap)
+				ph:Lock()
 			end
-
+			
+			self.Options[#self.Options+1] = {}
+			self.Options[#self.Options].text = "Home"
+			self.Options[#self.Options].func = function(ph,ap)
+				ph:OpenApp("home")
+			end
 		end
+	end
+	if !self.PauseInput then
+		for k,v in pairs(self.ValidKeys) do
+			if (input.IsKeyDown(v) || input.WasKeyPressed(v)) && self.KeyDelay[v] <= CurTime() then -- The only reason why I merge IsKeyDown and WasKeyPressed is because of people with shitty computers
+				if self.KeyDelay[v] < CurTime() - 1 then
+					self:OnButtonDown(v)
+					self:OnButton(v)
+					self.KeyDelay[v] = CurTime() + 1
+				elseif self.KeyDelay[v] <= CurTime() then
+					self.KeyDelay[v] = CurTime() + 0.1
+					self:OnButton(v)
+				end
+				
+			end
+			if input.WasKeyReleased(v) then
+				if self.KeyDelay[v] >= CurTime() - 1 then
+					self:OnButtonUp(v)
+					self.KeyDelay[v] = CurTime() - 2
+				end
+			end
+		end
+	end
+
+end
 		--[[
 		if self.OldStatus != self.Status then
 			self:Print("Call Status has been changed to: "..tostring(ARCPHONE_ERRORSTRINGS[self.Status]))
@@ -487,7 +488,7 @@ end
 		//file.Write(ARCPhone.ROOTDIR.."/messaging/"..number..".txt",util.TableToJSON(texts))
 	end
 	function ARCPhone.PhoneSys:Call(number)
-		if !number || !isstring(number) || number == "" then
+		if !ARCPhone.IsValidPhoneNumber(number) then
 			self:AddMsgBox("ARCPhone","Invalid number.","cross")
 		else
 			if self.Status != ARCPHONE_ERROR_CALL_ENDED then
@@ -497,12 +498,12 @@ end
 				net.WriteInt(1,8)
 				net.WriteString(number)
 				net.SendToServer()
+				if (self:AppExists("callscreen")) then
+					self:OpenApp("callscreen")
+				else
+					self:AddMsgBox("ARCPhone","The call progress screen doesn't seem to be installed! This means you cannot end your call in a nice GUI fasion!","cross")
+				end
 			end
-		end
-		if (ARCPhone.PhoneSys:AppExists("callscreen")) then
-			phone:OpenApp("callscreen")
-		else
-			self:AddMsgBox("ARCPhone","The call progress screen doesn't seem to be installed! This means you cannot end your call in a nice GUI fasion!","cross")
 		end
 	end
 	function ARCPhone.PhoneSys:Answer()
@@ -713,7 +714,7 @@ end
 	function ARCPhone.PhoneSys:OnButton(button)
 
 		local app = ARCPhone.Apps[self.ActiveApp]
-if #self.MsgBoxs > 0 then
+		if #self.MsgBoxs > 0 then
 			local i = #self.MsgBoxs
 			local maxo = 1
 			local typ = self.MsgBoxs[i].Type
@@ -740,6 +741,7 @@ if #self.MsgBoxs > 0 then
 					self:EmitSound("common/wpn_denyselect.wav")
 				end
 			end
+			return
 		elseif self.ShowOptions then
 			if button == KEY_BACKSPACE then
 				self.ShowOptions = false
@@ -758,6 +760,7 @@ if #self.MsgBoxs > 0 then
 					self:EmitSound("common/wpn_denyselect.wav")
 				end
 			end
+			return
 		else
 			if !app.DisableTileSwitching then
 				app:_SwitchTile(self,button)
@@ -801,10 +804,12 @@ if #self.MsgBoxs > 0 then
 					ispressinginmanu = false
 				end
 			end
+			return
 		elseif self.ShowOptions then
 			if button == KEY_ENTER then
 				self.Options[self.CurrentOption].func(self,app)
 				self.ShowOptions = false
+				return
 			end
 		else
 			if button == KEY_BACKSPACE then

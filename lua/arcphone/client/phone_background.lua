@@ -7,8 +7,8 @@
 local CallingSound
 local RingingSound
 
-function ARCPhone.OnStatusChanged(newstatus)
-	ARCPhone.PhoneSys.Status = newstatus
+function ARCPhone.OnStatusChanged()
+	local newstatus = ARCPhone.PhoneSys.Status
 	MsgN("Phone status has been changed to "..ARCPhone.PhoneSys.Status)
 	if newstatus == ARCPHONE_ERROR_DIALING then
 		if !CallingSound then
@@ -27,6 +27,7 @@ function ARCPhone.OnStatusChanged(newstatus)
 			RingingSound:Stop()
 			RingingSound = nil
 		end
+		MsgN("NEW STATUS:"..newstatus)
 		if newstatus > 0 then
 			LocalPlayer():EmitSound("arcphone/errors/"..newstatus..".wav")
 			ARCPhone.PhoneSys:AddMsgBox("ARCPhone",ARCPHONE_ERRORSTRINGS[newstatus],"warning")
@@ -34,7 +35,9 @@ function ARCPhone.OnStatusChanged(newstatus)
 				ARCPhone.PhoneSys:OpenApp("dialer")
 			end
 		elseif newstatus != ARCPHONE_ERROR_RINGING then
-			ARCPhone.PhoneSys:AddMsgBox("ARCPhone",ARCPHONE_ERRORSTRINGS[newstatus],"info")
+			if ARCPhone.PhoneSys.OldStatus <= 0 then
+				ARCPhone.PhoneSys:AddMsgBox("ARCPhone",ARCPHONE_ERRORSTRINGS[newstatus],"info")
+			end
 		end
 		
 		if newstatus == ARCPHONE_ERROR_RINGING then
@@ -43,7 +46,7 @@ function ARCPhone.OnStatusChanged(newstatus)
 			for k,v in pairs(ARCPhone.PhoneSys.CurrentCall.on) do
 				list = lst.."\n"..v
 			end
-			ARCPhone.PhoneSys:AddMsgBox("Incoming call","You're recieving a call from "..lst,"phone",8,function() MsgN("Answer") ARCPhone.PhoneSys:Answer() end,function() MsgN("Ignore") ARCPhone.PhoneSys:HangUp() end,function() MsgN("TextExcuse") ARCPhone.PhoneSys:AddMsgBox("Coming soon!","That feature hasn't been added yet.","cross") end)
+			ARCPhone.PhoneSys:AddMsgBox("Incoming call","You're recieving a call from "..lst,"phone",8,function() MsgN("Answer") ARCPhone.PhoneSys:Answer() end,function() MsgN("Ignore") ARCPhone.PhoneSys:HangUp() end,function() MsgN("TextExcuse") ARCPhone.PhoneSys:AddMsgBox("Coming soon!","That feature hasn't been added yet.","info") end)
 			--http://www.aritzcracker.ca/arcphone/ringtones/Reflection.mp3
 			--"http://www.aritzcracker.ca/arcphone/ringtones/generic1.mp3"
 			sound.PlayURL ( "http://www.aritzcracker.ca/arcphone/ringtones/generic1.mp3", "noblock", function( station,errid,errstr )

@@ -72,9 +72,13 @@ function ARCPhone.NewAppTextInputTile(txt,resize,w)
 	end
 	tile.Editable = true
 	tile.OnUnPressed = function(phone,app) 
+		phone.PauseInput = true
 		if tile.Editable then
 			Derma_StringRequest( "ARCPhone", "Text input", tile.TextInput, function(text) 
+				phone.PauseInput = false
 				tile.TextInput = text
+			end,function(text)
+				phone.PauseInput = false
 			end)
 		end
 	end
@@ -150,6 +154,9 @@ function ARCPhone.NewAppObject()
 					surface.DrawRect(v.x + mvx,v.y + mvy,v.w,v.h)
 					surface.SetDrawColor(ARCLib.ConvertColor(v.color))
 					local mfact = 12
+					if v.TextureNoresize then
+						mfact = 0
+					end
 					if v.text && string.len(v.text) > 0 then
 						mfact = 20
 					end
@@ -191,6 +198,10 @@ function ARCPhone.NewAppObject()
 			end
 		end
 	end
+	function app:ResetCurPos()
+		self.Phone.SelectedAppTile = 1
+		self.Phone.OldSelectedAppTile = self.Phone.SelectedAppTile
+	end
 	app.ShowTaskbar = true
 	function app:ForegroundThink() end
 	function app:BackgroundThink() end
@@ -227,7 +238,11 @@ function ARCPhone.NewAppObject()
 	function app:_SwitchTile(phone,butt) 
 		local ignoresound = false
 		local currenttile = self.Tiles[phone.SelectedAppTile]
-
+		
+		if (!currenttile) then
+			phone.SelectedAppTile = 1
+			phone.OldSelectedAppTile = phone.SelectedAppTile
+		end
 		
 		
 		local ti = {}

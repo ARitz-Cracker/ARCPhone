@@ -48,10 +48,10 @@ SWEP.ShowViewModel = true
 SWEP.ShowWorldModel = true
 
 function SWEP:PrimaryAttack()
-	self:SetNextPrimaryFire(CurTime() + 1)
-	if SERVER then
-		self.Owner:SendLua("Derma_StringRequest( LocalPlayer():GetActiveWeapon().CurrentDir, \"Input Command\",\"\", function( text ) ARCPhone.PhoneSys:RunCommand(text) end)")
-	end
+	--self:SetNextPrimaryFire(CurTime() + 1)
+	--if SERVER then
+	--	self.Owner:SendLua("Derma_StringRequest( LocalPlayer():GetActiveWeapon().CurrentDir, \"Input Command\",\"\", function( text ) ARCPhone.PhoneSys:RunCommand(text) end)")
+	--end
 end
 
 function SWEP:SecondaryAttack()

@@ -44,7 +44,7 @@ function ARCPhone.ValidPhoneNumberChars(txt)
 	local len = #txt
 	local valid = true
 	for i=1,len do
-		if txt[i] != "1" && txt[i] != "2" && txt[i] != "3" && txt[i] != "4" && txt[i] != "5" && txt[i] != "6" && txt[i] != "7" && txt[i] != "8" && txt[i] != "9" && txt[i] != "0" && txt[i] != "*" && txt[i] != "@" then
+		if txt[i] != "1" && txt[i] != "2" && txt[i] != "3" && txt[i] != "4" && txt[i] != "5" && txt[i] != "6" && txt[i] != "7" && txt[i] != "8" && txt[i] != "9" && txt[i] != "0" && txt[i] != "*" && txt[i] != "#" then
 			valid = false
 			break
 		end		
