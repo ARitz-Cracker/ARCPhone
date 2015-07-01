@@ -133,8 +133,35 @@ function ARCPhone.PhoneSys:Init(wep)
 
 	if !wep then return end
 	wep.VElements["screen"].draw_func = function( weapon )
+			
 			if self.HideWhatsOffTheScreen then
-				render.SetScissorRect( 0, 0, self.ScreenResX, self.ScreenResY, true )
+				-- I have no idea how to stencil, but hey, it works, and doesn't cause significant FPS drop
+				render.ClearStencil() --Clear stencil
+				render.SetStencilEnable( true ) --Enable stencil
+				--STENCILOPERATION_KEEP
+				--STENCILOPERATION_INCR
+				render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_NEVER )
+				render.SetStencilFailOperation( STENCILOPERATION_INCR )
+				render.SetStencilPassOperation( STENCILOPERATION_KEEP )
+				render.SetStencilZFailOperation(  STENCILOPERATION_KEEP  )
+
+				
+				-- Yeah yeah, I know drawing a giant box around the phone is probaly not the best way to do it. If anyone is willing to teach me how to stencil, that would be appriciated (You'd get moneh for it toooo!)
+				surface.SetDrawColor( 0, 0, 0, 255 )
+				surface.DrawRect( self.ScreenResX, 0, 1000, self.ScreenResY )
+				surface.DrawRect( -5000, 0, 5000, self.ScreenResY ) 
+				surface.DrawRect( -5000, -4000, 6000+self.ScreenResX, 4000 ) 
+				surface.DrawRect( -5000, self.ScreenResY, 6000+self.ScreenResX, 1000 ) 
+				--render.SetStencilPassOperation( STENCILOPERATION_DECR )
+
+				--surface.SetDrawColor( 255, 255, 255, 255 )
+				--surface.DrawRect( -100, 0, 100, 100 ) --224
+				
+				render.SetStencilReferenceValue( 0 ) --Reference value 1
+				render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_EQUAL ) --Only draw if pixel value == reference value
+				-----------------------------------
+				--Thing to be drawn in the cutout--4
+				-----------------------------------
 			end
 			
 			
@@ -378,7 +405,7 @@ function ARCPhone.PhoneSys:Init(wep)
 				end
 			end
 			surface.SetDrawColor( 255, 255, 255, 255 )
-			render.SetScissorRect( 0, 0, 0, 0, false )
+			render.SetStencilEnable( false )
 		end
 
 		
