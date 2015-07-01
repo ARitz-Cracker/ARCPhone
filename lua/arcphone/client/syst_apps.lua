@@ -776,13 +776,13 @@ APP = ARCPhone.NewAppObject()
 APP.Name = "Call Progress"
 APP.Author = "ARitz Cracker"
 APP.Purpose = "Calling screen for ARCPhone"
-APP.NextCheck = math.huge;
+APP.NextCheck = 0;
 function APP:Init()
 
 
 	self.Tiles[1] = ARCPhone.NewAppTile()
 	self.Tiles[1].x = 8
-	self.Tiles[1].y = 244
+	self.Tiles[1].y = 224
 	self.Tiles[1].w = 122
 	self.Tiles[1].h = 20
 	self.Tiles[1].color = Color(0,0,255,255)
