@@ -134,7 +134,7 @@ function ARCPhone.PhoneSys:Init(wep)
 	if !wep then return end
 	wep.VElements["screen"].draw_func = function( weapon )
 			if self.HideWhatsOffTheScreen then
-				render.SetScissorRect( 0, 0, self.ScreenResX, self.ScreenRes, true )
+				render.SetScissorRect( 0, 0, self.ScreenResX, self.ScreenResY, true )
 			end
 			
 			
