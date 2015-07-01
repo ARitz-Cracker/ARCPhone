@@ -79,69 +79,99 @@ APP.Name = "Contacts"
 APP.Author = "ARitz Cracker"
 APP.Purpose = "Contacts app for ARCPhone"
 
-function APP:OpenConvo(num)
-	local numdir = ARCPhone.ROOTDIR.."/messaging/"..num..".txt"
-	local len = 0
-	if file.Exists(numdir,"DATA") then
-		local msgs = string.Explode( "\f", file.Read(numdir))
-		len = #msgs
-		for i=1,len do
-			self.Tiles[i] = ARCPhone.NewAppTextInputTile(string.sub( msgs[i], 2),true,118)
-			self.Tiles[i].Editable = false
-			if i > 1 then
-				self.Tiles[i].y = self.Tiles[i-1].y + self.Tiles[i-1].h + 4
-			else
-				self.Tiles[i].y = 24
-			end
-			if msgs[i][1] == "s" then
-				self.Tiles[i].x = 12
-				self.Tiles[i].color = Color(0,0,255,255)
-			else
-				self.Tiles[i].x = 4
-				self.Tiles[i].color = Color(0,0,128,255)
-			end
+APP.ContactOptionNames = {}
+APP.ContactOptionFuncs = {}
+APP.ContactOptionArgs = {}
+local ARCPHONE_CONTACT_NUMBER = 1
+local ARCPHONE_CONTACT_NAME = 2
+function APP:AddContactOption(name,func,...)
+	local dothing = true
+	for i=1,#self.ContactOptionNames do
+		if self.ContactOptionNames[i] == name then
+			dothing = false
 		end
 	end
-	len = len + 1
-	self.Tiles[len] = ARCPhone.NewAppTextInputTile("Enter your message",true,118)
-	if len > 1 then
-		self.Tiles[len].y = self.Tiles[len-1].y + self.Tiles[len-1].h + 4
-	else
-		self.Tiles[len].y = 24
+	if dothing then
+		i = #self.ContactOptionNames + 1
+		self.ContactOptionNames[i] = name
+		self.ContactOptionFuncs[i] = func
+		self.ContactOptionArgs[i] = {...}
 	end
-	self.Tiles[len].w = 118
-	self.Tiles[len].x = 12
-	self.Tiles[len].color = Color(72,72,72,255)
-	len = len + 1
+end
+
+function APP:RemoveContactOption(name)
 	
-	self.InConvo = true
-	self.SendIcon = len
-	self.Tiles[len] = ARCPhone.NewAppTile()
-	self.Tiles[len].x = 12
-	self.Tiles[len].y = self.Tiles[len-1].y + self.Tiles[len-1].h + 2
-	self.Tiles[len].w = 118
-	self.Tiles[len].h = 18
-	self.Tiles[len].color = Color(75, 255, 75,255)
-	self.Tiles[len].drawfunc = function(phone,app,x,y)
-		draw.SimpleText("SEND", "ARCPhone", x+self.Tiles[len].w*0.5, y+self.Tiles[len].h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+	key = table.RemoveByValue( self.ContactOptionNames,name) 
+	if key then
+		table.remove( self.ContactOptionFuncs, key )
+		table.remove( self.ContactOptionArgs, key )
 	end
-	self.Tiles[len].OnPressed = function(phone,app)
-		self.Tiles[len].color = Color(75, 255, 75,128)
+end
+
+
+function APP:SelectContact(tileid)
+	self:ResetCurPos()
+	self.Home = false
+	table.Empty(self.Tiles)
+	self.Tiles[1] = ARCPhone.NewAppTile()
+	self.Tiles[1].x = 8
+	self.Tiles[1].y = 42
+	self.Tiles[1].w = 122
+	self.Tiles[1].h = 28
+	self.Tiles[1].color = Color(0,0,255,255)
+	self.Tiles[1].ContactEditable = true
+	if file.Exists(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[tileid][ARCPHONE_CONTACT_NUMBER]..".txt","DATA") then
+		self.ProfilePics[1] = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[tileid][ARCPHONE_CONTACT_NUMBER]..".txt","jpg");
 	end
-	self.Tiles[len].OnUnPressed = function(phone,app)
-		self.Tiles[len].color = Color(75, 255, 75,255)
-		
-		self.Phone:SendText(num,self.Tiles[self.SendIcon-1].TextInput)
-		self:OpenConvo(num)
+	self.Tiles[1].drawfunc = function(phone,app,x,y)
+		surface.SetDrawColor(255,255,255,255)
+		if (self.ProfilePics[tileid]) then
+			surface.SetMaterial(self.ProfilePics[tileid])
+		else
+			surface.SetMaterial(self.ProfilePics[0])
+		end
+		surface.DrawTexturedRect( x + 2, y + 2, 24, 24 )
+		draw.SimpleText(self.Disk[tileid][ARCPHONE_CONTACT_NAME], "ARCPhone", x + 28, y+self.Tiles[1].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
+		draw.SimpleText(self.Disk[tileid][ARCPHONE_CONTACT_NUMBER], "ARCPhone", x + 28, y+self.Tiles[1].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
 	end
-	self:SetSelectedTileID(1)
+	
+	local len = #self.ContactOptionNames + 1
+	
+	for i=2,len do
+		self.Tiles[i] = ARCPhone.NewAppTile()
+		self.Tiles[i].x = 8
+		self.Tiles[i].y = 42 + i*22
+		self.Tiles[i].w = 122
+		self.Tiles[i].h = 18
+		self.Tiles[i].color = Color(0,0,64,255)
+		self.Tiles[i].drawfunc = function(phone,app,x,y)
+			draw.SimpleText(self.ContactOptionNames[i-1], "ARCPhone", x+self.Tiles[i].w*0.5, y+self.Tiles[i].h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+
+		end
+		self.Tiles[i].OnPressed = function(phone,app)
+			self.Tiles[i].color = Color(0,0,64,128)
+		end
+		self.Tiles[i].OnUnPressed = function(phone,app)
+			self.Tiles[i].color = Color(0,0,64,255)
+			self.ContactOptionFuncs[i-1](unpack(self.ContactOptionArgs[i-1]),self.Disk[tileid][ARCPHONE_CONTACT_NUMBER])
+		end
+	end
+	
+	--[[
+	self.Tiles[1].OnPressed = function(phone,app)
+		self.Tiles[1].color = Color(0,0,255,128)
+	end
+	self.Tiles[1].OnUnPressed = function(phone,app)
+		self.Tiles[1].color = Color(0,0,255,255)
+		ARCPhone.PhoneSys:AddMsgBox("Coming soon!","Todo: contact options screen","info")
+	end
+	]]
 end
 
 function APP:ForegroundThink()
 
 end
-local ARCPHONE_CONTACT_NUMBER = 1
-local ARCPHONE_CONTACT_NAME = 2
+
 APP.Options[2] = {}
 APP.Options[2].text = "Edit"
 APP.Options[2].func = function(phone,app) 
@@ -176,14 +206,22 @@ function APP:GetDiskIDFromNumber(number)
 	end
 	return result
 end
-APP.ProfilePics = {}
-APP.ProfilePics[0] = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/contactphotos/0000000000.txt","jpg")
+function APP:PhoneStart()
+	self.ProfilePics = {}
+	self.ProfilePics[0] = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/contactphotos/0000000000.txt","jpg")
+	local len = #self.Disk
+	for i=1,len do
+		if file.Exists(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[i][ARCPHONE_CONTACT_NUMBER]..".txt","DATA") then
+			self.ProfilePics[i] = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[i][ARCPHONE_CONTACT_NUMBER]..".txt","jpg");
+		end
+	end
+end
 function APP:Init()
 	self:ResetCurPos()
 	self.Home = true;
 	
 	self.Tiles = {}
-	self.ProfilePics = {}
+	table.Empty(self.ProfilePics)
 	self.ProfilePics[0] = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/contactphotos/0000000000.txt","jpg")
 	
 	
@@ -216,7 +254,7 @@ function APP:Init()
 		end
 		self.Tiles[i].OnUnPressed = function(phone,app)
 			self.Tiles[i].color = Color(0,0,255,255)
-			ARCPhone.PhoneSys:AddMsgBox("Coming soon!","Todo: contact options screen","info")
+			self:SelectContact(i)
 		end
 	end
 	
@@ -283,40 +321,6 @@ function APP:Init()
 	
 end
 --APP:Init()
-function APP:SelectContact(tileid)
-	self:ResetCurPos()
-	self.Home = false
-	self.Tiles[1] = ARCPhone.NewAppTile()
-	self.Tiles[1].x = 8
-	self.Tiles[1].y = 42
-	self.Tiles[1].w = 122
-	self.Tiles[1].h = 28
-	self.Tiles[1].color = Color(0,0,255,255)
-	self.Tiles[1].ContactEditable = true
-	if file.Exists(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[tileid][ARCPHONE_CONTACT_NUMBER]..".txt","DATA") then
-		self.ProfilePics[1] = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[tileid][ARCPHONE_CONTACT_NUMBER]..".txt","jpg");
-	end
-	self.Tiles[1].drawfunc = function(phone,app,x,y)
-		surface.SetDrawColor(255,255,255,255)
-		if (self.ProfilePics[tileid]) then
-			surface.SetMaterial(self.ProfilePics[tileid])
-		else
-			surface.SetMaterial(self.ProfilePics[0])
-		end
-		surface.DrawTexturedRect( x + 2, y + 2, 24, 24 )
-		draw.SimpleText(self.Disk[tileid][ARCPHONE_CONTACT_NAME], "ARCPhone", x + 28, y+self.Tiles[1].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
-		draw.SimpleText(self.Disk[tileid][ARCPHONE_CONTACT_NUMBER], "ARCPhone", x + 28, y+self.Tiles[1].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
-	end
-	--[[
-	self.Tiles[1].OnPressed = function(phone,app)
-		self.Tiles[1].color = Color(0,0,255,128)
-	end
-	self.Tiles[1].OnUnPressed = function(phone,app)
-		self.Tiles[1].color = Color(0,0,255,255)
-		ARCPhone.PhoneSys:AddMsgBox("Coming soon!","Todo: contact options screen","info")
-	end
-	]]
-end
 
 function APP:EditContact(tileid)
 	self:ResetCurPos()
@@ -677,6 +681,9 @@ function APP:AddNumber(num)
 	elseif num == 0 then
 		self.Dialnum = string.Left( self.Dialnum, #self.Dialnum -1 )
 	end
+end
+function APP:PhoneStart()
+	ARCPhone.Apps["contacts"]:AddContactOption("Call",self.Phone.Call,self.Phone)
 end
 function APP:Init()
 	if ARCPhone.PhoneSys.Status == ARCPHONE_ERROR_CALL_RUNNING || ARCPhone.PhoneSys.Status == ARCPHONE_ERROR_DIALING then

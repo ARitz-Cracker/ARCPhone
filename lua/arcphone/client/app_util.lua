@@ -103,6 +103,7 @@ function ARCPhone.NewAppObject()
 	app.Options[1].func = function(phone,app) phone:AddMsgBox("About",tostring(app.Name).."\nby: "..tostring(app.Author).."\n\n"..tostring(app.Purpose),"box") end
 	app.Tiles = {ARCPhone.NewAppTile()}
 	function app:Init() end
+	function app:PhoneStart() end
 	function app:GetSelectedTile()
 		return self.Tiles[self.Phone.SelectedAppTile]
 	end

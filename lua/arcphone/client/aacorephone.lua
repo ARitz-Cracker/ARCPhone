@@ -449,6 +449,9 @@ function ARCPhone.PhoneSys:Init(wep)
 			end
 		end
 	end
+	for k,v in pairs(ARCPhone.Apps) do
+		v:PhoneStart()
+	end
 	self:OpenApp("home")
 	ARCPhone.PhoneSys:AddMsgBox("My excuse for a tutorial","Use the Arrow keys to move the cursor. Press BACKSPACE to go back, press CTRL to access the context menu, and press ENTER select.","info")
 	ARCPhone.PhoneSys:AddMsgBox("PROTOTYPE VERSION","This is the prototype version of ARCPhone (pre-alpha), and does not represent the final product. Everything is subject to change. (Press ENTER to close this window)","info")
