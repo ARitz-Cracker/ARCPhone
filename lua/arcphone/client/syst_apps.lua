@@ -802,6 +802,11 @@ end
 
 function APP:ForegroundThink()
 	if self.NextCheck <= CurTime() then
+		MsgN("Updating call list")
+		MsgN("ON:")
+		PrintTable(ARCPhone.PhoneSys.CurrentCall.on)
+		MsgN("PENDING:")
+		PrintTable(ARCPhone.PhoneSys.CurrentCall.pending)
 		--ARCPhone.PhoneSys.CurrentCall.on
 		--ARCPhone.PhoneSys.CurrentCall.pending
 		local len = #ARCPhone.PhoneSys.CurrentCall.on
@@ -872,9 +877,9 @@ function APP:ForegroundThink()
 		end
 		--
 		total = total + 1
-		self.Tiles[1].w = 10 + total*32
-		if (self.Tiles[1].w < 244) then
-			self.Tiles[1].w = 244
+		self.Tiles[1].y = 10 + total*32
+		if (self.Tiles[1].y < 224) then
+			self.Tiles[1].y = 224
 		end
 		
 		self.NextCheck = CurTime() + 1
