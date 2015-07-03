@@ -40,8 +40,12 @@ net.Receive( "arcphone_comm_status", function(length)
 	table.Empty(ARCPhone.PhoneSys.CurrentCall.pending)
 	local tab = net.ReadTable()
 	for k,v in pairs(tab.on) do
+		Msg(v.." != "..ARCPhone.GetPhoneNumber(LocalPlayer()).." -> ")
 		if v != ARCPhone.GetPhoneNumber(LocalPlayer()) then
+			MsgN("true")
 			table.insert(ARCPhone.PhoneSys.CurrentCall.on,v)
+		else
+			MsgN("false")
 		end
 	end
 	for k,v in pairs(tab.pending) do

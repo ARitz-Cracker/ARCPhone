@@ -862,7 +862,7 @@ function APP:ForegroundThink()
 					surface.SetMaterial(ARCPhone.Apps["contacts"].ProfilePics[0])
 				end
 				surface.DrawTexturedRect( x + 2, y + 2, 24, 24 )
-				draw.SimpleText(ARCPhone.Apps["contacts"]:GetNameFromNumber(RCPhone.PhoneSys.CurrentCall.pending[i-1]), "ARCPhone", x + 28, y+self.Tiles[len].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
+				draw.SimpleText(ARCPhone.Apps["contacts"]:GetNameFromNumber(ARCPhone.PhoneSys.CurrentCall.pending[i-1]), "ARCPhone", x + 28, y+self.Tiles[len].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
 				draw.SimpleText(ARCPhone.PhoneSys.CurrentCall.pending[i-1], "ARCPhone", x + 28, y+self.Tiles[len].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
 			end
 			--[[
