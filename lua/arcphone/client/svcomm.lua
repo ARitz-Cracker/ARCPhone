@@ -36,8 +36,8 @@ ARCPhone.PhoneSys.CurrentCall = {on = {},pending = {}}
 net.Receive( "arcphone_comm_status", function(length)
 	ARCPhone.PhoneSys.Reception = net.ReadInt(8)
 	ARCPhone.PhoneSys.Status = net.ReadInt(ARCPHONE_ERRORBITRATE)
-	table.Empty(ARCPhone.PhoneSys.CurrentCall.on)
-	table.Empty(ARCPhone.PhoneSys.CurrentCall.pending)
+	ARCPhone.PhoneSys.CurrentCall.on = {}
+	ARCPhone.PhoneSys.CurrentCall.pending = {}
 	local tab = net.ReadTable()
 	for k,v in pairs(tab.on) do
 		Msg(v.." != "..ARCPhone.GetPhoneNumber(LocalPlayer()).." -> ")
@@ -49,6 +49,7 @@ net.Receive( "arcphone_comm_status", function(length)
 		end
 	end
 	for k,v in pairs(tab.pending) do
+		Msg(v.." != "..ARCPhone.GetPhoneNumber(LocalPlayer()).." -> ")
 		table.insert(ARCPhone.PhoneSys.CurrentCall.pending,v)
 	end
 	ARCPhone.PhoneSys.CurrentCall = tab
