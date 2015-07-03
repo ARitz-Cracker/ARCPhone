@@ -809,15 +809,12 @@ function APP:ForegroundThink()
 		--PrintTable(ARCPhone.PhoneSys.CurrentCall.pending)
 		--ARCPhone.PhoneSys.CurrentCall.on
 		--ARCPhone.PhoneSys.CurrentCall.pending
-		MsgN("THIS IS FROM syst_apps/callscreen")
-		PrintTable(ARCPhone.PhoneSys.CurrentCall)
 		for i=2,#self.Tiles do
 			self.Tiles[i] = nil
 		end
 		local len = #ARCPhone.PhoneSys.CurrentCall.on
 		local total = len + #ARCPhone.PhoneSys.CurrentCall.pending
 		for i=2,len+1 do
-			MsgN("ARCPhone.PhoneSys.CurrentCall.on["..(i-1).."] -> "..ARCPhone.PhoneSys.CurrentCall.on[i-1])
 			self.Tiles[i] = ARCPhone.NewAppTile()
 			self.Tiles[i].x = 8
 			self.Tiles[i].y = 10 + (i-1)*32
@@ -851,7 +848,6 @@ function APP:ForegroundThink()
 		
 		
 		for i=len+2,total+1 do
-			MsgN("ARCPhone.PhoneSys.CurrentCall.pending["..(i-1-len).."] -> "..ARCPhone.PhoneSys.CurrentCall.pending[i-1-len])
 			self.Tiles[i] = ARCPhone.NewAppTile()
 			self.Tiles[i].x = 8
 			self.Tiles[i].y = 10 + (i-1)*32

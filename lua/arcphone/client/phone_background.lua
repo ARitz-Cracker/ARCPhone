@@ -34,7 +34,7 @@ function ARCPhone.OnStatusChanged()
 			if ARCPhone.PhoneSys.ActiveApp == "callscreen" then
 				ARCPhone.PhoneSys:OpenApp("dialer")
 			end
-		elseif newstatus != ARCPHONE_ERROR_RINGING then
+		elseif newstatus != ARCPHONE_ERROR_RINGING && newstatus != ARCPHONE_NO_ERROR then
 			if ARCPhone.PhoneSys.OldStatus <= 0 then
 				ARCPhone.PhoneSys:AddMsgBox("ARCPhone",ARCPHONE_ERRORSTRINGS[newstatus],"info")
 			end

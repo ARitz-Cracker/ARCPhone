@@ -36,27 +36,14 @@ ARCPhone.PhoneSys.CurrentCall = {on = {},pending = {}}
 net.Receive( "arcphone_comm_status", function(length)
 	ARCPhone.PhoneSys.Reception = net.ReadInt(8)
 	ARCPhone.PhoneSys.Status = net.ReadInt(ARCPHONE_ERRORBITRATE)
-	ARCPhone.PhoneSys.CurrentCall.on = {}
-	setmetatable(ARCPhone.PhoneSys.CurrentCall.on, {
-		__newindex = function(self, key, value)
-			print(self, key, value, debug.traceback())
-			rawset( self, key, value )
-		end
-	})
-
-	ARCPhone.PhoneSys.CurrentCall.pending = {}
+	table.Empty(ARCPhone.PhoneSys.CurrentCall.on)
 	local tab = net.ReadTable()
 	for k,v in pairs(tab.on) do
 		if v != ARCPhone.GetPhoneNumber(LocalPlayer()) then
 			table.insert(ARCPhone.PhoneSys.CurrentCall.on,v)
 		end
 	end
-	for k,v in pairs(tab.pending) do
-		table.insert(ARCPhone.PhoneSys.CurrentCall.pending,v)
-	end
-	MsgN("THIS IS FROM svcomm")
-	PrintTable(ARCPhone.PhoneSys.CurrentCall)
-	ARCPhone.PhoneSys.CurrentCall = tab
+	ARCPhone.PhoneSys.CurrentCall.pending = tab.pending
 	if ARCPhone.PhoneSys.OldStatus != ARCPhone.PhoneSys.Status then
 		ARCPhone.OnStatusChanged()
 		ARCPhone.PhoneSys.OldStatus = ARCPhone.PhoneSys.Status
