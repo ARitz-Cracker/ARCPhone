@@ -833,8 +833,8 @@ function APP:ForegroundThink()
 					surface.SetMaterial(ARCPhone.Apps["contacts"].ProfilePics[0])
 				end
 				surface.DrawTexturedRect( x + 2, y + 2, 24, 24 )
-				draw.SimpleText(ARCPhone.Apps["contacts"]:GetNameFromNumber(ARCPhone.PhoneSys.CurrentCall.on[i-1]), "ARCPhone", x + 28, y+self.Tiles[len].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
-				draw.SimpleText(ARCPhone.PhoneSys.CurrentCall.on[i-1], "ARCPhone", x + 28, y+self.Tiles[len].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
+				draw.SimpleText(ARCPhone.Apps["contacts"]:GetNameFromNumber(ARCPhone.PhoneSys.CurrentCall.on[i-1]), "ARCPhone", x + 28, y+self.Tiles[i].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
+				draw.SimpleText(ARCPhone.PhoneSys.CurrentCall.on[i-1], "ARCPhone", x + 28, y+self.Tiles[i].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
 			end
 			--[[
 			self.Tiles[i].OnPressed = function(phone,app)
@@ -849,7 +849,7 @@ function APP:ForegroundThink()
 		
 		
 		for i=len+2,total+1 do
-			MsgN("ARCPhone.PhoneSys.CurrentCall.pending["..(i-1).."] -> "..ARCPhone.PhoneSys.CurrentCall.pending[i-1])
+			MsgN("ARCPhone.PhoneSys.CurrentCall.pending["..(i-1-len).."] -> "..ARCPhone.PhoneSys.CurrentCall.pending[i-1-len])
 			self.Tiles[i] = ARCPhone.NewAppTile()
 			self.Tiles[i].x = 8
 			self.Tiles[i].y = 10 + (i-1)*32
@@ -857,7 +857,7 @@ function APP:ForegroundThink()
 			self.Tiles[i].h = 28
 			self.Tiles[i].color = Color(0,0,128,255)
 			self.Tiles[i].ContactEditable = true
-			local diski = ARCPhone.Apps["contacts"]:GetDiskIDFromNumber(ARCPhone.PhoneSys.CurrentCall.pending[i-1])
+			local diski = ARCPhone.Apps["contacts"]:GetDiskIDFromNumber(ARCPhone.PhoneSys.CurrentCall.pending[i-1-len])
 			--
 			self.Tiles[i].drawfunc = function(phone,app,x,y)
 				surface.SetDrawColor(255,255,255,255)
@@ -867,8 +867,8 @@ function APP:ForegroundThink()
 					surface.SetMaterial(ARCPhone.Apps["contacts"].ProfilePics[0])
 				end
 				surface.DrawTexturedRect( x + 2, y + 2, 24, 24 )
-				draw.SimpleText(ARCPhone.Apps["contacts"]:GetNameFromNumber(ARCPhone.PhoneSys.CurrentCall.pending[i-1]), "ARCPhone", x + 28, y+self.Tiles[len].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
-				draw.SimpleText(ARCPhone.PhoneSys.CurrentCall.pending[i-1], "ARCPhone", x + 28, y+self.Tiles[len].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
+				draw.SimpleText(ARCPhone.Apps["contacts"]:GetNameFromNumber(ARCPhone.PhoneSys.CurrentCall.pending[i-1-len]), "ARCPhone", x + 28, y+self.Tiles[i].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
+				draw.SimpleText(ARCPhone.PhoneSys.CurrentCall.pending[i-1-len], "ARCPhone", x + 28, y+self.Tiles[i].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
 			end
 			--[[
 			self.Tiles[i].OnPressed = function(phone,app)
