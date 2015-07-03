@@ -37,6 +37,13 @@ net.Receive( "arcphone_comm_status", function(length)
 	ARCPhone.PhoneSys.Reception = net.ReadInt(8)
 	ARCPhone.PhoneSys.Status = net.ReadInt(ARCPHONE_ERRORBITRATE)
 	ARCPhone.PhoneSys.CurrentCall.on = {}
+	setmetatable(ARCPhone.PhoneSys.CurrentCall.on, {
+__newindex = function(self, key, value)
+print(self, key, value, debug.traceback())
+rawset( self, key, value )
+end
+}
+
 	ARCPhone.PhoneSys.CurrentCall.pending = {}
 	local tab = net.ReadTable()
 	for k,v in pairs(tab.on) do
