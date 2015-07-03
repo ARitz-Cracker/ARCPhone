@@ -47,7 +47,6 @@ net.Receive( "arcphone_comm_status", function(length)
 	for k,v in pairs(tab.pending) do
 		table.insert(ARCPhone.PhoneSys.CurrentCall.pending,v)
 	end
-	PrintTable(ARCPhone.PhoneSys.CurrentCall)
 	ARCPhone.PhoneSys.CurrentCall = tab
 	if ARCPhone.PhoneSys.OldStatus != ARCPhone.PhoneSys.Status then
 		ARCPhone.OnStatusChanged()
