@@ -46,7 +46,7 @@ function ARCPhone.OnStatusChanged()
 			for k,v in pairs(ARCPhone.PhoneSys.CurrentCall.on) do
 				list = lst.."\n"..v
 			end
-			ARCPhone.PhoneSys:AddMsgBox("Incoming call","You're recieving a call from "..lst,"phone",8,function() MsgN("Answer") ARCPhone.PhoneSys:Answer() end,function() MsgN("Ignore") ARCPhone.PhoneSys:HangUp() end,function() MsgN("TextExcuse") ARCPhone.PhoneSys:AddMsgBox("Coming soon!","That feature hasn't been added yet.","info") end)
+			ARCPhone.PhoneSys:AddMsgBox("Incoming call","You're recieving a call from "..lst,"phone",8,function() ARCPhone.PhoneSys:Answer() ARCPhone.PhoneSys:OpenApp("callscreen") end,function() ARCPhone.PhoneSys:HangUp() end,function() ARCPhone.PhoneSys:AddMsgBox("Coming soon!","That feature hasn't been added yet. (You also ignored the call)","info") ARCPhone.PhoneSys:HangUp() end)
 			--http://www.aritzcracker.ca/arcphone/ringtones/Reflection.mp3
 			--"http://www.aritzcracker.ca/arcphone/ringtones/generic1.mp3"
 			sound.PlayURL ( "http://www.aritzcracker.ca/arcphone/ringtones/generic1.mp3", "noblock", function( station,errid,errstr )

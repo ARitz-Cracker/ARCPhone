@@ -778,8 +778,6 @@ APP.Author = "ARitz Cracker"
 APP.Purpose = "Calling screen for ARCPhone"
 APP.NextCheck = 0;
 function APP:Init()
-
-
 	self.Tiles[1] = ARCPhone.NewAppTile()
 	self.Tiles[1].x = 8
 	self.Tiles[1].y = 224
@@ -797,98 +795,99 @@ function APP:Init()
 	self.Tiles[1].drawfunc = function(phone,app,x,y)
 		draw.SimpleText("End Call", "ARCPhone", x+self.Tiles[1].w*0.5, y+self.Tiles[1].h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 	end
-	
+	self:UpdateCallList()
 end
 
+
+function APP:UpdateCallList()
+	for i=2,#self.Tiles do
+		self.Tiles[i] = nil
+	end
+	
+	local len = #ARCPhone.PhoneSys.CurrentCall.on
+	local total = len + #ARCPhone.PhoneSys.CurrentCall.pending
+	for i=2,len+1 do
+		self.Tiles[i] = ARCPhone.NewAppTile()
+		self.Tiles[i].x = 8
+		self.Tiles[i].y = 10 + (i-1)*32
+		self.Tiles[i].w = 122
+		self.Tiles[i].h = 28
+		self.Tiles[i].color = Color(0,0,255,255)
+		self.Tiles[i].ContactEditable = true
+		local diski = ARCPhone.Apps["contacts"]:GetDiskIDFromNumber(ARCPhone.PhoneSys.CurrentCall.on[i-1])
+		--
+		self.Tiles[i].drawfunc = function(phone,app,x,y)
+			surface.SetDrawColor(255,255,255,255)
+			if (ARCPhone.Apps["contacts"].ProfilePics[diski]) then
+				surface.SetMaterial(ARCPhone.Apps["contacts"].ProfilePics[diski])
+			else
+				surface.SetMaterial(ARCPhone.Apps["contacts"].ProfilePics[0])
+			end
+			surface.DrawTexturedRect( x + 2, y + 2, 24, 24 )
+			draw.SimpleText(ARCPhone.Apps["contacts"]:GetNameFromNumber(ARCPhone.PhoneSys.CurrentCall.on[i-1]), "ARCPhone", x + 28, y+self.Tiles[i].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
+			draw.SimpleText(ARCPhone.PhoneSys.CurrentCall.on[i-1], "ARCPhone", x + 28, y+self.Tiles[i].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
+		end
+		--[[
+		self.Tiles[i].OnPressed = function(phone,app)
+			self.Tiles[i].color = Color(0,0,255,128)
+		end
+		self.Tiles[i].OnUnPressed = function(phone,app)
+			self.Tiles[i].color = Color(0,0,255,255)
+			ARCPhone.PhoneSys:AddMsgBox("Coming soon!","Todo: contact options screen","info")
+		end
+		]]
+	end
+	
+	
+	for i=len+2,total+1 do
+		self.Tiles[i] = ARCPhone.NewAppTile()
+		self.Tiles[i].x = 8
+		self.Tiles[i].y = 10 + (i-1)*32
+		self.Tiles[i].w = 122
+		self.Tiles[i].h = 28
+		self.Tiles[i].color = Color(0,0,128,255)
+		self.Tiles[i].ContactEditable = true
+		local diski = ARCPhone.Apps["contacts"]:GetDiskIDFromNumber(ARCPhone.PhoneSys.CurrentCall.pending[i-1-len])
+		--
+		self.Tiles[i].drawfunc = function(phone,app,x,y)
+			surface.SetDrawColor(255,255,255,255)
+			if (ARCPhone.Apps["contacts"].ProfilePics[diski]) then
+				surface.SetMaterial(ARCPhone.Apps["contacts"].ProfilePics[diski])
+			else
+				surface.SetMaterial(ARCPhone.Apps["contacts"].ProfilePics[0])
+			end
+			surface.DrawTexturedRect( x + 2, y + 2, 24, 24 )
+			draw.SimpleText(ARCPhone.Apps["contacts"]:GetNameFromNumber(ARCPhone.PhoneSys.CurrentCall.pending[i-1-len]), "ARCPhone", x + 28, y+self.Tiles[i].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
+			draw.SimpleText(ARCPhone.PhoneSys.CurrentCall.pending[i-1-len], "ARCPhone", x + 28, y+self.Tiles[i].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
+		end
+		--[[
+		self.Tiles[i].OnPressed = function(phone,app)
+			self.Tiles[i].color = Color(0,0,255,128)
+		end
+		self.Tiles[i].OnUnPressed = function(phone,app)
+			self.Tiles[i].color = Color(0,0,255,255)
+			ARCPhone.PhoneSys:AddMsgBox("Coming soon!","Todo: contact options screen","info")
+		end
+		]]
+	end
+	--
+	total = total + 1
+	self.Tiles[1].y = 10 + total*32
+	if (self.Tiles[1].y < 224) then
+		self.Tiles[1].y = 224
+	end
+	if self.Tiles[self.Phone.SelectedAppTile] == nil then
+		self:ResetCurPos()
+	end
+end
+--[[
 function APP:ForegroundThink()
 	if self.NextCheck <= CurTime() then
-		--MsgN("Updating call list")
-		--MsgN("ON:")
-		--PrintTable(ARCPhone.PhoneSys.CurrentCall.on)
-		--MsgN("PENDING:")
-		--PrintTable(ARCPhone.PhoneSys.CurrentCall.pending)
-		--ARCPhone.PhoneSys.CurrentCall.on
-		--ARCPhone.PhoneSys.CurrentCall.pending
-		for i=2,#self.Tiles do
-			self.Tiles[i] = nil
-		end
-		local len = #ARCPhone.PhoneSys.CurrentCall.on
-		local total = len + #ARCPhone.PhoneSys.CurrentCall.pending
-		for i=2,len+1 do
-			self.Tiles[i] = ARCPhone.NewAppTile()
-			self.Tiles[i].x = 8
-			self.Tiles[i].y = 10 + (i-1)*32
-			self.Tiles[i].w = 122
-			self.Tiles[i].h = 28
-			self.Tiles[i].color = Color(0,0,255,255)
-			self.Tiles[i].ContactEditable = true
-			local diski = ARCPhone.Apps["contacts"]:GetDiskIDFromNumber(ARCPhone.PhoneSys.CurrentCall.on[i-1])
-			--
-			self.Tiles[i].drawfunc = function(phone,app,x,y)
-				surface.SetDrawColor(255,255,255,255)
-				if (ARCPhone.Apps["contacts"].ProfilePics[diski]) then
-					surface.SetMaterial(ARCPhone.Apps["contacts"].ProfilePics[diski])
-				else
-					surface.SetMaterial(ARCPhone.Apps["contacts"].ProfilePics[0])
-				end
-				surface.DrawTexturedRect( x + 2, y + 2, 24, 24 )
-				draw.SimpleText(ARCPhone.Apps["contacts"]:GetNameFromNumber(ARCPhone.PhoneSys.CurrentCall.on[i-1]), "ARCPhone", x + 28, y+self.Tiles[i].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
-				draw.SimpleText(ARCPhone.PhoneSys.CurrentCall.on[i-1], "ARCPhone", x + 28, y+self.Tiles[i].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
-			end
-			--[[
-			self.Tiles[i].OnPressed = function(phone,app)
-				self.Tiles[i].color = Color(0,0,255,128)
-			end
-			self.Tiles[i].OnUnPressed = function(phone,app)
-				self.Tiles[i].color = Color(0,0,255,255)
-				ARCPhone.PhoneSys:AddMsgBox("Coming soon!","Todo: contact options screen","info")
-			end
-			]]
-		end
-		
-		
-		for i=len+2,total+1 do
-			self.Tiles[i] = ARCPhone.NewAppTile()
-			self.Tiles[i].x = 8
-			self.Tiles[i].y = 10 + (i-1)*32
-			self.Tiles[i].w = 122
-			self.Tiles[i].h = 28
-			self.Tiles[i].color = Color(0,0,128,255)
-			self.Tiles[i].ContactEditable = true
-			local diski = ARCPhone.Apps["contacts"]:GetDiskIDFromNumber(ARCPhone.PhoneSys.CurrentCall.pending[i-1-len])
-			--
-			self.Tiles[i].drawfunc = function(phone,app,x,y)
-				surface.SetDrawColor(255,255,255,255)
-				if (ARCPhone.Apps["contacts"].ProfilePics[diski]) then
-					surface.SetMaterial(ARCPhone.Apps["contacts"].ProfilePics[diski])
-				else
-					surface.SetMaterial(ARCPhone.Apps["contacts"].ProfilePics[0])
-				end
-				surface.DrawTexturedRect( x + 2, y + 2, 24, 24 )
-				draw.SimpleText(ARCPhone.Apps["contacts"]:GetNameFromNumber(ARCPhone.PhoneSys.CurrentCall.pending[i-1-len]), "ARCPhone", x + 28, y+self.Tiles[i].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
-				draw.SimpleText(ARCPhone.PhoneSys.CurrentCall.pending[i-1-len], "ARCPhone", x + 28, y+self.Tiles[i].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
-			end
-			--[[
-			self.Tiles[i].OnPressed = function(phone,app)
-				self.Tiles[i].color = Color(0,0,255,128)
-			end
-			self.Tiles[i].OnUnPressed = function(phone,app)
-				self.Tiles[i].color = Color(0,0,255,255)
-				ARCPhone.PhoneSys:AddMsgBox("Coming soon!","Todo: contact options screen","info")
-			end
-			]]
-		end
-		--
-		total = total + 1
-		self.Tiles[1].y = 10 + total*32
-		if (self.Tiles[1].y < 224) then
-			self.Tiles[1].y = 224
-		end
 		
 		self.NextCheck = CurTime() + 1
 	end
 end
-
+]]
 function APP:OnBack()
 	self.Phone:OpenApp("home")
 end
@@ -899,6 +898,10 @@ APP = ARCPhone.NewAppObject()
 APP.Name = "Messaging"
 APP.Author = "ARitz Cracker"
 APP.Purpose = "Messaging app for ARCPhone"
+
+function APP:PhoneStart()
+	ARCPhone.Apps["contacts"]:AddContactOption("Text",ARCPhone.Apps["messaging"].OpenConvo,ARCPhone.Apps["messaging"])
+end
 
 function APP:OpenConvo(num)
 	self.Home = false
@@ -985,6 +988,10 @@ function APP:Init()
 	local len = #files
 	for i=1,len do
 		local num = string.sub( files[i], 1, #files[i]-4 )
+		local disp = ARCPhone.Apps["contacts"]:GetNameFromNumber(num)
+		if disp == "Unknown" then
+			disp = num
+		end
 		self.Tiles[i] = ARCPhone.NewAppTile()
 		self.Tiles[i].x = 8
 		self.Tiles[i].y = 10 + i*22
@@ -992,7 +999,7 @@ function APP:Init()
 		self.Tiles[i].h = 18
 		self.Tiles[i].color = Color(0,0,255,255)
 		self.Tiles[i].drawfunc = function(phone,app,x,y)
-			draw.SimpleText(num, "ARCPhone", x+self.Tiles[i].w*0.5, y+self.Tiles[i].h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+			draw.SimpleText(disp, "ARCPhone", x+self.Tiles[i].w*0.5, y+self.Tiles[i].h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 		end
 		self.Tiles[i].OnPressed = function(phone,app)
 			self.Tiles[i].color = Color(0,0,255,128)
