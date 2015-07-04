@@ -54,6 +54,7 @@ net.Receive( "arcphone_comm_status", function(length)
 			app:UpdateCallList()
 		end
 	end
+	PrintTable(ARCPhone.PhoneSys.CurrentCall)
 end)
 
 

@@ -2,7 +2,7 @@
 -- This file is under copyright, and is bound to the agreement stated in the ELUA.
 -- Any 3rd party content has been used as either public domain or with permission.
 -- © Copyright 2014 Aritz Beobide-Cardinal All rights reserved.
-
+--[[
 
 local APP = ARCPhone.NewAppObject()
 APP.Name = "Test"
@@ -64,7 +64,7 @@ APP.Tiles[7].color = Color(math.random(1,255),math.random(1,255),math.random(1,2
 ARCPhone.RegisterApp(APP,"test_multi")
 
 
-
+]]
 
 
 
@@ -415,7 +415,7 @@ ARCPhone.RegisterApp(APP,"contacts")
 
 
 
-
+--[[
 local APP = ARCPhone.NewAppObject()
 APP.Name = "Test"
 APP.Author = "ARitz Cracker"
@@ -439,7 +439,7 @@ for i = 0,80 do
 end
 
 ARCPhone.RegisterApp(APP,"test")
-
+]]
 APP = ARCPhone.NewAppObject()
 APP.Name = "Home"
 APP.Author = "ARitz Cracker"
@@ -901,7 +901,10 @@ APP.Author = "ARitz Cracker"
 APP.Purpose = "Messaging app for ARCPhone"
 
 function APP:PhoneStart()
-	ARCPhone.Apps["contacts"]:AddContactOption("Text",ARCPhone.Apps["messaging"].OpenConvo,ARCPhone.Apps["messaging"])
+	ARCPhone.Apps["contacts"]:AddContactOption("Text",function(num)
+		ARCPhone.PhoneSys:OpenApp("messaging")
+		ARCPhone.Apps["messaging"]:OpenConvo(num)
+	end)
 end
 
 function APP:OpenConvo(num)
