@@ -684,6 +684,7 @@ function APP:AddNumber(num)
 end
 function APP:PhoneStart()
 	ARCPhone.Apps["contacts"]:AddContactOption("Call",self.Phone.Call,self.Phone)
+	ARCPhone.Apps["contacts"]:AddContactOption("Add to call",self.Phone.AddToCall,self.Phone)
 end
 function APP:Init()
 	if ARCPhone.PhoneSys.Status == ARCPHONE_ERROR_CALL_RUNNING || ARCPhone.PhoneSys.Status == ARCPHONE_ERROR_DIALING then

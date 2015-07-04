@@ -518,18 +518,17 @@ end
 			self:AddMsgBox("ARCPhone","Cannot answer while not ringing","cross")
 		end
 	end
-	function ARCPhone.PhoneSys.GroupCall(tabonumbers)
+	function ARCPhone.PhoneSys:GroupCall(tabonumbers)
 		local number = #tabonumbers
 		if number > 127 then
-			self:Print("Too many numbers.")
+			self:AddMsgBox("ARCPhone","Too many numbers.","cross")
 		elseif number > 1 then
 			net.Start("arcphone_comm_call")
 			net.WriteInt(number*-1,8)
 			for i = 1,number do
-				if !tabonumbers[i] || !isstring(tabonumbers[i]) || tabonumbers[i] == "" then
-					self:Print("Number "..i.." is invalid.")
+				if ARCPhone.IsValidPhoneNumber(tabonumbers[i]) then
+					self:AddMsgBox("ARCPhone","Number "..i.." is invalid.","warning")
 				else
-					MsgN(tabonumbers[i])
 					net.WriteString(tabonumbers[i])
 				end
 			end
@@ -539,10 +538,10 @@ end
 		end
 	end
 	
-	function ARCPhone.PhoneSys.AddToCall(number)
-		if !number || !isstring(number) || number == "" then
-			if self.Status != ARCPHONE_ERROR_NONE then
-				self:Print("No call running or call has not been established.")
+	function ARCPhone.PhoneSys:AddToCall(number)
+		if ARCPhone.IsValidPhoneNumber(number) then
+			if ARCPhone.PhoneSys.Status != ARCPHONE_ERROR_NONE then
+				self:AddMsgBox("ARCPhone","No call running or call has not been established.","warning")
 			else
 				net.Start("arcphone_comm_call")
 				net.WriteInt(4,8)
@@ -550,7 +549,7 @@ end
 				net.SendToServer()
 			end
 		else
-			self:Print("Invalid phone number.")
+			self:AddMsgBox("ARCPhone","Invalid number.","cross")
 		end
 	end
 	function ARCPhone.PhoneSys:HangUp()
