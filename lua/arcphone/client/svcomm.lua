@@ -49,8 +49,10 @@ net.Receive( "arcphone_comm_status", function(length)
 		ARCPhone.PhoneSys.OldStatus = ARCPhone.PhoneSys.Status
 	end
 	local app = ARCPhone.PhoneSys:GetActiveApp()
-	if app.sysname == "callscreen" then
-		app:UpdateCallList()
+	if (app) then
+		if app.sysname == "callscreen" then
+			app:UpdateCallList()
+		end
 	end
 end)
 
