@@ -60,6 +60,12 @@ if CLIENT then
 			end
 		end
 	end)
+	hook.Add( "StartChat", "ARCPhone OpenChat", function(t) 
+		ARCPhone.PhoneSys.PauseInput = true
+	end)
+	hook.Add( "FinishChat", "ARCPhone CloseChat", function(t) 
+		ARCPhone.PhoneSys.PauseInput = false
+	end)
 	--[[
 	
 	]]

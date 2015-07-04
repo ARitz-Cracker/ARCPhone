@@ -547,6 +547,11 @@ end
 				net.WriteInt(4,8)
 				net.WriteString(number)
 				net.SendToServer()
+				if (self:AppExists("callscreen")) then
+					self:OpenApp("callscreen")
+				else
+					self:AddMsgBox("ARCPhone","The call progress screen doesn't seem to be installed! This means you cannot end your call in a nice GUI fasion!","cross")
+				end
 			end
 		else
 			self:AddMsgBox("ARCPhone","Invalid number.","cross")
