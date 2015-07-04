@@ -267,7 +267,7 @@ function APP:EditContact(tileid)
 	
 	self.Tiles[4] = ARCPhone.NewAppTile()
 	self.Tiles[4].x = 8
-	self.Tiles[4].y = 204
+	self.Tiles[4].y = 196
 	self.Tiles[4].w = 122
 	self.Tiles[4].h = 18
 	self.Tiles[4].color = Color(128,128,128,255)
@@ -288,7 +288,7 @@ function APP:EditContact(tileid)
 	
 	self.Tiles[5] = ARCPhone.NewAppTile()
 	self.Tiles[5].x = 8
-	self.Tiles[5].y = 204
+	self.Tiles[5].y = 220
 	self.Tiles[5].w = 122
 	self.Tiles[5].h = 18
 	self.Tiles[5].color = Color(0,0,255,255)

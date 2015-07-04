@@ -143,7 +143,7 @@ function ARCPhone.NewAppObject()
 	function app:DrawTiles(phone,mvx,mvy)
 		for k,v in pairs(self.Tiles) do
 			--
-			if ARCLib.TouchingBox(v.x + mvx,v.x + mvx + v.w,v.y + mvy,v.y + mvy + v.h,0,128,0,224) then
+			if ARCLib.TouchingBox(v.x + mvx,v.x + mvx + v.w,v.y + mvy,v.y + mvy + v.h,0,self.ScreenResX,0,self.ScreenResY) then
 				
 				if v.drawfunc_override then
 					v.drawfunc_override(phone,app,v.x + mvx,v.y + mvy)
