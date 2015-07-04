@@ -120,8 +120,8 @@ function APP:SelectContact(tileid)
 	self.Tiles[1].h = 28
 	self.Tiles[1].color = Color(0,0,255,255)
 	self.Tiles[1].ContactEditable = true
-	if file.Exists(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[tileid][ARCPHONE_CONTACT_NUMBER]..".txt","DATA") then
-		self.ProfilePics[1] = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[tileid][ARCPHONE_CONTACT_NUMBER]..".txt","jpg");
+	if file.Exists(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[tileid][ARCPHONE_CONTACT_NUMBER]..".dat","DATA") then
+		self.ProfilePics[1] = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[tileid][ARCPHONE_CONTACT_NUMBER]..".dat","jpg");
 	end
 	self.Tiles[1].drawfunc = function(phone,app,x,y)
 		surface.SetDrawColor(255,255,255,255)
@@ -208,11 +208,11 @@ function APP:GetDiskIDFromNumber(number)
 end
 function APP:PhoneStart()
 	self.ProfilePics = {}
-	self.ProfilePics[0] = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/contactphotos/0000000000.txt","jpg")
+	self.ProfilePics[0] = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/contactphotos/0000000000.dat","jpg")
 	local len = #self.Disk
 	for i=1,len do
-		if file.Exists(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[i][ARCPHONE_CONTACT_NUMBER]..".txt","DATA") then
-			self.ProfilePics[i] = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[i][ARCPHONE_CONTACT_NUMBER]..".txt","jpg");
+		if file.Exists(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[i][ARCPHONE_CONTACT_NUMBER]..".dat","DATA") then
+			self.ProfilePics[i] = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[i][ARCPHONE_CONTACT_NUMBER]..".dat","jpg");
 		end
 	end
 end
@@ -222,7 +222,7 @@ function APP:Init()
 	
 	self.Tiles = {}
 	table.Empty(self.ProfilePics)
-	self.ProfilePics[0] = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/contactphotos/0000000000.txt","jpg")
+	self.ProfilePics[0] = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/contactphotos/0000000000.dat","jpg")
 	
 	
 
@@ -235,8 +235,8 @@ function APP:Init()
 		self.Tiles[i].h = 28
 		self.Tiles[i].color = Color(0,0,255,255)
 		self.Tiles[i].ContactEditable = true
-		if file.Exists(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[i][ARCPHONE_CONTACT_NUMBER]..".txt","DATA") then
-			self.ProfilePics[i] = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[i][ARCPHONE_CONTACT_NUMBER]..".txt","jpg");
+		if file.Exists(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[i][ARCPHONE_CONTACT_NUMBER]..".dat","DATA") then
+			self.ProfilePics[i] = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[i][ARCPHONE_CONTACT_NUMBER]..".dat","jpg");
 		end
 		self.Tiles[i].drawfunc = function(phone,app,x,y)
 			surface.SetDrawColor(255,255,255,255)
