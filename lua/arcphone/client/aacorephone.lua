@@ -54,7 +54,7 @@ function ARCPhone.PhoneSys:Think(wep)
 			end
 		end
 	end
-	if !self.PauseInput then
+	if !self.PauseInput && !gui.IsGameUIVisible() then
 		for k,v in pairs(self.ValidKeys) do
 			if (input.IsKeyDown(v) || input.WasKeyPressed(v)) && self.KeyDelay[v] <= CurTime() then -- The only reason why I merge IsKeyDown and WasKeyPressed is because of people with shitty computers
 				if self.KeyDelay[v] < CurTime() - 1 then
