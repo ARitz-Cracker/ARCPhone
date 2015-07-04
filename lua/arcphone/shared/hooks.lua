@@ -64,7 +64,9 @@ if CLIENT then
 		ARCPhone.PhoneSys.PauseInput = true
 	end)
 	hook.Add( "FinishChat", "ARCPhone CloseChat", function(t) 
-		ARCPhone.PhoneSys.PauseInput = false
+		timer.Simple(0.1,function()
+			ARCPhone.PhoneSys.PauseInput = false
+		end
 	end)
 	--[[
 	
