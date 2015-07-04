@@ -270,16 +270,37 @@ function APP:EditContact(tileid)
 	self.Tiles[4].y = 204
 	self.Tiles[4].w = 122
 	self.Tiles[4].h = 18
-	self.Tiles[4].color = Color(0,0,255,255)
+	self.Tiles[4].color = Color(128,128,128,255)
 	self.Tiles[4].OnPressed = function(phone,app)
-		self.Tiles[4].color = Color(0,0,255,128)
+		self.Tiles[4].color = Color(128,128,128,128)
 	end
 	self.Tiles[4].OnUnPressed = function(phone,app)
-		self.Tiles[4].color = Color(0,0,255,255)
+		self.Tiles[4].color = Color(128,128,128,255)	
+		if (tileid > 0) then
+			table.remove(app.Disk,tileid)
+		end
+		app:SaveData()
+		app:Init()
+	end
+	self.Tiles[4].drawfunc = function(phone,app,x,y)
+		draw.SimpleText( "Delete", "ARCPhone", x+app.Tiles[4].w*0.5, y+app.Tiles[4].h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+	end
+	
+	self.Tiles[5] = ARCPhone.NewAppTile()
+	self.Tiles[5].x = 8
+	self.Tiles[5].y = 204
+	self.Tiles[5].w = 122
+	self.Tiles[5].h = 18
+	self.Tiles[5].color = Color(0,0,255,255)
+	self.Tiles[5].OnPressed = function(phone,app)
+		self.Tiles[5].color = Color(0,0,255,128)
+	end
+	self.Tiles[5].OnUnPressed = function(phone,app)
+		self.Tiles[5].color = Color(0,0,255,255)
 		if (ARCPhone.IsValidPhoneNumber(app.Tiles[3].TextInput)) then
 			if (tileid > 0) then
-				app.Disk[i][ARCPHONE_CONTACT_NAME] = app.Tiles[2].TextInput
-				app.Disk[i][ARCPHONE_CONTACT_NUMBER] = app.Tiles[3].TextInput
+				app.Disk[tileid][ARCPHONE_CONTACT_NAME] = app.Tiles[2].TextInput
+				app.Disk[tileid][ARCPHONE_CONTACT_NUMBER] = app.Tiles[3].TextInput
 			else
 				local len = #app.Disk + 1
 				app.Disk[len] = {}
@@ -293,8 +314,8 @@ function APP:EditContact(tileid)
 		end
 		--phone:Call(self.Dialnum)
 	end
-	self.Tiles[4].drawfunc = function(phone,app,x,y)
-		draw.SimpleText( "Save", "ARCPhone", x+app.Tiles[4].w*0.5, y+app.Tiles[4].h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+	self.Tiles[5].drawfunc = function(phone,app,x,y)
+		draw.SimpleText( "Save", "ARCPhone", x+app.Tiles[5].w*0.5, y+app.Tiles[5].h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 	end
 	
 end
