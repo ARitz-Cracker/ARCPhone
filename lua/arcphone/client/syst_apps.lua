@@ -175,8 +175,8 @@ end
 APP.Options[2] = {}
 APP.Options[2].text = "Edit"
 APP.Options[2].func = function(phone,app) 
-	if self.Tiles[phone.SelectedAppTile].ContactEditable then
-		self:EditContact(phone.SelectedAppTile)
+	if app.Tiles[phone.SelectedAppTile].ContactEditable then
+		app:EditContact(phone.SelectedAppTile)
 	else
 		ARCPhone.PhoneSys:AddMsgBox("Cannot edit","You cannot edit this icon because it's not a contact entry","cross")
 	end
