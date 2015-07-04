@@ -1,5 +1,5 @@
 
-APP = ARCPhone.NewAppObject()
+local APP = ARCPhone.NewAppObject()
 APP.Name = "Messaging"
 APP.Author = "ARitz Cracker"
 APP.Purpose = "Messaging app for ARCPhone"
