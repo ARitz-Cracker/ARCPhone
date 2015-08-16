@@ -84,7 +84,7 @@ function ARCPhone.NewAppTextInputTile(txt,resize,w)
 	end
 	return tile
 end
-
+local NULLFUNC = function(...) end
 local curapptime = 0
 local oldapptime = 0
 function ARCPhone.NewAppObject()
@@ -102,8 +102,8 @@ function ARCPhone.NewAppObject()
 	
 	app.Options[1].func = function(phone,app) phone:AddMsgBox("About",tostring(app.Name).."\nby: "..tostring(app.Author).."\n\n"..tostring(app.Purpose),"box") end
 	app.Tiles = {ARCPhone.NewAppTile()}
-	function app:Init() end
-	function app:PhoneStart() end
+	app.Init = NULLFUNC
+	app.PhoneStart = NULLFUNC
 	function app:GetSelectedTile()
 		return self.Tiles[self.Phone.SelectedAppTile]
 	end
@@ -138,15 +138,15 @@ function ARCPhone.NewAppObject()
 	function app:ResetTiles(tileid)
 		self.Tiles = {}
 	end
-	function app:BackgroundDraw(phone) end
-	function app:ForegroundDraw(phone) end
-	function app:DrawTiles(phone,mvx,mvy)
+	function app:BackgroundDraw() end
+	function app:ForegroundDraw() end
+	function app:DrawTiles(mvx,mvy)
 		for k,v in pairs(self.Tiles) do
 			--
 			if ARCLib.TouchingBox(v.x + mvx,v.x + mvx + v.w,v.y + mvy,v.y + mvy + v.h,0,self.Phone.ScreenResX,0,self.Phone.ScreenResY) then
 				
 				if v.drawfunc_override then
-					v.drawfunc_override(phone,app,v.x + mvx,v.y + mvy)
+					v.drawfunc_override(self.Phone,app,v.x + mvx,v.y + mvy)
 				else
 					if (!v.bgcolor) then
 						v.bgcolor = v.color
@@ -178,7 +178,7 @@ function ARCPhone.NewAppObject()
 						surface.DrawTexturedRect(v.x + mvx + v.w/2 - rez/2,v.y + mvy + v.h/2 - rez/2,rez,rez)
 					end
 					if v.drawfunc then
-						v.drawfunc(phone,app,v.x + mvx,v.y + mvy)
+						v.drawfunc(app,v.x + mvx,v.y + mvy)
 					end
 					if v.text && string.len(v.text) > 0 then
 						draw.SimpleText( ARCLib.CutOutText(v.text,"ARCPhoneSSmall",v.w), "ARCPhoneSSmall", v.x + mvx +1, v.y + mvy + v.h -1, Color(255,255,255,255),TEXT_ALIGN_LEFT , TEXT_ALIGN_TOP ) 
@@ -186,47 +186,48 @@ function ARCPhone.NewAppObject()
 				end
 			end
 		end
-		if self.Tiles[phone.SelectedAppTile] then
+		if self.Tiles[self.Phone.SelectedAppTile] then
 			surface.SetDrawColor(255,255,255,255)
 
 			if curapptime <= CurTime() then
-				surface.DrawOutlinedRect(self.Tiles[phone.SelectedAppTile].x + mvx,self.Tiles[phone.SelectedAppTile].y + mvy,self.Tiles[phone.SelectedAppTile].w,self.Tiles[phone.SelectedAppTile].h)
+				surface.DrawOutlinedRect(self.Tiles[self.Phone.SelectedAppTile].x + mvx,self.Tiles[self.Phone.SelectedAppTile].y + mvy,self.Tiles[self.Phone.SelectedAppTile].w,self.Tiles[self.Phone.SelectedAppTile].h)
 			else
 				local thing = ARCLib.BetweenNumberScale(oldapptime,CurTime(),curapptime)
 				local negthing = -thing + 1
 				
-				surface.DrawOutlinedRect((self.Tiles[phone.SelectedAppTile].x*thing + self.Tiles[phone.OldSelectedAppTile].x*negthing) + mvx,(self.Tiles[phone.SelectedAppTile].y*thing + self.Tiles[phone.OldSelectedAppTile].y*negthing) + mvy,self.Tiles[phone.SelectedAppTile].w*thing + self.Tiles[phone.OldSelectedAppTile].w*negthing,self.Tiles[phone.SelectedAppTile].h*thing + self.Tiles[phone.OldSelectedAppTile].h*negthing)
+				surface.DrawOutlinedRect((self.Tiles[self.Phone.SelectedAppTile].x*thing + self.Tiles[self.Phone.OldSelectedAppTile].x*negthing) + mvx,(self.Tiles[self.Phone.SelectedAppTile].y*thing + self.Tiles[self.Phone.OldSelectedAppTile].y*negthing) + mvy,self.Tiles[self.Phone.SelectedAppTile].w*thing + self.Tiles[self.Phone.OldSelectedAppTile].w*negthing,self.Tiles[self.Phone.SelectedAppTile].h*thing + self.Tiles[self.Phone.OldSelectedAppTile].h*negthing)
 			end
 		end
 	end
+	app.DrawHUD = NULLFUNC
 	function app:ResetCurPos()
 		self.Phone.SelectedAppTile = 1
 		self.Phone.OldSelectedAppTile = self.Phone.SelectedAppTile
 	end
 	app.ShowTaskbar = true
-	function app:ForegroundThink() end
-	function app:BackgroundThink() end
-	function app:Think() end
-	function app:OnBack() end
-	function app:OnEnter() end
-	function app:OnUp() end
-	function app:OnDown() end
-	function app:OnLeft() end
-	function app:OnRight() end
+	app.ForegroundThink = NULLFUNC
+	app.BackgroundThink = NULLFUNC
+	app.Think = NULLFUNC
+	app.OnBack = NULLFUNC
+	app.OnEnter = NULLFUNC
+	app.OnUp = NULLFUNC
+	app.OnDown = NULLFUNC
+	app.OnLeft = NULLFUNC
+	app.OnRight = NULLFUNC
 	
-	function app:OnBackUp() end
-	function app:OnEnterUp() end
-	function app:OnUpUp() end
-	function app:OnDownUp() end
-	function app:OnLeftUp() end
-	function app:OnRightUp() end
+	app.OnBackUp = NULLFUNC
+	app.OnEnterUp = NULLFUNC
+	app.OnUpUp = NULLFUNC
+	app.OnDownUp = NULLFUNC
+	app.OnLeftUp = NULLFUNC
+	app.OnRightUp = NULLFUNC
 	
-	function app:OnBackDown() end
-	function app:OnEnterDown() end
-	function app:OnUpDown() end
-	function app:OnDownDown() end
-	function app:OnLeftDown() end
-	function app:OnRightDown() end
+	app.OnBackDown = NULLFUNC
+	app.OnEnterDown = NULLFUNC
+	app.OnUpDown = NULLFUNC
+	app.OnDownDown = NULLFUNC
+	app.OnLeftDown = NULLFUNC
+	app.OnRightDown = NULLFUNC
 	
 	function app:_OnEnterDown(phone) 
 		self.Tiles[phone.SelectedAppTile].OnPressed(phone,self)

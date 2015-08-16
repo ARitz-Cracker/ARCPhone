@@ -78,7 +78,11 @@ function APP:SelectContact(tileid)
 		end
 		self.Tiles[i].OnUnPressed = function(phone,app)
 			self.Tiles[i].color = Color(0,0,64,255)
-			self.ContactOptionFuncs[i-1](unpack(self.ContactOptionArgs[i-1]),self.Disk[tileid][ARCPHONE_CONTACT_NUMBER])
+			if #self.ContactOptionArgs[i-1] > 0 then
+				self.ContactOptionFuncs[i-1](unpack(self.ContactOptionArgs[i-1]),self.Disk[tileid][ARCPHONE_CONTACT_NUMBER])
+			else
+				self.ContactOptionFuncs[i-1](self.Disk[tileid][ARCPHONE_CONTACT_NUMBER])
+			end
 		end
 	end
 	
@@ -267,7 +271,7 @@ function APP:EditContact(tileid)
 	
 	self.Tiles[4] = ARCPhone.NewAppTile()
 	self.Tiles[4].x = 8
-	self.Tiles[4].y = 196
+	self.Tiles[4].y = 194
 	self.Tiles[4].w = 122
 	self.Tiles[4].h = 18
 	self.Tiles[4].color = Color(128,128,128,255)
@@ -288,7 +292,7 @@ function APP:EditContact(tileid)
 	
 	self.Tiles[5] = ARCPhone.NewAppTile()
 	self.Tiles[5].x = 8
-	self.Tiles[5].y = 220
+	self.Tiles[5].y = 218
 	self.Tiles[5].w = 122
 	self.Tiles[5].h = 18
 	self.Tiles[5].color = Color(0,0,255,255)

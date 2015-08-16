@@ -59,9 +59,9 @@ function SWEP:SecondaryAttack()
 end
 function SWEP:Think()
 	if CLIENT then
-		if ARCLoad.Loaded then
+		--if ARCLoad.Loaded then
 			ARCPhone.PhoneSys:Think(self)
-		end
+		--end
 	else
 	end
 end
@@ -163,6 +163,10 @@ end
 
 function SWEP:OnRemove()
 	self:Holster()
+end
+
+function SWEP:DrawHUD()
+	ARCPhone.PhoneSys:DrawHud(self)
 end
 --PlayerButtonDown
 

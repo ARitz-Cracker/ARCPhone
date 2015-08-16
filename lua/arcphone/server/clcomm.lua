@@ -93,7 +93,12 @@ net.Receive( "arcphone_comm_text", function(length,ply)
 	local part = net.ReadUInt(32)
 	local whole = net.ReadUInt(32)
 	local hash = net.ReadString()
-	local str = net.ReadString()
+	local str = ""
+	local strlen = net.ReadUInt(32)
+	if strlen > 0 then
+		str = net.ReadData(strlen)
+	end
+	
 	local vnum = ARCPhone.GetPhoneNumber(ply)
 	
 	
@@ -110,7 +115,9 @@ net.Receive( "arcphone_comm_text", function(length,ply)
 				net.WriteUInt(ARCPhone.Disk.Texts[vnum][hash].place,32)
 				net.WriteUInt(len,32)
 				net.WriteString(hash)
-				net.WriteString(tostring(ARCPhone.Disk.Texts[vnum][hash].msg[ARCPhone.Disk.Texts[vnum][hash].place]))
+				local str = ARCPhone.Disk.Texts[vnum][hash].msg[ARCPhone.Disk.Texts[vnum][hash].place]
+				net.WriteUInt(#str,32)
+				net.WriteData(str,#str)
 				net.Send(ply)
 			else
 				MsgN("ARCPhone: Client mismatched in part")
@@ -119,7 +126,7 @@ net.Receive( "arcphone_comm_text", function(length,ply)
 				net.WriteUInt(1,32)
 				net.WriteUInt(1,32)
 				net.WriteString(hash)
-				net.WriteString("")
+				net.WriteUInt(0,32)
 				net.Send(ply)
 				ARCPhone.Disk.Texts[vnum][hash].place = -1
 			end
@@ -130,7 +137,7 @@ net.Receive( "arcphone_comm_text", function(length,ply)
 			net.WriteUInt(1,32)
 			net.WriteUInt(1,32)
 			net.WriteString(hash)
-			net.WriteString("")
+			net.WriteUInt(0,32)
 			net.Send(ply)
 			ARCPhone.Disk.Texts[vnum][hash].place = -1
 		end
@@ -149,26 +156,23 @@ net.Receive( "arcphone_comm_text", function(length,ply)
 		else
 			msgchunks[hash].msg = msgchunks[hash].msg .. str
 			if part == whole then
-				MsgN(#msgchunks[hash].msg)
-				timer.Simple(1,function()
-					ARCPhone.SendTextMsg(string.Left( msgchunks[hash].msg, 10 ),vnum,string.Right( msgchunks[hash].msg, #msgchunks[hash].msg-10 ))
-					msgchunks[hash] = nil
-					net.Start("arcphone_comm_text")
-					net.WriteInt(-2,8)
-					net.WriteUInt(0,32)
-					net.WriteUInt(0,32)
-					net.WriteString(hash) --Hash
-					net.WriteString("") --Number
-					net.Send(ply)
-					
-				end)
+				local destr = util.Decompress(msgchunks[hash].msg)
+				ARCPhone.SendTextMsg(string.Left( destr ),vnum,string.Right( destr, #destr-10 ))
+				msgchunks[hash] = nil
+				net.Start("arcphone_comm_text")
+				net.WriteInt(-2,8)
+				net.WriteUInt(0,32)
+				net.WriteUInt(0,32)
+				net.WriteString(hash) --Hash
+				net.WriteUInt(0,32)
+				net.Send(ply)
 			else
 				net.Start("arcphone_comm_text")
 				net.WriteInt(-1,8)
 				net.WriteUInt(part,32)
 				net.WriteUInt(whole,32)
 				net.WriteString(hash) --Hash
-				net.WriteString("") --Number
+				net.WriteUInt(0,32)
 				net.Send(ply)
 				msgchunks[hash].prt = msgchunks[hash].prt + 1
 			end

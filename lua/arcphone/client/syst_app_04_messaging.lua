@@ -12,6 +12,7 @@ function APP:PhoneStart()
 end
 
 function APP:OpenConvo(num)
+	self:ResetCurPos()
 	self.Home = false
 	local numdir = ARCPhone.ROOTDIR.."/messaging/"..num..".txt"
 	local len = 0
@@ -85,6 +86,7 @@ function APP:NewConvo()
 	end)
 end
 function APP:Init()
+	self:ResetCurPos()
 	self.Home = true
 	self.Tiles = {}
 	self.InConvo = false

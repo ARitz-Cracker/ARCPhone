@@ -323,7 +323,7 @@ function ARCPhone.SendTextMsg(tonum,fromnum,msg)
 		ARCPhone.Disk.Texts[tonum] = {}
 	end
 	ARCPhone.Disk.Texts[tonum][hash] = {}
-	ARCPhone.Disk.Texts[tonum][hash].msg = ARCLib.SplitString(msg,16384)
+	ARCPhone.Disk.Texts[tonum][hash].msg = ARCLib.SplitString(util.Compress(fromnum.."\v"..os.time().."\v"..msg),16384)
 	ARCPhone.Disk.Texts[tonum][hash].number = fromnum
 	ARCPhone.Disk.Texts[tonum][hash].place = -1
 end
@@ -359,7 +359,7 @@ function ARCPhone.Think()
 						net.WriteUInt(0,32)
 						net.WriteUInt(#vv.msg,32)
 						net.WriteString(kk) --Hash
-						net.WriteString(vv.number) --Number
+						net.WriteUInt(0,32)
 						net.Send(v)
 					end
 				end

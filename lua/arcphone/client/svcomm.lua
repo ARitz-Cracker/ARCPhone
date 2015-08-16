@@ -64,8 +64,12 @@ net.Receive( "arcphone_comm_text", function(length)
 	local part = net.ReadUInt(32)
 	local whole = net.ReadUInt(32)
 	local hash = net.ReadString()
-	local str = net.ReadString()
-
+	local str = ""
+	local strlen = net.ReadUInt(32)
+	if strlen > 0 then
+		str = net.ReadData(strlen)
+	end
+	
 	if succ == -1 then
 		local len = #ARCPhone.PhoneSys.OutgoingTexts[hash].msg
 		if whole == len then
@@ -77,7 +81,9 @@ net.Receive( "arcphone_comm_text", function(length)
 				net.WriteUInt(ARCPhone.PhoneSys.OutgoingTexts[hash].place,32)
 				net.WriteUInt(len,32)
 				net.WriteString(hash)
-				net.WriteString(tostring(ARCPhone.PhoneSys.OutgoingTexts[hash].msg[ARCPhone.PhoneSys.OutgoingTexts[hash].place]))
+				local str = ARCPhone.PhoneSys.OutgoingTexts[hash].msg[ARCPhone.PhoneSys.OutgoingTexts[hash].place]
+				net.WriteUInt(#str,32)
+				net.WriteData(str,#str)
 				net.SendToServer()
 			else
 				MsgN("ARCPhone: Server mismatched in part")
@@ -86,7 +92,7 @@ net.Receive( "arcphone_comm_text", function(length)
 				net.WriteUInt(1,32)
 				net.WriteUInt(1,32)
 				net.WriteString(hash)
-				net.WriteString("")
+				net.WriteUInt(0,32)
 				net.SendToServer()
 				ARCPhone.PhoneSys.OutgoingTexts[hash].place = -1
 			end
@@ -97,7 +103,7 @@ net.Receive( "arcphone_comm_text", function(length)
 			net.WriteUInt(1,32)
 			net.WriteUInt(1,32)
 			net.WriteString(hash)
-			net.WriteString("")
+			net.WriteUInt(0,32)
 			net.SendToServer()
 			ARCPhone.PhoneSys.OutgoingTexts[hash].place = -1
 		end
@@ -116,29 +122,23 @@ net.Receive( "arcphone_comm_text", function(length)
 		else
 			msgchunks[hash].msg = msgchunks[hash].msg .. str
 			if part == whole then
-				MsgN(#msgchunks[hash].msg)
-				timer.Simple(1,function()
-					ARCPhone.PhoneSys:RecieveText(string.Left( msgchunks[hash].msg, 10 ),string.Right( msgchunks[hash].msg, #msgchunks[hash].msg-10 ))
-					
-					--Done Recieving
-					
+					ARCPhone.PhoneSys:RecieveText(unpack(string.Explode( "\v", util.Decompress(msgchunks[hash].msg))))
 					msgchunks[hash] = nil
 					net.Start("arcphone_comm_text")
 					net.WriteInt(-2,8)
 					net.WriteUInt(0,32)
 					net.WriteUInt(0,32)
 					net.WriteString(hash) --Hash
-					net.WriteString("") --Number
+					net.WriteUInt(0,32)
 					net.SendToServer()
 					
-				end)
 			else
 				net.Start("arcphone_comm_text")
 				net.WriteInt(-1,8)
 				net.WriteUInt(part,32)
 				net.WriteUInt(whole,32)
 				net.WriteString(hash) --Hash
-				net.WriteString("") --Number
+				net.WriteUInt(0,32)
 				net.SendToServer()
 				msgchunks[hash].prt = msgchunks[hash].prt + 1
 			end

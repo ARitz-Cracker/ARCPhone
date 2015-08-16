@@ -38,7 +38,7 @@ if CLIENT then
 					net.WriteUInt(0,32)
 					net.WriteUInt(#vv.msg,32)
 					net.WriteString(kk) --Hash
-					net.WriteString(vv.number) --Number
+					net.WriteUInt(0,32)
 					net.SendToServer()
 				end
 			end
