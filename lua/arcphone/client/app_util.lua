@@ -4,8 +4,7 @@
 -- © Copyright Aritz Beobide-Cardinal 2014 All rights reserved.
 ARCPhone.Apps = {}
 
-
-function ARCPhone.NewAppTile()
+function ARCPhone.NewAppTile(app)
 	local tile = {}
 	tile.tile = true
 	tile.x = 48
@@ -18,10 +17,11 @@ function ARCPhone.NewAppTile()
 	tile.drawfunc_override = false
 	tile.drawfunc = false
 	tile.text = ""
-	tile.OnPressed = function(phone,app) end
-	tile.OnUnPressed = function(phone,app) end
-	tile.OnSelected = function(phone,app) end
-	tile.OnUnSelected = function(phone,app) end
+	tile.OnPressed = NULLFUNC -- (self)
+	tile.OnUnPressed = NULLFUNC -- (self)
+	tile.OnSelected = NULLFUNC -- (self)
+	tile.OnUnSelected = NULLFUNC -- (self)
+	tile.App = app
 	return tile
 end
 --[[
@@ -41,8 +41,8 @@ function ARCPhone.NewAppInputTile(typ)
 end
 ]]
 
-function ARCPhone.NewAppTextInputTile(txt,resize,w)
-	local tile = ARCPhone.NewAppTile()
+function ARCPhone.NewAppTextInputTile(app,txt,resize,w)
+	local tile = ARCPhone.NewAppTile(app)
 	tile.TextInput = txt or ""
 	tile.CanResize = resize
 	tile.w = w or 100
@@ -51,102 +51,127 @@ function ARCPhone.NewAppTextInputTile(txt,resize,w)
 		tile._MaxLines = #tile._InputTable
 		tile.h = tile._MaxLines * 12 + 2
 	end
-	tile.drawfunc = function(phone,app,xpos,ypos)
-		if tile.Editable && tile.TextInput != tile.OldTextInput then
-			if tile.CanResize then
-				tile._InputTable = ARCLib.FitText(tile.TextInput,"ARCPhoneSmall",tile.w - 2)
-				tile._MaxLines = #tile._InputTable
-				tile.h = tile._MaxLines * 12 + 2
+	function tile:drawfunc(xpos,ypos)
+		if self.Editable && self.TextInput != self.OldTextInput then
+			if self.CanResize then
+				self._InputTable = ARCLib.FitText(self.TextInput,"ARCPhoneSmall",self.w - 2)
+				self._MaxLines = #self._InputTable
+				self.h = self._MaxLines * 12 + 2
 			else
-				tile._MaxLines = math.floor((tile.h-2)/12)
-				tile._InputTable = ARCLib.FitText(tile.TextInput,"ARCPhoneSmall",tile.w - 2)
+				self._MaxLines = math.floor((self.h-2)/12)
+				self._InputTable = ARCLib.FitText(self.TextInput,"ARCPhoneSmall",self.w - 2)
 			end
-			tile.OldTextInput = tile.TextInput
+			self.OldTextInput = self.TextInput
 		end
-		for i=1,tile._MaxLines do
-			if tile._InputTable[i] then
-				draw.SimpleText( tile._InputTable[i], "ARCPhoneSmall", xpos+1, ypos-11 + i*12, Color(255,255,255,255),TEXT_ALIGN_LEFT , TEXT_ALIGN_BOTTOM )
+		for i=1,self._MaxLines do
+			if self._InputTable[i] then
+				draw.SimpleText( self._InputTable[i], "ARCPhoneSmall", xpos+1, ypos-11 + i*12, Color(255,255,255,255),TEXT_ALIGN_LEFT , TEXT_ALIGN_BOTTOM )
 			end
 		end
 		
 	end
 	tile.Editable = true
-	tile.OnUnPressed = function(phone,app) 
-		phone.PauseInput = true
-		if tile.Editable then
-			Derma_StringRequest( "ARCPhone", "Text input", tile.TextInput, function(text) 
-				phone.PauseInput = false
-				tile.TextInput = text
+	function tile:OnUnPressed() 
+		self.App.Phone.PauseInput = true
+		if self.Editable then
+			Derma_StringRequest( "ARCPhone", "Text input", self.TextInput, function(text) 
+				self.App.Phone.PauseInput = false
+				self.TextInput = text
 			end,function(text)
-				phone.PauseInput = false
+				self.App.Phone.PauseInput = false
 			end)
 		end
 	end
 	return tile
 end
-local NULLFUNC = function(...) end
+
 local curapptime = 0
 local oldapptime = 0
-function ARCPhone.NewAppObject()
-	local app = {}
-	app.ARCPhoneApp = true
-	app.Name = "Unnamed App"
-	app.Author = "Anonymous"
-	app.Purpose = "A brand-new app."
-	app.DisableTileSwitching = false
-	app.Phone = ARCPhone.PhoneSys
-	app.Disk = {}
-	app.Options = {}
-	app.Options[1] = {}
-	app.Options[1].text = "About"
+
+
+
+local ARCPHONE_APP = {}
 	
-	app.Options[1].func = function(phone,app) phone:AddMsgBox("About",tostring(app.Name).."\nby: "..tostring(app.Author).."\n\n"..tostring(app.Purpose),"box") end
-	app.Tiles = {ARCPhone.NewAppTile()}
-	app.Init = NULLFUNC
-	app.PhoneStart = NULLFUNC
-	function app:GetSelectedTile()
+	function ARCPHONE_APP:CreateNewTile(x,y,h,w)
+		local tile = ARCPhone.NewAppTile(self)
+		tile.tile = true
+		tile.x = x or 48
+		tile.y = y or 48
+		tile.w = h or 16
+		tile.h = w or 16
+		return tile
+	end
+	
+	function ARCPHONE_APP:CreateNewTileTextInput(x,y,h,w)
+		local tile = ARCPhone.NewAppTextInputTile(self)
+		tile.tile = true
+		tile.x = x or 48
+		tile.y = y or 48
+		tile.w = h or 16
+		tile.h = w or 16
+		return tile
+	end
+	
+	
+	ARCPHONE_APP.ARCPhoneApp = true
+	ARCPHONE_APP.Name = "Unnamed App"
+	ARCPHONE_APP.Author = "Anonymous"
+	ARCPHONE_APP.Purpose = "A brand-new ARCPHONE_APP."
+	ARCPHONE_APP.DisableTileSwitching = false
+	--ARCPHONE_APP.Phone = ARCPhone.PhoneSys -- NOT A GOOD IDEA FOR table.FullCopy!!!
+	ARCPHONE_APP.Disk = {}
+	ARCPHONE_APP.Options = {}
+	ARCPHONE_APP.Options[1] = {}
+	ARCPHONE_APP.Options[1].text = "About"
+	
+	ARCPHONE_APP.Options[1].func = function(app) app.Phone:AddMsgBox("About",tostring(app.Name).."\nby: "..tostring(app.Author).."\n\n"..tostring(app.Purpose),"box") end
+	ARCPHONE_APP.Tiles = {}
+	ARCPHONE_APP.Init = NULLFUNC
+	ARCPHONE_APP.PhoneStart = NULLFUNC
+	ARCPHONE_APP.OnClose = NULLFUNC
+	function ARCPHONE_APP:GetSelectedTile()
 		return self.Tiles[self.Phone.SelectedAppTile]
 	end
-	function app:SetSelectedTileID(id)
+	function ARCPHONE_APP:SetSelectedTileID(id)
 		self.Phone.SelectedAppTile = id
 	end
-	function app:GetSelectedTileID()
+	function ARCPHONE_APP:GetSelectedTileID()
 		return self.Phone.SelectedAppTile
 	end
-	function app:AddMenuOption(name,func)
+	function ARCPHONE_APP:AddMenuOption(name,func)
 		self.Options[#self.Options+1] = {}
 		self.Options[#self.Options].text = name
 		self.Options[#self.Options].func = func
 	end
-	function app:RemoveMenuOption(name)
+	function ARCPHONE_APP:RemoveMenuOption(name)
 		for k,v in pairs(self.Options) do
 			if v.text && v.text == name then
 				self.Options[k] = nil
 			end
 		end
 	end
-	function app:SaveData()
+	function ARCPHONE_APP:SaveData()
 		file.Write(ARCPhone.ROOTDIR.."/appdata/"..self.sysname..".txt",util.TableToJSON(self.Disk))
 	end
-	function app:AddTile(tile)
+	function ARCPHONE_APP:AddTile(tile)
 		assert( tile.tile, "ARCPHONE_APP.AddTile: Bad argument #1; Invalid tile object" )
 		self.Tiles[#self.Tiles + 1] = tile
 	end
-	function app:RemoveTile(tileid)
+	function ARCPHONE_APP:RemoveTile(tileid)
 		self.Tiles[tileid] = nil
 	end
-	function app:ResetTiles(tileid)
+	function ARCPHONE_APP:ResetTiles(tileid)
 		self.Tiles = {}
 	end
-	function app:BackgroundDraw() end
-	function app:ForegroundDraw() end
-	function app:DrawTiles(mvx,mvy)
+	ARCPHONE_APP.BackgroundDraw = NULLFUNC
+	ARCPHONE_APP.ForegroundDraw = NULLFUNC
+	function ARCPHONE_APP:DrawTiles(mvx,mvy)
 		for k,v in pairs(self.Tiles) do
 			--
 			if ARCLib.TouchingBox(v.x + mvx,v.x + mvx + v.w,v.y + mvy,v.y + mvy + v.h,0,self.Phone.ScreenResX,0,self.Phone.ScreenResY) then
 				
 				if v.drawfunc_override then
-					v.drawfunc_override(self.Phone,app,v.x + mvx,v.y + mvy)
+					v:drawfunc_override(v.x + mvx,v.y + mvy)
 				else
 					if (!v.bgcolor) then
 						v.bgcolor = v.color
@@ -178,7 +203,7 @@ function ARCPhone.NewAppObject()
 						surface.DrawTexturedRect(v.x + mvx + v.w/2 - rez/2,v.y + mvy + v.h/2 - rez/2,rez,rez)
 					end
 					if v.drawfunc then
-						v.drawfunc(app,v.x + mvx,v.y + mvy)
+						v:drawfunc(v.x + mvx,v.y + mvy)
 					end
 					if v.text && string.len(v.text) > 0 then
 						draw.SimpleText( ARCLib.CutOutText(v.text,"ARCPhoneSSmall",v.w), "ARCPhoneSSmall", v.x + mvx +1, v.y + mvy + v.h -1, Color(255,255,255,255),TEXT_ALIGN_LEFT , TEXT_ALIGN_TOP ) 
@@ -199,51 +224,52 @@ function ARCPhone.NewAppObject()
 			end
 		end
 	end
-	app.DrawHUD = NULLFUNC
-	function app:ResetCurPos()
+	ARCPHONE_APP.DrawHUD = NULLFUNC
+	ARCPHONE_APP.TranslateFOV = NULLFUNC
+	function ARCPHONE_APP:ResetCurPos()
 		self.Phone.SelectedAppTile = 1
 		self.Phone.OldSelectedAppTile = self.Phone.SelectedAppTile
 	end
-	app.ShowTaskbar = true
-	app.ForegroundThink = NULLFUNC
-	app.BackgroundThink = NULLFUNC
-	app.Think = NULLFUNC
-	app.OnBack = NULLFUNC
-	app.OnEnter = NULLFUNC
-	app.OnUp = NULLFUNC
-	app.OnDown = NULLFUNC
-	app.OnLeft = NULLFUNC
-	app.OnRight = NULLFUNC
+	ARCPHONE_APP.ShowTaskbar = true
+	ARCPHONE_APP.ForegroundThink = NULLFUNC
+	ARCPHONE_APP.BackgroundThink = NULLFUNC
+	ARCPHONE_APP.Think = NULLFUNC
+	ARCPHONE_APP.OnBack = NULLFUNC
+	ARCPHONE_APP.OnEnter = NULLFUNC
+	ARCPHONE_APP.OnUp = NULLFUNC
+	ARCPHONE_APP.OnDown = NULLFUNC
+	ARCPHONE_APP.OnLeft = NULLFUNC
+	ARCPHONE_APP.OnRight = NULLFUNC
 	
-	app.OnBackUp = NULLFUNC
-	app.OnEnterUp = NULLFUNC
-	app.OnUpUp = NULLFUNC
-	app.OnDownUp = NULLFUNC
-	app.OnLeftUp = NULLFUNC
-	app.OnRightUp = NULLFUNC
+	ARCPHONE_APP.OnBackUp = NULLFUNC
+	ARCPHONE_APP.OnEnterUp = NULLFUNC
+	ARCPHONE_APP.OnUpUp = NULLFUNC
+	ARCPHONE_APP.OnDownUp = NULLFUNC
+	ARCPHONE_APP.OnLeftUp = NULLFUNC
+	ARCPHONE_APP.OnRightUp = NULLFUNC
 	
-	app.OnBackDown = NULLFUNC
-	app.OnEnterDown = NULLFUNC
-	app.OnUpDown = NULLFUNC
-	app.OnDownDown = NULLFUNC
-	app.OnLeftDown = NULLFUNC
-	app.OnRightDown = NULLFUNC
+	ARCPHONE_APP.OnBackDown = NULLFUNC
+	ARCPHONE_APP.OnEnterDown = NULLFUNC
+	ARCPHONE_APP.OnUpDown = NULLFUNC
+	ARCPHONE_APP.OnDownDown = NULLFUNC
+	ARCPHONE_APP.OnLeftDown = NULLFUNC
+	ARCPHONE_APP.OnRightDown = NULLFUNC
 	
-	function app:_OnEnterDown(phone) 
-		self.Tiles[phone.SelectedAppTile].OnPressed(phone,self)
+	function ARCPHONE_APP:_OnEnterDown() 
+		self.Tiles[self.Phone.SelectedAppTile]:OnPressed()
 	end
 	
-	function app:_OnEnterUp(phone) 
-		self.Tiles[phone.SelectedAppTile].OnUnPressed(phone,self)
+	function ARCPHONE_APP:_OnEnterUp() 
+		self.Tiles[self.Phone.SelectedAppTile]:OnUnPressed()
 	end
 	
-	function app:_SwitchTile(phone,butt) 
+	function ARCPHONE_APP:_SwitchTile(butt) 
 		local ignoresound = false
-		local currenttile = self.Tiles[phone.SelectedAppTile]
+		local currenttile = self.Tiles[self.Phone.SelectedAppTile]
 		
 		if (!currenttile) then
-			phone.SelectedAppTile = 1
-			phone.OldSelectedAppTile = phone.SelectedAppTile
+			self.Phone.SelectedAppTile = 1
+			self.Phone.OldSelectedAppTile = self.Phone.SelectedAppTile
 		end
 		
 		
@@ -251,8 +277,8 @@ function ARCPhone.NewAppObject()
 		local bti = false
 		local mvscr = false
 		if butt == KEY_RIGHT then
-			if currenttile.x + currenttile.w + ARCPhone.PhoneSys.MoveX > ARCPhone.PhoneSys.ScreenResX - 8 && currenttile.w > ARCPhone.PhoneSys.ScreenResX then
-				ARCPhone.PhoneSys.BigTileX = ARCPhone.PhoneSys.BigTileX + ARCPhone.PhoneSys.ScreenResX - 20
+			if currenttile.x + currenttile.w + self.Phone.MoveX > self.Phone.ScreenResX - 8 && currenttile.w > self.Phone.ScreenResX then
+				self.Phone.BigTileX = self.Phone.BigTileX + self.Phone.ScreenResX - 20
 				
 			
 				mvscr = true
@@ -265,10 +291,9 @@ function ARCPhone.NewAppObject()
 				end
 			end
 		elseif butt == KEY_LEFT then
-			if currenttile.x + ARCPhone.PhoneSys.MoveX < 8 && currenttile.w > ARCPhone.PhoneSys.ScreenResX then
+			if currenttile.x + self.Phone.MoveX < 8 && currenttile.w > self.Phone.ScreenResX then
 
-				ARCPhone.PhoneSys.BigTileX = ARCPhone.PhoneSys.BigTileX - ARCPhone.PhoneSys.ScreenResX + 20
-				MsgN(ARCPhone.PhoneSys.BigTileX)
+				self.Phone.BigTileX = self.Phone.BigTileX - self.Phone.ScreenResX + 20
 
 				mvscr = true
 			else
@@ -280,8 +305,8 @@ function ARCPhone.NewAppObject()
 				end
 			end
 		elseif butt == KEY_DOWN then
-			if currenttile.y + currenttile.h + ARCPhone.PhoneSys.MoveY > ARCPhone.PhoneSys.ScreenResY - 8 && currenttile.h > ARCPhone.PhoneSys.ScreenResX then
-				ARCPhone.PhoneSys.BigTileY = ARCPhone.PhoneSys.BigTileY + ARCPhone.PhoneSys.ScreenResY - 20
+			if currenttile.y + currenttile.h + self.Phone.MoveY > self.Phone.ScreenResY - 8 && currenttile.h > self.Phone.ScreenResX then
+				self.Phone.BigTileY = self.Phone.BigTileY + self.Phone.ScreenResY - 20
 
 				mvscr = true
 			else
@@ -293,8 +318,8 @@ function ARCPhone.NewAppObject()
 				end
 			end
 		elseif butt == KEY_UP then
-			if currenttile.y + ARCPhone.PhoneSys.MoveY < 29 && currenttile.h > ARCPhone.PhoneSys.ScreenResX then
-				ARCPhone.PhoneSys.BigTileY = ARCPhone.PhoneSys.BigTileY - ARCPhone.PhoneSys.ScreenResY + 41
+			if currenttile.y + self.Phone.MoveY < 29 && currenttile.h > self.Phone.ScreenResX then
+				self.Phone.BigTileY = self.Phone.BigTileY - self.Phone.ScreenResY + 41
 			
 
 				mvscr = true
@@ -329,35 +354,39 @@ function ARCPhone.NewAppObject()
 			end
 		end
 		if bti then
-			phone:EmitSound("buttons/button9.wav",60,255)
+			self.Phone:EmitSound("buttons/button9.wav",60,255)
 			curapptime = CurTime() + 0.1
 			oldapptime = CurTime()
-			currenttile.OnUnSelected(phone,self)
+			currenttile:OnUnSelected()
 			if (input.IsKeyDown(KEY_ENTER) || input.WasKeyPressed(KEY_ENTER)) then
-				currenttile.OnUnPressed(phone,self)
+				currenttile:OnUnPressed()
 			end
-			ARCPhone.PhoneSys.OldSelectedAppTile = phone.SelectedAppTile
-			phone.SelectedAppTile = bti 
+			self.Phone.OldSelectedAppTile = self.Phone.SelectedAppTile
+			self.Phone.SelectedAppTile = bti 
 			if butt == KEY_RIGHT then
-				ARCPhone.PhoneSys.BigTileX = self.Tiles[bti].x
+				self.Phone.BigTileX = self.Tiles[bti].x
 			elseif butt == KEY_LEFT then
-				ARCPhone.PhoneSys.BigTileX = self.Tiles[bti].x + self.Tiles[bti].w - ARCPhone.PhoneSys.ScreenResX + 8
+				self.Phone.BigTileX = self.Tiles[bti].x + self.Tiles[bti].w - self.Phone.ScreenResX + 8
 			elseif butt == KEY_DOWN then
-				ARCPhone.PhoneSys.BigTileY = self.Tiles[bti].y
+				self.Phone.BigTileY = self.Tiles[bti].y
 			elseif butt == KEY_UP then
-				ARCPhone.PhoneSys.BigTileY = self.Tiles[bti].y + self.Tiles[bti].h - ARCPhone.PhoneSys.ScreenResY + 8
+				self.Phone.BigTileY = self.Tiles[bti].y + self.Tiles[bti].h - self.Phone.ScreenResY + 8
 			end
-			self.Tiles[bti].OnSelected(phone,self)
+			self.Tiles[bti]:OnSelected()
 			if (input.IsKeyDown(KEY_ENTER) || input.WasKeyPressed(KEY_ENTER)) then
-				self.Tiles[bti].OnPressed(phone,self)
+				self.Tiles[bti]:OnPressed()
 			end
 		elseif butt == KEY_BACKSPACE || butt == KEY_ENTER || mvscr then
-			phone:EmitSound("buttons/button9.wav",60,255)
+			self.Phone:EmitSound("buttons/button9.wav",60,255)
 		else
-			phone:EmitSound("common/wpn_denyselect.wav")
+			self.Phone:EmitSound("common/wpn_denyselect.wav")
 		end
 	end
-	return app
+
+function ARCPhone.NewAppObject()
+	local tab = table.FullCopy(ARCPHONE_APP)
+	tab.Phone = ARCPhone.PhoneSys
+	return tab
 end
 function ARCPhone.RegisterApp(app,name)
 	assert( istable(app), "ARCPhone.RegisterApp: Bad argument #1; All I wanted was a table, but I got some sort of "..type(app).." thing..." )

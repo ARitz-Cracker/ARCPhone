@@ -12,6 +12,8 @@ ARCPhone.PhoneSys.OutgoingTexts = ARCPhone.PhoneSys.OutgoingTexts or {}
 
 ARCPhone.PhoneSys.Booted = false
 
+ARCPhone.PhoneSys.Ent = NULL
+
 for k,v in pairs(ARCPhone.PhoneSys.ValidKeys) do
 	ARCPhone.PhoneSys.KeyDelay[v] = CurTime() - 1
 end
@@ -28,12 +30,12 @@ function ARCPhone.PhoneSys:GetApp(id)
 end
 function ARCPhone.PhoneSys:SetLoading(percent)
 	percent = percent or -0.01
-	if percent < 0 then
+	if percent > 0 then
 		self.LoadingPer = math.floor(percent*100)
 	else
 		self.LoadingPer = -1
 	end
-	self.Loading = percent > -2
+	self.Loading = tobool(percent > -2)
 	
 end
 function ARCPhone.PhoneSys:Think(wep)		
@@ -45,14 +47,14 @@ function ARCPhone.PhoneSys:Think(wep)
 				self.Options = table.Copy(ARCPhone.Apps[self.ActiveApp].Options)
 				self.Options[#self.Options+1] = {}
 				self.Options[#self.Options].text = "Lock"
-				self.Options[#self.Options].func = function(ph,ap)
-					ph:Lock()
+				self.Options[#self.Options].func = function(ap)
+					ap.Phone:Lock()
 				end
 				
 				self.Options[#self.Options+1] = {}
 				self.Options[#self.Options].text = "Home"
-				self.Options[#self.Options].func = function(ph,ap)
-					ph:OpenApp("home")
+				self.Options[#self.Options].func = function(ap)
+					ap.Phone:OpenApp("home")
 				end
 			end
 		end
@@ -96,6 +98,7 @@ for i = 0,7 do
 end
 
 function ARCPhone.PhoneSys:AddMsgBox(title,txt,icon,typ,gfunc,rfunc,yfunc)
+	if (!istable(self.MsgBoxs)) then return end
 	local i = #self.MsgBoxs + 1
 	self.MsgBoxOption = 1
 	self.MsgBoxs[i] = {}
@@ -103,15 +106,29 @@ function ARCPhone.PhoneSys:AddMsgBox(title,txt,icon,typ,gfunc,rfunc,yfunc)
 	self.MsgBoxs[i].Text = txt or "Message Box"
 	self.MsgBoxs[i].Icon = icon or "info"
 	self.MsgBoxs[i].Type = typ or 1
-	self.MsgBoxs[i].GreenFunc = gfunc or function() end 
-	self.MsgBoxs[i].RedFunc = rfunc or function() end
-	self.MsgBoxs[i].YellowFunc = yfunc or function() end
+	self.MsgBoxs[i].GreenFunc = gfunc or NULLFUNC
+	self.MsgBoxs[i].RedFunc = rfunc or NULLFUNC
+	self.MsgBoxs[i].YellowFunc = yfunc or NULLFUNC
 end
 
 function ARCPhone.PhoneSys:DrawHud(wep)
 	local app = ARCPhone.Apps[self.ActiveApp]
 	if (app && self.Booted) then
 		app:DrawHUD()
+	end
+end
+
+function ARCPhone.PhoneSys:DrawHud(wep)
+	local app = ARCPhone.Apps[self.ActiveApp]
+	if (app && self.Booted) then
+		app:DrawHUD()
+	end
+end
+
+function ARCPhone.PhoneSys:TranslateFOV(wep)
+	local app = ARCPhone.Apps[self.ActiveApp]
+	if (app && self.Booted) then
+		return app:TranslateFOV()
 	end
 end
 
@@ -141,6 +158,8 @@ function ARCPhone.PhoneSys:Init(wep)
 	self.MsgBoxs = {}
 	self.MsgBoxOption = 1
 
+	self.Ent = wep or NULL
+	
 	if !wep then return end
 	wep.VElements["screen"].draw_func = function( weapon )
 			
@@ -255,7 +274,7 @@ function ARCPhone.PhoneSys:Init(wep)
 				end
 				
 				local maxmsgbox = #self.MsgBoxs  
-				if maxmsgbox > 0 then -- ARITZ WORK HERE!
+				if maxmsgbox > 0 then
 					
 					local buttonwidth = self.ScreenResX - 8
 					local maxo = 1
@@ -282,7 +301,7 @@ function ARCPhone.PhoneSys:Init(wep)
 					elseif self.MsgBoxs[maxmsgbox].Icon == "info" then
 						surface.SetDrawColor( 64, 255, 64, 255 )
 					elseif self.MsgBoxs[maxmsgbox].Icon == "question" then
-						surface.SetDrawColor( 255, 64, 64, 255 )
+						surface.SetDrawColor( 64, 64, 255, 255 )
 					end
 					surface.DrawTexturedRect( 4, 26, 16, 16 )
 					
@@ -451,6 +470,9 @@ function ARCPhone.PhoneSys:Init(wep)
 	if !file.IsDir( ARCPhone.ROOTDIR.."/camera","DATA" ) then
 		file.CreateDir( ARCPhone.ROOTDIR.."/camera")
 	end
+	if !file.IsDir( ARCPhone.ROOTDIR.."/photos","DATA" ) then
+		file.CreateDir( ARCPhone.ROOTDIR.."/photos")
+	end
 	if (ARCPhone.ClientFiles) then
 		for k,v in pairs(ARCPhone.ClientFiles) do
 			MsgN("WRITING "..ARCPhone.ROOTDIR..k)
@@ -481,31 +503,35 @@ end
 		self:AddMsgBox("PROTOTYPE VERSION","Because this is not a public release, BE PREPARED TO LOOSE ALL DATA WITH EVERY UPDATE.","warning")
 		self:AddMsgBox("My excuse for a tutorial","Use the Arrow keys to move the cursor. Press BACKSPACE to go back, press CTRL to access the context menu, and press ENTER select.","info")
 		self:AddMsgBox("PROTOTYPE VERSION","This is the prototype version of ARCPhone (pre-alpha), and does not represent the final product. Everything is subject to change. (Press ENTER to close this window)","info")
-
 	end
 	
 	function ARCPhone.PhoneSys:Init_DLFiles(num,retries) 
 		if (ARCPhone.ClientFilesDL && ARCPhone.ClientFilesDL[num]) then
-			http.Fetch( "https://update.aritzcracker.ca/arcphone_dlfiles"..ARCPhone.ClientFilesDL[num],
-				function( body, len, headers, code )
-					if code == 200 then
-						file.Write(ARCPhone.ROOTDIR..ARCPhone.ClientFilesDL[num],util.Base64Decode(body))
-						ARCPhone.PhoneSys:Init_DLFiles(num+1)
-						self:SetLoading(num/#ARCPhone.ClientFilesDL)
-					else
-						self:AddMsgBox("HTTP Error code: "..code.." while getting "..ARCPhone.ClientFilesDL[num].."\nThis may cause graphical glitches","cross")
+			if (file.Exists(ARCPhone.ROOTDIR..ARCPhone.ClientFilesDL[num],"DATA")) then		
+				self:SetLoading(num/#ARCPhone.ClientFilesDL)
+				timer.Simple(0.1, function() ARCPhone.PhoneSys:Init_DLFiles(num+1) end)
+			else
+				http.Fetch( "https://update.aritzcracker.ca/arcphone_dlfiles"..ARCPhone.ClientFilesDL[num],
+					function( body, len, headers, code )
+						if code == 200 then
+							file.Write(ARCPhone.ROOTDIR..ARCPhone.ClientFilesDL[num],util.Base64Decode(body))
+							self:SetLoading(num/#ARCPhone.ClientFilesDL)
+							ARCPhone.PhoneSys:Init_DLFiles(num+1)
+						else
+							self:AddMsgBox("HTTP Error code: "..code.." while getting "..ARCPhone.ClientFilesDL[num].."\nThis may cause graphical glitches","cross")
+						end
+					end,
+					function( err )
+						if retries < 10 then
+							timer.Simple(10,function() ARCPhone.PhoneSys:Init_DLFiles(num) end)
+						else
+							ARCPhone.PhoneSys:Init_DLFiles(num+1)
+							self:SetLoading(num/#ARCPhone.ClientFilesDL)
+							self:AddMsgBox("HTTP Error: "..err.." while getting "..ARCPhone.ClientFilesDL[num].."\nThis may cause graphical glitches","cross")
+						end
 					end
-				end,
-				function( err )
-					if retries < 10 then
-						timer.Simple(10,function() ARCPhone.PhoneSys:Init_DLFiles(num) end)
-					else
-						ARCPhone.PhoneSys:Init_DLFiles(num+1)
-						self:SetLoading(num/#ARCPhone.ClientFilesDL)
-						self:AddMsgBox("HTTP Error: "..err.." while getting "..ARCPhone.ClientFilesDL[num].."\nThis may cause graphical glitches","cross")
-					end
-				end
-			);
+				);
+			end
 		else
 			ARCPhone.PhoneSys:Init_Final()
 		end
@@ -620,9 +646,11 @@ end
 		return ARCPhone.Apps[app] != nil
 	end
 	function ARCPhone.PhoneSys:OpenApp(app)
-		if !app || !isstring(app) || app == "" || !ARCPhone.Apps[app] then
-			self:AddMsgBox("Cannot open app","App is invalid or not available in this area.","cross")
+		if !isstring(app) || !istable(ARCPhone.Apps[app]) then
+			app = tostring(app)
+			self:AddMsgBox("Cannot open "..app,"App '"..app.."' is invalid or not available in this area.\n("..type(ARCPhone.Apps[app])..")","cross")
 		else
+			ARCPhone.Apps[self.ActiveApp]:OnClose()
 			self.OldSelectedAppTile = 1
 			self.SelectedAppTile = 1
 			self.ShowConsole = false
@@ -826,24 +854,24 @@ end
 			return
 		else
 			if !app.DisableTileSwitching then
-				app:_SwitchTile(self,button)
+				app:_SwitchTile(button)
 			end
 			if button == KEY_BACKSPACE then
 				if (CurTime() < lastback) then
 					self:Lock()
 				end
 				lastback = CurTime() + 0.1
-				app:OnBack(self)
+				app:OnBack()
 			elseif button == KEY_ENTER then
-				app:OnEnter(self)
+				app:OnEnter()
 			elseif button == KEY_UP then
-				app:OnUp(self)
+				app:OnUp()
 			elseif button == KEY_DOWN then
-				app:OnDown(self)
+				app:OnDown()
 			elseif button == KEY_LEFT then
-				app:OnLeft(self)
+				app:OnLeft()
 			elseif button == KEY_RIGHT then
-				app:OnRight(self)
+				app:OnRight()
 			end
 		end
 	end
@@ -870,24 +898,24 @@ end
 			return
 		elseif self.ShowOptions then
 			if button == KEY_ENTER then
-				self.Options[self.CurrentOption].func(self,app)
+				self.Options[self.CurrentOption].func(app)
 				self.ShowOptions = false
 				return
 			end
 		else
 			if button == KEY_BACKSPACE then
-				app:OnBackUp(self)
+				app:OnBackUp()
 			elseif button == KEY_ENTER then
-				app:_OnEnterUp(self)
-				app:OnEnterUp(self)
+				app:_OnEnterUp()
+				app:OnEnterUp()
 			elseif button == KEY_UP then
-				app:OnUpUp(self)
+				app:OnUpUp()
 			elseif button == KEY_DOWN then
-				app:OnDownUp(self)
+				app:OnDownUp()
 			elseif button == KEY_LEFT then
-				app:OnLeftUp(self)
+				app:OnLeftUp()
 			elseif button == KEY_RIGHT then
-				app:OnRightUp(self)
+				app:OnRightUp()
 			end
 		end
 	end
@@ -897,18 +925,18 @@ end
 		elseif self.ShowOptions then return end
 		local app = ARCPhone.Apps[self.ActiveApp]
 		if button == KEY_BACKSPACE then
-			app:OnBackDown(self)
+			app:OnBackDown()
 		elseif button == KEY_ENTER then
-			app:_OnEnterDown(self)
-			app:OnEnterDown(self)
+			app:_OnEnterDown()
+			app:OnEnterDown()
 		elseif button == KEY_UP then
-			app:OnUpDown(self)
+			app:OnUpDown()
 		elseif button == KEY_DOWN then
-			app:OnDownDown(self)
+			app:OnDownDown()
 		elseif button == KEY_LEFT then
-			app:OnLeftDown(self)
+			app:OnLeftDown()
 		elseif button == KEY_RIGHT then
-			app:OnRightDown(self)
+			app:OnRightDown()
 		end
 	end
 	

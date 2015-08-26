@@ -1,14 +1,15 @@
--- phone_background.lua - background proccesses while the phone is holstered.
+-- phone_background.lua - background processes while the phone is holstered.
 
 -- This file is under copyright, and is bound to the agreement stated in the ELUA.
 -- Any 3rd party content has been used as either public domain or with permission.
--- © Copyright Aritz Beobide-Cardinal 2014 All rights reserved.
+-- © Copyright Aritz Beobide-Cardinal 2014,2015 All rights reserved.
 
 local CallingSound
 local RingingSound
 
 function ARCPhone.OnStatusChanged()
 	local newstatus = ARCPhone.PhoneSys.Status
+	if !ARCPhone.PhoneSys.Booted then return end
 	MsgN("Phone status has been changed to "..ARCPhone.PhoneSys.Status)
 	if newstatus == ARCPHONE_ERROR_DIALING then
 		if !CallingSound then

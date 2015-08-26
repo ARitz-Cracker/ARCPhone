@@ -38,7 +38,7 @@ function APP:SelectContact(tileid)
 	self:ResetCurPos()
 	self.Home = false
 	table.Empty(self.Tiles)
-	self.Tiles[1] = ARCPhone.NewAppTile()
+	self.Tiles[1] = ARCPhone.NewAppTile(self)
 	self.Tiles[1].x = 8
 	self.Tiles[1].y = 42
 	self.Tiles[1].w = 122
@@ -48,49 +48,49 @@ function APP:SelectContact(tileid)
 	if file.Exists(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[tileid][ARCPHONE_CONTACT_NUMBER]..".dat","DATA") then
 		self.ProfilePics[1] = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[tileid][ARCPHONE_CONTACT_NUMBER]..".dat","jpg");
 	end
-	self.Tiles[1].drawfunc = function(phone,app,x,y)
+	self.Tiles[1].drawfunc = function(tile,x,y)
 		surface.SetDrawColor(255,255,255,255)
-		if (self.ProfilePics[tileid]) then
-			surface.SetMaterial(self.ProfilePics[tileid])
+		if (tile.App.ProfilePics[tileid]) then
+			surface.SetMaterial(tile.App.ProfilePics[tileid])
 		else
-			surface.SetMaterial(self.ProfilePics[0])
+			surface.SetMaterial(tile.App.ProfilePics[0])
 		end
 		surface.DrawTexturedRect( x + 2, y + 2, 24, 24 )
-		draw.SimpleText(self.Disk[tileid][ARCPHONE_CONTACT_NAME], "ARCPhone", x + 28, y+self.Tiles[1].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
-		draw.SimpleText(self.Disk[tileid][ARCPHONE_CONTACT_NUMBER], "ARCPhone", x + 28, y+self.Tiles[1].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
+		draw.SimpleText(tile.App.Disk[tileid][ARCPHONE_CONTACT_NAME], "ARCPhone", x + 28, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
+		draw.SimpleText(tile.App.Disk[tileid][ARCPHONE_CONTACT_NUMBER], "ARCPhone", x + 28, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
 	end
 	
 	local len = #self.ContactOptionNames + 1
 	
 	for i=2,len do
-		self.Tiles[i] = ARCPhone.NewAppTile()
+		self.Tiles[i] = ARCPhone.NewAppTile(self)
 		self.Tiles[i].x = 8
 		self.Tiles[i].y = 42 + i*22
 		self.Tiles[i].w = 122
 		self.Tiles[i].h = 18
 		self.Tiles[i].color = Color(0,0,64,255)
-		self.Tiles[i].drawfunc = function(phone,app,x,y)
-			draw.SimpleText(self.ContactOptionNames[i-1], "ARCPhone", x+self.Tiles[i].w*0.5, y+self.Tiles[i].h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+		self.Tiles[i].drawfunc = function(tile,x,y)
+			draw.SimpleText(self.ContactOptionNames[i-1], "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 
 		end
-		self.Tiles[i].OnPressed = function(phone,app)
-			self.Tiles[i].color = Color(0,0,64,128)
+		self.Tiles[i].OnPressed = function(tile)
+			tile.color = Color(0,0,64,128)
 		end
-		self.Tiles[i].OnUnPressed = function(phone,app)
-			self.Tiles[i].color = Color(0,0,64,255)
-			if #self.ContactOptionArgs[i-1] > 0 then
-				self.ContactOptionFuncs[i-1](unpack(self.ContactOptionArgs[i-1]),self.Disk[tileid][ARCPHONE_CONTACT_NUMBER])
+		self.Tiles[i].OnUnPressed = function(tile)
+			tile.color = Color(0,0,64,255)
+			if #tile.App.ContactOptionArgs[i-1] > 0 then
+				tile.App.ContactOptionFuncs[i-1](unpack(tile.App.ContactOptionArgs[i-1]),tile.App.Disk[tileid][ARCPHONE_CONTACT_NUMBER])
 			else
-				self.ContactOptionFuncs[i-1](self.Disk[tileid][ARCPHONE_CONTACT_NUMBER])
+				tile.App.ContactOptionFuncs[i-1](tile.App.Disk[tileid][ARCPHONE_CONTACT_NUMBER])
 			end
 		end
 	end
 	
 	--[[
-	self.Tiles[1].OnPressed = function(phone,app)
+	self.Tiles[1].OnPressed = function(app)
 		self.Tiles[1].color = Color(0,0,255,128)
 	end
-	self.Tiles[1].OnUnPressed = function(phone,app)
+	self.Tiles[1].OnUnPressed = function(app)
 		self.Tiles[1].color = Color(0,0,255,255)
 		ARCPhone.PhoneSys:AddMsgBox("Coming soon!","Todo: contact options screen","info")
 	end
@@ -103,9 +103,9 @@ end
 
 APP.Options[2] = {}
 APP.Options[2].text = "Edit"
-APP.Options[2].func = function(phone,app) 
-	if app.Tiles[phone.SelectedAppTile].ContactEditable then
-		app:EditContact(phone.SelectedAppTile)
+APP.Options[2].func = function(app) 
+	if app.Tiles[app.Phone.SelectedAppTile].ContactEditable then
+		app:EditContact(app.Phone.SelectedAppTile)
 	else
 		ARCPhone.PhoneSys:AddMsgBox("Cannot edit","You cannot edit this icon because it's not a contact entry","cross")
 	end
@@ -157,7 +157,7 @@ function APP:Init()
 
 	local len = #self.Disk
 	for i=1,len do
-		self.Tiles[i] = ARCPhone.NewAppTile()
+		self.Tiles[i] = ARCPhone.NewAppTile(self)
 		self.Tiles[i].x = 8
 		self.Tiles[i].y = 10 + i*32
 		self.Tiles[i].w = 122
@@ -167,60 +167,60 @@ function APP:Init()
 		if file.Exists(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[i][ARCPHONE_CONTACT_NUMBER]..".dat","DATA") then
 			self.ProfilePics[i] = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[i][ARCPHONE_CONTACT_NUMBER]..".dat","jpg");
 		end
-		self.Tiles[i].drawfunc = function(phone,app,x,y)
+		self.Tiles[i].drawfunc = function(tile,x,y)
 			surface.SetDrawColor(255,255,255,255)
-			if (self.ProfilePics[i]) then
-				surface.SetMaterial(self.ProfilePics[i])
+			if (tile.App.ProfilePics[i]) then
+				surface.SetMaterial(tile.App.ProfilePics[i])
 			else
-				surface.SetMaterial(self.ProfilePics[0])
+				surface.SetMaterial(tile.App.ProfilePics[0])
 			end
 			surface.DrawTexturedRect( x + 2, y + 2, 24, 24 )
-			draw.SimpleText(self.Disk[i][ARCPHONE_CONTACT_NAME], "ARCPhone", x + 28, y+self.Tiles[i].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
-			draw.SimpleText(self.Disk[i][ARCPHONE_CONTACT_NUMBER], "ARCPhone", x + 28, y+self.Tiles[i].h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
+			draw.SimpleText(tile.App.Disk[i][ARCPHONE_CONTACT_NAME], "ARCPhone", x + 28, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
+			draw.SimpleText(tile.App.Disk[i][ARCPHONE_CONTACT_NUMBER], "ARCPhone", x + 28, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
 		end
-		self.Tiles[i].OnPressed = function(phone,app)
-			self.Tiles[i].color = Color(0,0,255,128)
+		self.Tiles[i].OnPressed = function(tile)
+			tile.color = Color(0,0,255,128)
 		end
-		self.Tiles[i].OnUnPressed = function(phone,app)
-			self.Tiles[i].color = Color(0,0,255,255)
-			self:SelectContact(i)
+		self.Tiles[i].OnUnPressed = function(tile)
+			tile.color = Color(0,0,255,255)
+			tile.App:SelectContact(i)
 		end
 	end
 	len = len + 1
-	self.Tiles[len] = ARCPhone.NewAppTile()
+	self.Tiles[len] = ARCPhone.NewAppTile(self)
 	self.Tiles[len].x = 8
 	self.Tiles[len].y = 10 + len*32
 	self.Tiles[len].w = 122
 	self.Tiles[len].h = 28
 	self.Tiles[len].color = Color(0,0,64,255)
-	self.Tiles[len].drawfunc = function(phone,app,x,y)
-		draw.SimpleText("**New contact**", "ARCPhone", x+self.Tiles[len].w*0.5, y+self.Tiles[len].h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+	self.Tiles[len].drawfunc = function(tile,x,y)
+		draw.SimpleText("**New contact**", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 
 	end
-	self.Tiles[len].OnPressed = function(phone,app)
-		self.Tiles[len].color = Color(0,0,64,128)
+	self.Tiles[len].OnPressed = function(tile)
+		tile.color = Color(0,0,64,128)
 	end
-	self.Tiles[len].OnUnPressed = function(phone,app)
-		self.Tiles[len].color = Color(0,0,64,255)
-		self:EditContact(0)
+	self.Tiles[len].OnUnPressed = function(tile)
+		tile.color = Color(0,0,64,255)
+		tile.App:EditContact(0)
 	end
 
 	len = len + 1
-	self.Tiles[len] = ARCPhone.NewAppTile()
+	self.Tiles[len] = ARCPhone.NewAppTile(self)
 	self.Tiles[len].x = 8
 	self.Tiles[len].y = 10 + len*32
 	self.Tiles[len].w = 122
 	self.Tiles[len].h = 28
 	self.Tiles[len].color = Color(0,0,64,255)
-	self.Tiles[len].drawfunc = function(phone,app,x,y)
-		draw.SimpleText("**People near by**", "ARCPhone", x+self.Tiles[len].w*0.5, y+self.Tiles[len].h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+	self.Tiles[len].drawfunc = function(tile,x,y)
+		draw.SimpleText("**People near by**", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 	end
-	self.Tiles[len].OnPressed = function(phone,app)
-		self.Tiles[len].color = Color(0,0,64,128)
+	self.Tiles[len].OnPressed = function(tile)
+		tile.color = Color(0,0,64,128)
 	end
-	self.Tiles[len].OnUnPressed = function(phone,app)
-		self.Tiles[len].color = Color(0,0,64,255)
-		ARCPhone.PhoneSys:AddMsgBox("Coming soon!","This feature has not been implemented yet, it will be available in a later version of ARCPhone","info")
+	self.Tiles[len].OnUnPressed = function(tile)
+		tile.color = Color(0,0,64,255)
+		tile.App.Phone:AddMsgBox("Coming soon!","This feature has not been implemented yet, it will be available in a later version of ARCPhone","info")
 	end
 	
 end
@@ -230,7 +230,7 @@ function APP:EditContact(tileid)
 	self:ResetCurPos()
 	self.Home = false
 	self.Tiles = {}
-	self.Tiles[1] = ARCPhone.NewAppTile()
+	self.Tiles[1] = ARCPhone.NewAppTile(self)
 	self.Tiles[1].x = 8
 	self.Tiles[1].y = 24
 	self.Tiles[1].w = 24
@@ -242,12 +242,12 @@ function APP:EditContact(tileid)
 	else
 		self.Tiles[1].mat = self.ProfilePics[0]
 	end
-	self.Tiles[1].OnPressed = function(phone,app)
-		self.Tiles[1].color = Color(255,255,255,128)
+	self.Tiles[1].OnPressed = function(tile)
+		tile.color = Color(255,255,255,128)
 	end
-	self.Tiles[1].OnUnPressed = function(phone,app)
-		self.Tiles[1].color = Color(255,255,255,255)
-		ARCPhone.PhoneSys:AddMsgBox("Coming soon!","You cannot change contact photos yet","info")
+	self.Tiles[1].OnUnPressed = function(tile)
+		tile.color = Color(255,255,255,255)
+		tile.App:AddMsgBox("Coming soon!","You cannot change contact photos yet","info")
 	end
 	
 	if (tileid > 0) then
@@ -269,57 +269,56 @@ function APP:EditContact(tileid)
 	self.Tiles[3].color = Color(72,72,72,255)
 	
 	
-	self.Tiles[4] = ARCPhone.NewAppTile()
+	self.Tiles[4] = ARCPhone.NewAppTile(self)
 	self.Tiles[4].x = 8
 	self.Tiles[4].y = 194
 	self.Tiles[4].w = 122
 	self.Tiles[4].h = 18
 	self.Tiles[4].color = Color(128,128,128,255)
-	self.Tiles[4].OnPressed = function(phone,app)
-		self.Tiles[4].color = Color(128,128,128,128)
+	self.Tiles[4].OnPressed = function(tile)
+		tile.color = Color(128,128,128,128)
 	end
-	self.Tiles[4].OnUnPressed = function(phone,app)
-		self.Tiles[4].color = Color(128,128,128,255)	
+	self.Tiles[4].OnUnPressed = function(tile)
+		tile.color = Color(128,128,128,255)	
 		if (tileid > 0) then
-			table.remove(app.Disk,tileid)
+			table.remove(tile.App.Disk,tileid)
 		end
-		app:SaveData()
-		app:Init()
+		tile.App:SaveData()
+		tile.App:Init()
 	end
-	self.Tiles[4].drawfunc = function(phone,app,x,y)
-		draw.SimpleText( "Delete", "ARCPhone", x+app.Tiles[4].w*0.5, y+app.Tiles[4].h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+	self.Tiles[4].drawfunc = function(tile,x,y)
+		draw.SimpleText( "Delete", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 	end
 	
-	self.Tiles[5] = ARCPhone.NewAppTile()
+	self.Tiles[5] = ARCPhone.NewAppTile(self)
 	self.Tiles[5].x = 8
 	self.Tiles[5].y = 218
 	self.Tiles[5].w = 122
 	self.Tiles[5].h = 18
 	self.Tiles[5].color = Color(0,0,255,255)
-	self.Tiles[5].OnPressed = function(phone,app)
-		self.Tiles[5].color = Color(0,0,255,128)
+	self.Tiles[5].OnPressed = function(tile)
+		tile.color = Color(0,0,255,128)
 	end
-	self.Tiles[5].OnUnPressed = function(phone,app)
-		self.Tiles[5].color = Color(0,0,255,255)
+	self.Tiles[5].OnUnPressed = function(tile)
+		tile.color = Color(0,0,255,255)
 		if (ARCPhone.IsValidPhoneNumber(app.Tiles[3].TextInput)) then
 			if (tileid > 0) then
-				app.Disk[tileid][ARCPHONE_CONTACT_NAME] = app.Tiles[2].TextInput
-				app.Disk[tileid][ARCPHONE_CONTACT_NUMBER] = app.Tiles[3].TextInput
+				tile.App.Disk[tileid][ARCPHONE_CONTACT_NAME] = app.Tiles[2].TextInput
+				tile.App.Disk[tileid][ARCPHONE_CONTACT_NUMBER] = tile.App.Tiles[3].TextInput
 			else
-				local len = #app.Disk + 1
-				app.Disk[len] = {}
-				app.Disk[len][ARCPHONE_CONTACT_NAME] = app.Tiles[2].TextInput
-				app.Disk[len][ARCPHONE_CONTACT_NUMBER] = app.Tiles[3].TextInput
+				local len = #tile.App.Disk + 1
+				tile.App.Disk[len] = {}
+				tile.App.Disk[len][ARCPHONE_CONTACT_NAME] = tile.App.Tiles[2].TextInput
+				tile.App.Disk[len][ARCPHONE_CONTACT_NUMBER] = tile.App.Tiles[3].TextInput
 			end
-			app:SaveData()
-			app:Init()
+			tile.App:SaveData()
+			tile.App:Init()
 		else
 			ARCPhone.PhoneSys:AddMsgBox("Cannot save","the number you have entered is invalid.","warning")
 		end
-		--phone:Call(self.Dialnum)
 	end
-	self.Tiles[5].drawfunc = function(phone,app,x,y)
-		draw.SimpleText( "Save", "ARCPhone", x+app.Tiles[5].w*0.5, y+app.Tiles[5].h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+	self.Tiles[5].drawfunc = function(tile,x,y)
+		draw.SimpleText( "Save", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 	end
 	
 end

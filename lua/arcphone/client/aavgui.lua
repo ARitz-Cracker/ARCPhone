@@ -48,3 +48,20 @@ surface.CreateFont( "ARCPhoneSSmall", {
 	additive = false,
 	outline = false
 } )
+
+surface.CreateFont( "ARCPhoneHudText", {
+	font = "Arial",
+	size = 30,
+	weight = 120,
+	blursize = 0,
+	scanlines = 0,
+	antialias = false,
+	underline = false,
+	italic = false,
+	strikeout = false,
+	symbol = false,
+	rotary = false,
+	shadow = false,
+	additive = false,
+	outline = true
+} )
