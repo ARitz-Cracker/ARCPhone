@@ -22,6 +22,12 @@ function ARCPhone.PhoneSys:EmitSound(snd,vol,pitch)
 	sound.Play( snd, LocalPlayer():GetPos(), vol, pitch) 
 end
 
+function ARCPhone.PhoneSys:ChoosePhoto(func,...)
+	local curapp = ARCPhone.Apps[self.ActiveApp]
+	local newapp = ARCPhone.PhoneSys:OpenApp("photos",false,true)
+	newapp:AttachPhoto(curapp.sysname,func,...)
+end
+
 function ARCPhone.PhoneSys:GetActiveApp()
 	return ARCPhone.Apps[self.ActiveApp]
 end
@@ -645,19 +651,24 @@ end
 	function ARCPhone.PhoneSys:AppExists(app)
 		return ARCPhone.Apps[app] != nil
 	end
-	function ARCPhone.PhoneSys:OpenApp(app)
+	function ARCPhone.PhoneSys:OpenApp(app,noinit,noclose)
 		if !isstring(app) || !istable(ARCPhone.Apps[app]) then
 			app = tostring(app)
 			self:AddMsgBox("Cannot open "..app,"App '"..app.."' is invalid or not available in this area.\n("..type(ARCPhone.Apps[app])..")","cross")
 		else
-			ARCPhone.Apps[self.ActiveApp]:OnClose()
+			if (!noclose) then
+				ARCPhone.Apps[self.ActiveApp]:OnClose()
+			end
 			self.OldSelectedAppTile = 1
 			self.SelectedAppTile = 1
 			self.ShowConsole = false
 			self.ActiveApp = app
 			self.MoveX = 0
 			self.MoveY = 0
-			ARCPhone.Apps[app]:Init()
+			if (!noinit) then
+				ARCPhone.Apps[app]:Init()
+			end
+			return ARCPhone.Apps[app]
 		end
 	end
 	function ARCPhone.PhoneSys:Lock()
