@@ -567,7 +567,7 @@ end
 		local matches = {string.gmatch(message, "({{IMG:(.*):(.*):IMG}})")()} --WHY DOES string.gmatch RETURN A FUNCTION INSTEAD OF A TABLE? WHY DO I HAVE TO CALL THAT FUNCTION TO MAKE A TABLE MYSELF?!
 		while #matches > 0 do
 			message = string.Replace(message, matches[1], "{{IMGDATA:"..util.Base64Encode(file.Read(matches[2],"DATA"))..":"..util.Base64Encode(file.Read(matches[3],"DATA"))..":IMGDATA}}")
-			matches = {string.gmatch(displaytext, "({{IMG:(.*):(.*):IMG}})")()}
+			matches = {string.gmatch(message, "({{IMG:(.*):(.*):IMG}})")()}
 		end
 		local fil = ARCPhone.ROOTDIR.."/messaging/"..number..".txt"
 		if file.Exists(fil,"DATA") then
@@ -595,7 +595,7 @@ end
 			file.Write(thumbname,util.Base64Decode(matches[2]))
 			file.Write(imgname,util.Base64Decode(matches[3]))
 			message = string.Replace(message, matches[1], "{{IMG:"..thumbname..":"..imgname..":IMG}}")
-			matches = {string.gmatch(displaytext, "({{IMGDATA:(.*):(.*):IMGDATA}})")()}
+			matches = {string.gmatch(message, "({{IMGDATA:(.*):(.*):IMGDATA}})")()}
 		end
 		local fil = ARCPhone.ROOTDIR.."/messaging/"..number..".txt"
 		if file.Exists(fil,"DATA") then
