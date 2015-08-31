@@ -2,14 +2,17 @@ local APP = ARCPhone.NewAppObject()
 APP.Name = "Home"
 APP.Author = "ARitz Cracker"
 APP.Purpose = "Home screen for ARCPhone"
-APP.Options[2] = {}
-APP.Options[2].text = "Customize"
-APP.Options[2].func = function(app) 
-	if app.Customize then
-		app:EndCustomization()
-	else
-		app:StartCustomization()
+function APP:PhoneStart()
+	self.Options[2] = {}
+	self.Options[2].text = "Customize"
+	self.Options[2].func = function(app) 
+		if app.Customize then
+			app:EndCustomization()
+		else
+			app:StartCustomization()
+		end
 	end
+	self.Options[2].args = {self}
 end
 function APP:Init()
 	self:ResetCurPos()
@@ -81,24 +84,24 @@ function APP:ForegroundThink()
 end
 local MovingTile = false
 function APP:StartCustomization()
-	self:AddMenuOption("Resize",function()
+	self:AddMenuOption("Resize",function(app)
 		if MovingTile then
-			self.Disk[MovingTile].size = self.Disk[MovingTile].size + 1
-			if self.Disk[MovingTile].size > 1 then
-				self.Disk[MovingTile].size = 0
+			app.Disk[MovingTile].size = app.Disk[MovingTile].size + 1
+			if app.Disk[MovingTile].size > 1 then
+				app.Disk[MovingTile].size = 0
 			end
-			if self.Disk[MovingTile].size == 0 then
-				self.Tiles[MovingTile].w = 24
-				self.Tiles[MovingTile].h = 24
-				self.Tiles[MovingTile].text = nil
-			elseif self.Disk[MovingTile].size == 1 then
-				self.Tiles[MovingTile].w = 56
-				self.Tiles[MovingTile].h = 56
-				self.Tiles[MovingTile].text = self.Disk[MovingTile].name
+			if app.Disk[MovingTile].size == 0 then
+				app.Tiles[MovingTile].w = 24
+				app.Tiles[MovingTile].h = 24
+				app.Tiles[MovingTile].text = nil
+			elseif app.Disk[MovingTile].size == 1 then
+				app.Tiles[MovingTile].w = 56
+				app.Tiles[MovingTile].h = 56
+				app.Tiles[MovingTile].text = app.Disk[MovingTile].name
 			end
 			
 		end
-	end)
+	end,self)
 	for i =1,#self.Disk do
 		self.Tiles[i].swivxstart = 0
 		self.Tiles[i].swivystart = 0

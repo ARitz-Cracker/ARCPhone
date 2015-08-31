@@ -11,7 +11,15 @@ function APP:PhoneStart()
 	end)
 end
 
+
+function APP:AttachPhoto(thumb,photo)
+	MsgN("APP:AttachPhoto APP="..tostring(self))
+	self.Tiles[self.TextInputIcon]:SetText(self.Tiles[self.TextInputIcon]:GetText().."{{IMG:"..thumb..":"..photo..":IMG}}")
+end
+
 function APP:OpenConvo(num)
+	MsgN("APP:OpenConvo APP="..tostring(self))
+	self:AddMenuOption("Attach Photo",self.Phone.ChoosePhoto,self.Phone,self.AttachPhoto,self)
 	self:ResetCurPos()
 	self.Home = false
 	local numdir = ARCPhone.ROOTDIR.."/messaging/"..num..".txt"
@@ -37,6 +45,7 @@ function APP:OpenConvo(num)
 		end
 	end
 	len = len + 1
+	self.TextInputIcon = len
 	self.Tiles[len] = ARCPhone.NewAppTextInputTile(self,"Enter your message",true,118)
 	if len > 1 then
 		self.Tiles[len].y = self.Tiles[len-1].y + self.Tiles[len-1].h + 4
@@ -90,7 +99,7 @@ function APP:Init()
 	self.Home = true
 	self.Tiles = {}
 	self.InConvo = false
-	
+	self:RemoveMenuOption("Attach Photo")
 	
 	
 	local files,_ = file.Find(ARCPhone.ROOTDIR.."/messaging/*", "DATA", "datedesc")

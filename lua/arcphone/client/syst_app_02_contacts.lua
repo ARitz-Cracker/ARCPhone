@@ -247,7 +247,7 @@ function APP:EditContact(tileid)
 	end
 	self.Tiles[1].OnUnPressed = function(tile)
 		tile.color = Color(255,255,255,255)
-		tile.App:AddMsgBox("Coming soon!","You cannot change contact photos yet","info")
+		tile.App.Phone:AddMsgBox("Coming soon!","You cannot change contact photos yet","info")
 	end
 	
 	if (tileid > 0) then
@@ -314,7 +314,7 @@ function APP:EditContact(tileid)
 			tile.App:SaveData()
 			tile.App:Init()
 		else
-			ARCPhone.PhoneSys:AddMsgBox("Cannot save","the number you have entered is invalid.","warning")
+			tile.App.Phone:AddMsgBox("Cannot save","the number you have entered is invalid.","warning")
 		end
 	end
 	self.Tiles[5].drawfunc = function(tile,x,y)

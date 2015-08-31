@@ -23,9 +23,15 @@ function ARCPhone.PhoneSys:EmitSound(snd,vol,pitch)
 end
 
 function ARCPhone.PhoneSys:ChoosePhoto(func,...)
+	local test = {...}
+	for i=1,#test do
+		MsgN("SysFunc: i => "..tostring(test[i]))
+	end
 	local curapp = ARCPhone.Apps[self.ActiveApp]
 	local newapp = ARCPhone.PhoneSys:OpenApp("photos",false,true)
-	newapp:AttachPhoto(curapp.sysname,func,...)
+	if (newapp) then
+		newapp:AttachPhoto(curapp.sysname,func,...)
+	end
 end
 
 function ARCPhone.PhoneSys:GetActiveApp()
@@ -50,18 +56,16 @@ function ARCPhone.PhoneSys:Think(wep)
 			self.ShowOptions = !self.ShowOptions
 			if self.ShowOptions then
 				self.CurrentOption = 1
-				self.Options = table.Copy(ARCPhone.Apps[self.ActiveApp].Options)
+				self.Options = table.LiteCopy(ARCPhone.Apps[self.ActiveApp].Options)
 				self.Options[#self.Options+1] = {}
 				self.Options[#self.Options].text = "Lock"
-				self.Options[#self.Options].func = function(ap)
-					ap.Phone:Lock()
-				end
+				self.Options[#self.Options].args = {self}
+				self.Options[#self.Options].func = self.Lock
 				
 				self.Options[#self.Options+1] = {}
 				self.Options[#self.Options].text = "Home"
-				self.Options[#self.Options].func = function(ap)
-					ap.Phone:OpenApp("home")
-				end
+				self.Options[#self.Options].args = {self,"home"}
+				self.Options[#self.Options].func = self.OpenApp
 			end
 		end
 		--if !self.PauseInput && !gui.IsGameUIVisible() then
@@ -223,7 +227,7 @@ function ARCPhone.PhoneSys:Init(wep)
 			else
 				local app = ARCPhone.Apps[self.ActiveApp]
 				
-				if (app && self.Booted) then
+				if (app && self.Booted && app.Tiles && #app.Tiles > 0) then
 				
 					local relx1 = app.Tiles[self.SelectedAppTile].x + self.MoveX
 					local relx2 = app.Tiles[self.SelectedAppTile].x + app.Tiles[self.SelectedAppTile].w + self.MoveX
@@ -479,6 +483,15 @@ function ARCPhone.PhoneSys:Init(wep)
 	if !file.IsDir( ARCPhone.ROOTDIR.."/photos","DATA" ) then
 		file.CreateDir( ARCPhone.ROOTDIR.."/photos")
 	end
+	if !file.IsDir( ARCPhone.ROOTDIR.."/photos/texts","DATA" ) then
+		file.CreateDir( ARCPhone.ROOTDIR.."/photos/texts")
+	end
+	if !file.IsDir( ARCPhone.ROOTDIR.."/photos/camera","DATA" ) then
+		file.CreateDir( ARCPhone.ROOTDIR.."/photos/camera")
+	end
+	if !file.IsDir( ARCPhone.ROOTDIR.."/photos/saved","DATA" ) then
+		file.CreateDir( ARCPhone.ROOTDIR.."/photos/saved")
+	end
 	if (ARCPhone.ClientFiles) then
 		for k,v in pairs(ARCPhone.ClientFiles) do
 			MsgN("WRITING "..ARCPhone.ROOTDIR..k)
@@ -507,7 +520,7 @@ end
 		self:OpenApp("home")
 		self.Booted = true
 		self:AddMsgBox("PROTOTYPE VERSION","Because this is not a public release, BE PREPARED TO LOOSE ALL DATA WITH EVERY UPDATE.","warning")
-		self:AddMsgBox("My excuse for a tutorial","Use the Arrow keys to move the cursor. Press BACKSPACE to go back, press CTRL to access the context menu, and press ENTER select.","info")
+		self:AddMsgBox("My excuse for a tutorial","Use the Arrow keys to move the cursor. Press BACKSPACE to go back, press CTRL to access the context menu, and press ENTER to select.","info")
 		self:AddMsgBox("PROTOTYPE VERSION","This is the prototype version of ARCPhone (pre-alpha), and does not represent the final product. Everything is subject to change. (Press ENTER to close this window)","info")
 	end
 	
@@ -551,6 +564,11 @@ end
 		self.MsgsTab = ARCLib.FitText(self.Msgs,"ARCPhoneSmall",124)
 	end
 	function ARCPhone.PhoneSys:SendText(number,message)
+		local matches = {string.gmatch(message, "({{IMG:(.*):(.*):IMG}})")()} --WHY DOES string.gmatch RETURN A FUNCTION INSTEAD OF A TABLE? WHY DO I HAVE TO CALL THAT FUNCTION TO MAKE A TABLE MYSELF?!
+		while #matches > 0 do
+			message = string.Replace(message, matches[1], "{{IMGDATA:"..util.Base64Encode(file.Read(matches[2],"DATA"))..":"..util.Base64Encode(file.Read(matches[3],"DATA"))..":IMGDATA}}")
+			matches = {string.gmatch(displaytext, "({{IMG:(.*):(.*):IMG}})")()}
+		end
 		local fil = ARCPhone.ROOTDIR.."/messaging/"..number..".txt"
 		if file.Exists(fil,"DATA") then
 			file.Append(fil,"\fs"..message) 
@@ -564,16 +582,31 @@ end
 		ARCPhone.PhoneSys.OutgoingTexts[hash].place = -1
 	end
 	function ARCPhone.PhoneSys:RecieveText(number,timestamp,message)
-		self:AddMsgBox("New Message","New Message from "..number,"comments",ARCPHONE_MSGBOX_REPLY,function()
-			self:OpenApp("messaging")
-			ARCPhone.Apps["messaging"]:OpenConvo(number)
-		end)
+
+		local matches = {string.gmatch(message, "({{IMGDATA:(.*):(.*):IMGDATA}})")()} --WHY DOES string.gmatch RETURN A FUNCTION INSTEAD OF A TABLE? WHY DO I HAVE TO CALL THAT FUNCTION TO MAKE A TABLE MYSELF?!
+		while #matches > 0 do
+			local i = 1
+			local imgname = ARCPhone.ROOTDIR.."/photos/camera/"..number.."_"..i..".photo.dat"
+			if file.Exists(imgname,"DATA") then
+				i = i + 1
+				imgname = ARCPhone.ROOTDIR.."/photos/camera/"..number.."_"..i..".photo.dat"
+			end
+			local thumbname = ARCPhone.ROOTDIR.."/photos/camera/"..number.."_"..i..".thumb.dat"
+			file.Write(thumbname,util.Base64Decode(matches[2]))
+			file.Write(imgname,util.Base64Decode(matches[3]))
+			message = string.Replace(message, matches[1], "{{IMG:"..thumbname..":"..imgname..":IMG}}")
+			matches = {string.gmatch(displaytext, "({{IMGDATA:(.*):(.*):IMGDATA}})")()}
+		end
 		local fil = ARCPhone.ROOTDIR.."/messaging/"..number..".txt"
 		if file.Exists(fil,"DATA") then
 			file.Append(fil,"\fr"..message) 
 		else
 			file.Write(fil,"r"..message) 
 		end
+		self:AddMsgBox("New Message","New Message from "..number,"comments",ARCPHONE_MSGBOX_REPLY,function()
+			self:OpenApp("messaging")
+			ARCPhone.Apps["messaging"]:OpenConvo(number)
+		end)
 		//file.Write(ARCPhone.ROOTDIR.."/messaging/"..number..".txt",util.TableToJSON(texts))
 	end
 	function ARCPhone.PhoneSys:Call(number)
@@ -909,7 +942,11 @@ end
 			return
 		elseif self.ShowOptions then
 			if button == KEY_ENTER then
-				self.Options[self.CurrentOption].func(app)
+				MsgN("Calling option function with arguements:")
+				for i=1,#self.Options[self.CurrentOption].args do
+					MsgN(self.Options[self.CurrentOption].args[i])
+				end
+				self.Options[self.CurrentOption].func(unpack(self.Options[self.CurrentOption].args))
 				self.ShowOptions = false
 				return
 			end

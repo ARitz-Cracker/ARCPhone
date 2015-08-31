@@ -74,7 +74,7 @@ end
 function APP:ForegroundThink()
 
 	if self.CameraStage == 2 then
-		file.Write(ARCPhone.ROOTDIR.."/photos/"..self.PicFileName..".thumb.dat", render.Capture {
+		file.Write(ARCPhone.ROOTDIR.."/photos/camera/"..self.PicFileName..".thumb.dat", render.Capture {
 			x = self.FoneXPos - 129,
 			y = self.ScreenYPos+1,
 			h = 128,
@@ -85,7 +85,7 @@ function APP:ForegroundThink()
 		self.CameraStage = 0
 		self.ThumbMat = nil
 	elseif self.CameraStage == 1 then
-		file.Write(ARCPhone.ROOTDIR.."/photos/"..self.PicFileName..".photo.dat", render.Capture {
+		file.Write(ARCPhone.ROOTDIR.."/photos/camera/"..self.PicFileName..".photo.dat", render.Capture {
 			x = self.ScreenXPos+1,
 			y = self.ScreenYPos+1,
 			h = self.ScreenHight-2,
@@ -94,7 +94,7 @@ function APP:ForegroundThink()
 			format = "jpeg"
 			
 		})
-		self.ThumbMat = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/photos/"..self.PicFileName..".photo.dat","jpg")
+		self.ThumbMat = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/photos/camera/"..self.PicFileName..".photo.dat","jpg")
 		self.CameraStage = self.CameraStage + 1
 	end
 end

@@ -85,9 +85,6 @@ ARCPHONE_MSGBOX_CALL = 8
 ARCPhoneMsg("Version: "..ARCPhone.Version)
 ARCPhoneMsg("Updated on: "..ARCPhone.Update)
 if SERVER then
-	if true then -- Yeah... long story.
-		--resource.AddWorkshop("200318235")
-	end
 	AddCSLuaFile() -----------------------------------------
 	ARCPhoneMsg("####    Loading ARCPhone Lua files..     ####")
 	local sharedfiles, _ = file.Find( "arcphone/shared/*.lua", "LUA" )
