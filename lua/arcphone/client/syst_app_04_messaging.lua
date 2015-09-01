@@ -13,12 +13,18 @@ end
 
 
 function APP:AttachPhoto(thumb,photo)
-	MsgN("APP:AttachPhoto APP="..tostring(self))
-	self.Tiles[self.TextInputIcon]:SetText(self.Tiles[self.TextInputIcon]:GetText().."{{IMG:"..thumb..":"..photo..":IMG}}")
+	local imagetag = "{{IMG:"..thumb..":"..photo..":IMG}}"
+	if string.find( self.Tiles[self.TextInputIcon]:GetText(), imagetag ,1 ,false) then
+		ARCPhone.PhoneSys:AddMsgBox("Duplicate image","You cannot attach 2 of the same image","warning")
+	else
+		self.Tiles[self.TextInputIcon]:SetText(self.Tiles[self.TextInputIcon]:GetText()..imagetag)
+		timer.Simple(0.1,function()
+		self:SetCurPos(self.SendIcon)
+		end)
+	end
 end
 
 function APP:OpenConvo(num)
-	MsgN("APP:OpenConvo APP="..tostring(self))
 	self:AddMenuOption("Attach Photo",self.Phone.ChoosePhoto,self.Phone,self.AttachPhoto,self)
 	self:ResetCurPos()
 	self.Home = false
@@ -55,6 +61,9 @@ function APP:OpenConvo(num)
 	self.Tiles[len].w = 118
 	self.Tiles[len].x = 12
 	self.Tiles[len].color = Color(72,72,72,255)
+	self:SetCurPos(len)
+	
+	
 	len = len + 1
 	
 	self.InConvo = true
@@ -73,8 +82,8 @@ function APP:OpenConvo(num)
 	end
 	self.Tiles[len].OnUnPressed = function(tile)
 		tile.color = Color(75, 255, 75,255)
-		
-		tile.App.Phone:SendText(num,tile.App.Tiles[tile.App.SendIcon-1].TextInput)
+		local msg = tile.App.Tiles[tile.App.SendIcon-1].TextInput
+		tile.App.Phone:SendText(num,msg)
 		tile.App:OpenConvo(num)
 	end
 end

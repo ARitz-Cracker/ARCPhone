@@ -50,13 +50,15 @@ function texttile:UpdateText()
 	if self.CanResize then
 		table.Empty(self._images)
 		local displaytext = self.TextInput
-		local matches = {string.gmatch(displaytext, "({{IMG:(.*):(.*):IMG}})")()} --WHY DOES string.gmatch RETURN A FUNCTION INSTEAD OF A TABLE? WHY DO I HAVE TO CALL THAT FUNCTION TO MAKE A TABLE MYSELF?!
+		local matches = {string.gmatch(displaytext, "({{IMG:([^:]*):([^:]*):IMG}})")()} --WHY DOES string.gmatch RETURN A FUNCTION INSTEAD OF A TABLE? WHY DO I HAVE TO CALL THAT FUNCTION TO MAKE A TABLE MYSELF?!
 		local imgnum = 0
 		while #matches > 0 do
+			MsgN("MATCHES:")
+			PrintTable(matches)
 			imgnum = imgnum + 1;
 			self._images[imgnum] = ARCLib.MaterialFromTxt(matches[2],"jpg")
 			displaytext = string.Replace(displaytext, matches[1], "\nIMG_"..imgnum.."\n")
-			matches = {string.gmatch(displaytext, "({{IMG:(.*):(.*):IMG}})")()}
+			matches = {string.gmatch(displaytext, "({{IMG:([^:]*):([^:]*):IMG}})")()}
 		end
 		self._InputTable = ARCLib.FitText(displaytext,"ARCPhoneSmall",self.w - 2)
 
@@ -247,7 +249,18 @@ ARCPHONE_APP.TranslateFOV = NULLFUNC
 function ARCPHONE_APP:ResetCurPos()
 	self.Phone.SelectedAppTile = 1
 	self.Phone.OldSelectedAppTile = self.Phone.SelectedAppTile
+	if self.Tiles[1] then
+		self.Tiles[1]:OnSelected()
+	end
 end
+
+function ARCPHONE_APP:SetCurPos(pos)
+	self.Phone.OldSelectedAppTile = self.Phone.SelectedAppTile
+	self.Tiles[self.Phone.OldSelectedAppTile]:OnUnSelected()
+	self.Phone.SelectedAppTile = pos
+	self.Tiles[pos]:OnSelected()
+end
+
 ARCPHONE_APP.ShowTaskbar = true
 ARCPHONE_APP.ForegroundThink = NULLFUNC
 ARCPHONE_APP.BackgroundThink = NULLFUNC

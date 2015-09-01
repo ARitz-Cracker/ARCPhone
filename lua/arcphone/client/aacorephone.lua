@@ -564,18 +564,19 @@ end
 		self.MsgsTab = ARCLib.FitText(self.Msgs,"ARCPhoneSmall",124)
 	end
 	function ARCPhone.PhoneSys:SendText(number,message)
-		local matches = {string.gmatch(message, "({{IMG:(.*):(.*):IMG}})")()} --WHY DOES string.gmatch RETURN A FUNCTION INSTEAD OF A TABLE? WHY DO I HAVE TO CALL THAT FUNCTION TO MAKE A TABLE MYSELF?!
-		while #matches > 0 do
-			message = string.Replace(message, matches[1], "{{IMGDATA:"..util.Base64Encode(file.Read(matches[2],"DATA"))..":"..util.Base64Encode(file.Read(matches[3],"DATA"))..":IMGDATA}}")
-			matches = {string.gmatch(message, "({{IMG:(.*):(.*):IMG}})")()}
-		end
 		local fil = ARCPhone.ROOTDIR.."/messaging/"..number..".txt"
 		if file.Exists(fil,"DATA") then
 			file.Append(fil,"\fs"..message) 
 		else
 			file.Write(fil,"s"..message) 
 		end
-		local hash = ARCLib.md5(message)
+		
+		local matches = {string.gmatch(message, "({{IMG:([^:]*):([^:]*):IMG}})")()} --WHY DOES string.gmatch RETURN A FUNCTION INSTEAD OF A TABLE? WHY DO I HAVE TO CALL THAT FUNCTION TO MAKE A TABLE MYSELF?!
+		while #matches > 0 do
+			message = string.Replace(message, matches[1], "{{IMGDATA:"..util.Base64Encode(file.Read(matches[2],"DATA"))..":"..util.Base64Encode(file.Read(matches[3],"DATA"))..":IMGDATA}}")
+			matches = {string.gmatch(message, "({{IMG:([^:]*):([^:]*):IMG}})")()}
+		end
+		local hash = ARCLib.JamesHash(message)
 		ARCPhone.PhoneSys.OutgoingTexts[hash] = {}
 		ARCPhone.PhoneSys.OutgoingTexts[hash].msg = ARCLib.SplitString(util.Compress(number..message),16384)
 		ARCPhone.PhoneSys.OutgoingTexts[hash].number = number
@@ -583,19 +584,19 @@ end
 	end
 	function ARCPhone.PhoneSys:RecieveText(number,timestamp,message)
 
-		local matches = {string.gmatch(message, "({{IMGDATA:(.*):(.*):IMGDATA}})")()} --WHY DOES string.gmatch RETURN A FUNCTION INSTEAD OF A TABLE? WHY DO I HAVE TO CALL THAT FUNCTION TO MAKE A TABLE MYSELF?!
+		local matches = {string.gmatch(message, "({{IMGDATA:([^:]*):([^:]*):IMGDATA}})")()} --WHY DOES string.gmatch RETURN A FUNCTION INSTEAD OF A TABLE? WHY DO I HAVE TO CALL THAT FUNCTION TO MAKE A TABLE MYSELF?!
+		local i = 1
 		while #matches > 0 do
-			local i = 1
-			local imgname = ARCPhone.ROOTDIR.."/photos/camera/"..number.."_"..i..".photo.dat"
-			if file.Exists(imgname,"DATA") then
+			local imgname = ARCPhone.ROOTDIR.."/photos/texts/"..number.."_"..i..".photo.dat"
+			while file.Exists(imgname,"DATA") do
 				i = i + 1
-				imgname = ARCPhone.ROOTDIR.."/photos/camera/"..number.."_"..i..".photo.dat"
+				imgname = ARCPhone.ROOTDIR.."/photos/texts/"..number.."_"..i..".photo.dat"
 			end
-			local thumbname = ARCPhone.ROOTDIR.."/photos/camera/"..number.."_"..i..".thumb.dat"
+			local thumbname = ARCPhone.ROOTDIR.."/photos/texts/"..number.."_"..i..".thumb.dat"
 			file.Write(thumbname,util.Base64Decode(matches[2]))
 			file.Write(imgname,util.Base64Decode(matches[3]))
 			message = string.Replace(message, matches[1], "{{IMG:"..thumbname..":"..imgname..":IMG}}")
-			matches = {string.gmatch(message, "({{IMGDATA:(.*):(.*):IMGDATA}})")()}
+			matches = {string.gmatch(message, "({{IMGDATA:([^:]*):([^:]*):IMGDATA}})")()}
 		end
 		local fil = ARCPhone.ROOTDIR.."/messaging/"..number..".txt"
 		if file.Exists(fil,"DATA") then

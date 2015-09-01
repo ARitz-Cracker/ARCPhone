@@ -157,7 +157,7 @@ net.Receive( "arcphone_comm_text", function(length,ply)
 			msgchunks[hash].msg = msgchunks[hash].msg .. str
 			if part == whole then
 				local destr = util.Decompress(msgchunks[hash].msg)
-				ARCPhone.SendTextMsg(string.Left( destr ),vnum,string.Right( destr, #destr-10 ))
+				ARCPhone.SendTextMsg(string.Left( destr , 10 ),vnum,string.Right( destr, #destr-10 ))
 				msgchunks[hash] = nil
 				net.Start("arcphone_comm_text")
 				net.WriteInt(-2,8)

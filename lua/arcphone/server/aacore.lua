@@ -318,7 +318,8 @@ function ARCPhone.AddToCall(caller,reciever)
 end
 
 function ARCPhone.SendTextMsg(tonum,fromnum,msg)
-	local hash = ARCLib.md5(msg)
+	MsgN("Sending text message from "..fromnum.." to "..tonum)
+	local hash = ARCLib.JamesHash(msg)
 	if !ARCPhone.Disk.Texts[tonum] then
 		ARCPhone.Disk.Texts[tonum] = {}
 	end
@@ -349,7 +350,7 @@ function ARCPhone.Think()
 				if !ARCPhone.Disk.Texts[vnum] then
 					ARCPhone.Disk.Texts[vnum] = {}
 				end
-				PrintTable(ARCPhone.Disk.Texts[vnum])
+				--PrintTable(ARCPhone.Disk.Texts[vnum])
 				for kk,vv in pairs(ARCPhone.Disk.Texts[vnum]) do
 					if vv.place == -1 then
 						vv.place = 0
