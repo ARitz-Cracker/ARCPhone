@@ -101,15 +101,7 @@ function APP:ForegroundThink()
 
 end
 
-APP.Options[2] = {}
-APP.Options[2].text = "Edit"
-APP.Options[2].func = function(app) 
-	if app.Tiles[app.Phone.SelectedAppTile].ContactEditable then
-		app:EditContact(app.Phone.SelectedAppTile)
-	else
-		ARCPhone.PhoneSys:AddMsgBox("Cannot edit","You cannot edit this icon because it's not a contact entry","cross")
-	end
-end
+
 
 
 function APP:GetNameFromNumber(number)
@@ -136,6 +128,16 @@ function APP:GetDiskIDFromNumber(number)
 	return result
 end
 function APP:PhoneStart()
+	self.Options[2] = {}
+	self.Options[2].text = "Edit"
+	self.Options[2].func = function(app) 
+		if app.Tiles[app.Phone.SelectedAppTile].ContactEditable then
+			app:EditContact(app.Phone.SelectedAppTile)
+		else
+			ARCPhone.PhoneSys:AddMsgBox("Cannot edit","You cannot edit this icon because it's not a contact entry","cross")
+		end
+	end
+	self.Options[2].args = {self}
 	self.ProfilePics = {}
 	self.ProfilePics[0] = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/contactphotos/0000000000.dat","jpg")
 	local len = #self.Disk

@@ -226,7 +226,7 @@ function ARCPHONE_APP:DrawTiles(mvx,mvy)
 					v:drawfunc(v.x + mvx,v.y + mvy)
 				end
 				if v.text && string.len(v.text) > 0 then
-					draw.SimpleText( ARCLib.CutOutText(v.text,"ARCPhoneSSmall",v.w), "ARCPhoneSSmall", v.x + mvx +1, v.y + mvy + v.h -1, Color(255,255,255,255),TEXT_ALIGN_LEFT , TEXT_ALIGN_TOP ) 
+					draw.SimpleText( ARCLib.CutOutText(v.text,"ARCPhoneSmall",v.w), "ARCPhoneSmall", v.x + mvx +1, v.y + mvy + v.h -1, Color(255,255,255,255),TEXT_ALIGN_LEFT , TEXT_ALIGN_TOP ) 
 				end
 			end
 		end
@@ -256,7 +256,9 @@ end
 
 function ARCPHONE_APP:SetCurPos(pos)
 	self.Phone.OldSelectedAppTile = self.Phone.SelectedAppTile
-	self.Tiles[self.Phone.OldSelectedAppTile]:OnUnSelected()
+	if self.Tiles[self.Phone.OldSelectedAppTile] then
+		self.Tiles[self.Phone.OldSelectedAppTile]:OnUnSelected()
+	end
 	self.Phone.SelectedAppTile = pos
 	self.Tiles[pos]:OnSelected()
 end
@@ -385,7 +387,7 @@ function ARCPHONE_APP:_SwitchTile(butt)
 		end
 	end
 	if bti then
-		self.Phone:EmitSound("buttons/button9.wav",60,255)
+		self.Phone:EmitSound("arcphone/menus/press.wav",60)
 		curapptime = CurTime() + 0.1
 		oldapptime = CurTime()
 		currenttile:OnUnSelected()
@@ -408,7 +410,7 @@ function ARCPHONE_APP:_SwitchTile(butt)
 			self.Tiles[bti]:OnPressed()
 		end
 	elseif butt == KEY_BACKSPACE || butt == KEY_ENTER || mvscr then
-		self.Phone:EmitSound("buttons/button9.wav",60,255)
+		self.Phone:EmitSound("arcphone/menus/press.wav",60)
 	else
 		self.Phone:EmitSound("common/wpn_denyselect.wav")
 	end

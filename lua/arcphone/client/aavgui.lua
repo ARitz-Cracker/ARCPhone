@@ -34,7 +34,7 @@ surface.CreateFont( "ARCPhoneSmall", {
 } )
 surface.CreateFont( "ARCPhoneSSmall", {
 	font = "Arial",
-	size = 12,
+	size = 10,
 	weight = 200,
 	blursize = 0,
 	scanlines = 0,

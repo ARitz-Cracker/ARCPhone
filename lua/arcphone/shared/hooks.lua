@@ -45,21 +45,7 @@ if CLIENT then
 		end
 		
 	end)
-	hook.Add("PostDrawOpaqueRenderables","ARCPhone Theatrics",function()
-		if ARCPhone.VideoDisplay then 
-			local phone = LocalPlayer():GetWeapon("weapon_arc_phone")
-			if IsValid(phone) then
-				if phone.WorldModelView && phone.VElements["screen"].draw_func then
-					
-					for k,v in pairs(ents.FindByClass("prop_physics")) do
-						cam.Start3D2D(v:LocalToWorld(Vector(-1.45, 2.535,0.19)),v:GetAngles(),0.02265)
-							phone.VElements["screen"].draw_func()
-						cam.End3D2D()
-					end
-				end
-			end
-		end
-	end)
+
 	hook.Add( "StartChat", "ARCPhone OpenChat", function(t) 
 		ARCPhone.PhoneSys.PauseInput = true
 	end)
@@ -73,24 +59,18 @@ if CLIENT then
 	]]
 else
 
-	hook.Add("PlayerButtonDown","ARCPhoneUp",function(ply,butt)
-		if butt == KEY_UP && !ply:GetActiveWeapon().IsDahAwesomePhone then
+	hook.Add("PlayerButtonDown","ARCPhone UnlockPhone",function(ply,butt)
+		if butt == KEY_UP && !ply:GetActiveWeapon().IsDahAwesomePhone && IsValid(ply:GetWeapon( "weapon_arc_phone" )) then
 			local lastwep = ply:GetActiveWeapon():GetClass()
 			ply:GetActiveWeapon():SendWeaponAnim(ACT_VM_HOLSTER)
 			timer.Simple(0.25,function()
 				if !IsValid(ply) then return end
 				ply:SelectWeapon( "weapon_arc_phone" )
-				if ply:GetActiveWeapon().IsDahAwesomePhone then
-					ply:GetActiveWeapon():SendWeaponAnim(ACT_VM_DRAW)
 					timer.Simple(0.1,function()
-						ply:SendLua("ARCPhone.PhoneSys.LastWep = \""..lastwep.."\"")
+						if ply:GetActiveWeapon().IsDahAwesomePhone then
+							ply:SendLua("ARCPhone.PhoneSys.LastWep = \""..lastwep.."\"")
+						end
 					end)
-				end
-			end)
-			timer.Simple(0.9,function()
-				if IsValid(ply) && ply:IsPlayer() && ply:GetActiveWeapon().IsDahAwesomePhone then
-					ply:GetActiveWeapon():SendWeaponAnim( ACT_VM_IDLE )
-				end
 			end)
 		end
 	end)
@@ -119,3 +99,14 @@ else
 	end )
 end
 
+
+hook.Add( "ARCLoad_OnUpdate", "ARCPhone Remuv",function(loaded)
+	if loaded != "ARCPhone" then return end
+	if SERVER then
+		for k,v in pairs(player.GetAll()) do 
+			ARCPhoneMsgCL(v,"Updating...") 
+		end
+	else
+		ARCPhone.PhoneSys:AddMsgBox("Update","This phone will re-start for an update in 5 seconds and there's nothing you can do about it.","warning")
+	end
+end)

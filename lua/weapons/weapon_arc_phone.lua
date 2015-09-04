@@ -89,17 +89,22 @@ function SWEP:Reload()
 	end
 	]]
 end
+
+function SWEP:SendWeaponAnimTime(anim,time)
+	time = tonumber(time) or 0.5
+	self:SendWeaponAnim( anim )
+	self.Owner:GetViewModel():SetPlaybackRate( time )
+	self.Owner:GetViewModel():SetAnimation(anim)
+end
+
 function SWEP:Deploy()
-	timer.Simple(0.9,function()
+	timer.Simple(1.5,function()
 		if self.Owner:GetActiveWeapon() == self then
-			self:SendWeaponAnim( ACT_VM_IDLE )
+			self:SendWeaponAnimTime( ACT_VM_IDLE , 0.3 )
 		end
 	end)
-        self.m_WeaponDeploySpeed=1
-        self.Weapon:SendWeaponAnim( ACT_VM_DRAW )
-        self:SetNextPrimaryFire( CurTime() + 1 )
-        self:SetNextSecondaryFire( CurTime() + 1 )
-			IsFull = false
+	self:SendWeaponAnimTime( ACT_VM_DRAW )
+	IsFull = false
 	return true
 end
 --[[
@@ -157,7 +162,9 @@ function SWEP:Holster()
 			self:ResetBonePositions(vm)
 		end
 	end
-	
+	if IsValid(self.Owner) then
+		self.Owner:GetViewModel():SetPlaybackRate(1)
+	end
 	return true
 end
 

@@ -26,7 +26,6 @@ end
 
 function APP:OpenConvo(num)
 	self:AddMenuOption("Attach Photo",self.Phone.ChoosePhoto,self.Phone,self.AttachPhoto,self)
-	self:ResetCurPos()
 	self.Home = false
 	local numdir = ARCPhone.ROOTDIR.."/messaging/"..num..".txt"
 	local len = 0

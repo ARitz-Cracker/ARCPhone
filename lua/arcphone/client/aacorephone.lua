@@ -6,7 +6,7 @@ ARCPhone.PhoneSys.OldStatus = ARCPHONE_ERROR_CALL_ENDED
 
 
 ARCPhone.PhoneSys.HideWhatsOffTheScreen = true
-ARCPhone.PhoneSys.ValidKeys = {KEY_UP,KEY_DOWN,KEY_LEFT,KEY_RIGHT,KEY_ENTER,KEY_BACKSPACE,KEY_RCONTROL}
+ARCPhone.PhoneSys.ValidKeys = {KEY_UP,KEY_DOWN,KEY_LEFT,KEY_RIGHT,KEY_ENTER,KEY_BACKSPACE,KEY_LCONTROL,KEY_RCONTROL}
 ARCPhone.PhoneSys.KeyDelay = {}
 ARCPhone.PhoneSys.OutgoingTexts = ARCPhone.PhoneSys.OutgoingTexts or {}
 
@@ -52,43 +52,25 @@ function ARCPhone.PhoneSys:SetLoading(percent)
 end
 function ARCPhone.PhoneSys:Think(wep)		
 	if !self.Loading && !self.ShowConsole && !self.PauseInput && !gui.IsGameUIVisible() then
-		if input.WasKeyReleased(KEY_LCONTROL) || input.WasKeyReleased(KEY_RCONTROL) then
-			self.ShowOptions = !self.ShowOptions
-			if self.ShowOptions then
-				self.CurrentOption = 1
-				self.Options = table.LiteCopy(ARCPhone.Apps[self.ActiveApp].Options)
-				self.Options[#self.Options+1] = {}
-				self.Options[#self.Options].text = "Lock"
-				self.Options[#self.Options].args = {self}
-				self.Options[#self.Options].func = self.Lock
+		for k,v in pairs(self.ValidKeys) do
+			if (input.IsKeyDown(v) || input.WasKeyPressed(v)) && self.KeyDelay[v] <= CurTime() then -- The only reason why I merge IsKeyDown and WasKeyPressed is because of people with shitty computers
+				if self.KeyDelay[v] < CurTime() - 1 then
+					self:OnButtonDown(v)
+					self:OnButton(v)
+					self.KeyDelay[v] = CurTime() + 1
+				elseif self.KeyDelay[v] <= CurTime() then
+					self.KeyDelay[v] = CurTime() + 0.1
+					self:OnButton(v)
+				end
 				
-				self.Options[#self.Options+1] = {}
-				self.Options[#self.Options].text = "Home"
-				self.Options[#self.Options].args = {self,"home"}
-				self.Options[#self.Options].func = self.OpenApp
+			end
+			if input.WasKeyReleased(v) then
+				if self.KeyDelay[v] >= CurTime() - 1 then
+					self:OnButtonUp(v)
+					self.KeyDelay[v] = CurTime() - 2
+				end
 			end
 		end
-		--if !self.PauseInput && !gui.IsGameUIVisible() then
-			for k,v in pairs(self.ValidKeys) do
-				if (input.IsKeyDown(v) || input.WasKeyPressed(v)) && self.KeyDelay[v] <= CurTime() then -- The only reason why I merge IsKeyDown and WasKeyPressed is because of people with shitty computers
-					if self.KeyDelay[v] < CurTime() - 1 then
-						self:OnButtonDown(v)
-						self:OnButton(v)
-						self.KeyDelay[v] = CurTime() + 1
-					elseif self.KeyDelay[v] <= CurTime() then
-						self.KeyDelay[v] = CurTime() + 0.1
-						self:OnButton(v)
-					end
-					
-				end
-				if input.WasKeyReleased(v) then
-					if self.KeyDelay[v] >= CurTime() - 1 then
-						self:OnButtonUp(v)
-						self.KeyDelay[v] = CurTime() - 2
-					end
-				end
-			end
-		--end
 
 	end
 		--[[
@@ -109,6 +91,7 @@ end
 
 function ARCPhone.PhoneSys:AddMsgBox(title,txt,icon,typ,gfunc,rfunc,yfunc)
 	if (!istable(self.MsgBoxs)) then return end
+	self.ShowOptions = false
 	local i = #self.MsgBoxs + 1
 	self.MsgBoxOption = 1
 	self.MsgBoxs[i] = {}
@@ -167,7 +150,10 @@ function ARCPhone.PhoneSys:Init(wep)
 	
 	self.MsgBoxs = {}
 	self.MsgBoxOption = 1
-
+	
+	self.OptionAnimStartTime = 0
+	self.OptionAnimEndTime = 1
+	
 	self.Ent = wep or NULL
 	
 	if !wep then return end
@@ -273,14 +259,29 @@ function ARCPhone.PhoneSys:Init(wep)
 						surface.DrawOutlinedRect( relx1, rely1, relx2-relx1, rely2-rely1 ) 
 					end
 				end
+				
+				local multiplier
 				if self.ShowOptions then
+					multiplier = ARCLib.BetweenNumberScale(self.OptionAnimStartTime,CurTime(),self.OptionAnimEndTime)^2
+				else
+					multiplier = ARCLib.BetweenNumberScaleReverse(self.OptionAnimStartTime,CurTime(),self.OptionAnimEndTime)^2
+				end
+				if multiplier > 0 then
+				--[[	self.OptionAnimStartTime = 0
+	self.OptionAnimEndTime = 1]]
+				
+					local size = #self.Options * 14
+					surface.SetDrawColor( 0, 0, 128, 255 )
+					surface.DrawRect( 0, self.ScreenResY - size*multiplier, self.ScreenResX, size ) 
 					for i = 1,#self.Options do
 						if self.CurrentOption == i then
-							draw.SimpleText("$"..self.Options[i].text, "ARCPhoneSmall", 126, 220 - ((i-1)*14), Color(255,255,255,255), TEXT_ALIGN_RIGHT , TEXT_ALIGN_TOP  )
-						else
-							draw.SimpleText(self.Options[i].text, "ARCPhoneSmall", 126, 220 - ((i-1)*14), Color(255,255,255,255), TEXT_ALIGN_RIGHT , TEXT_ALIGN_TOP  )
+							surface.SetDrawColor( 0, 0, 255, 255 )
+							surface.DrawRect( 0, self.ScreenResY - ((i)*14)*multiplier, self.ScreenResX, 14 ) 
 						end
+						draw.SimpleText(self.Options[i].text, "ARCPhoneSmall", 2, self.ScreenResY - (i*14)*multiplier, Color(255,255,255,255), TEXT_ALIGN_LEFT , TEXT_ALIGN_BOTTOM  )
 					end
+					surface.SetDrawColor( 50, 50, 255, 255 )
+					surface.DrawOutlinedRect( 0, self.ScreenResY - size*multiplier, self.ScreenResX, size ) 
 				end
 				
 				local maxmsgbox = #self.MsgBoxs  
@@ -848,7 +849,6 @@ end
 	-- KEY_UP,KEY_DOWN,KEY_LEFT,KEY_RIGHT,KEY_ENTER,KEY_BACKSPACE,KEY_RCONTROL
 	local lastback = 0;
 	function ARCPhone.PhoneSys:OnButton(button)
-
 		local app = ARCPhone.Apps[self.ActiveApp]
 		if #self.MsgBoxs > 0 then
 			local i = #self.MsgBoxs
@@ -865,33 +865,52 @@ end
 			if button == KEY_DOWN then
 				if self.MsgBoxOption < maxo then
 					self.MsgBoxOption = self.MsgBoxOption + 1
-					self:EmitSound("buttons/button9.wav",60,255)
+					self:EmitSound("arcphone/menus/press.wav",60)
 				else
 					self:EmitSound("common/wpn_denyselect.wav")
 				end
 			elseif button == KEY_UP then
 				if self.MsgBoxOption > 1 then
 					self.MsgBoxOption = self.MsgBoxOption - 1
-					self:EmitSound("buttons/button9.wav",60,255)
+					self:EmitSound("arcphone/menus/press.wav",60)
 				else
 					self:EmitSound("common/wpn_denyselect.wav")
 				end
 			end
 			return
+		elseif button == KEY_LCONTROL || button == KEY_LCONTROL then
+			self.ShowOptions = !self.ShowOptions
+			self.OptionAnimStartTime = CurTime()
+			self.OptionAnimEndTime = CurTime() + 0.35
+			if self.ShowOptions then
+				self.Options = table.LiteCopy(app.Options)
+				self.Options[#self.Options+1] = {}
+				self.Options[#self.Options].text = "Lock"
+				self.Options[#self.Options].args = {self}
+				self.Options[#self.Options].func = self.Lock
+				
+				self.Options[#self.Options+1] = {}
+				self.Options[#self.Options].text = "Home"
+				self.Options[#self.Options].args = {self,"home"}
+				self.Options[#self.Options].func = self.OpenApp
+				self.CurrentOption = #self.Options
+			end
 		elseif self.ShowOptions then
 			if button == KEY_BACKSPACE then
+				self.OptionAnimStartTime = CurTime()
+				self.OptionAnimEndTime = CurTime() + 0.35
 				self.ShowOptions = false
 			elseif button == KEY_UP then
 				if self.CurrentOption < #self.Options then
 					self.CurrentOption = self.CurrentOption + 1
-					self:EmitSound("buttons/button9.wav",60,255)
+					self:EmitSound("arcphone/menus/press.wav",60)
 				else
 					self:EmitSound("common/wpn_denyselect.wav")
 				end
 			elseif button == KEY_DOWN then
 				if self.CurrentOption > 1 then
 					self.CurrentOption = self.CurrentOption - 1
-					self:EmitSound("buttons/button9.wav",60,255)
+					self:EmitSound("arcphone/menus/press.wav",60)
 				else
 					self:EmitSound("common/wpn_denyselect.wav")
 				end
@@ -923,6 +942,7 @@ end
 	
 	local ispressinginmanu = false
 	function ARCPhone.PhoneSys:OnButtonUp(button)
+		if button == KEY_RCONTROL || button == KEY_LCONTROL then return end
 		local app = ARCPhone.Apps[self.ActiveApp]
 		if #self.MsgBoxs > 0 then
 			if ispressinginmanu then
@@ -943,11 +963,9 @@ end
 			return
 		elseif self.ShowOptions then
 			if button == KEY_ENTER then
-				MsgN("Calling option function with arguements:")
-				for i=1,#self.Options[self.CurrentOption].args do
-					MsgN(self.Options[self.CurrentOption].args[i])
-				end
 				self.Options[self.CurrentOption].func(unpack(self.Options[self.CurrentOption].args))
+				self.OptionAnimStartTime = CurTime()
+				self.OptionAnimEndTime = CurTime() + 0.1
 				self.ShowOptions = false
 				return
 			end
@@ -969,6 +987,7 @@ end
 		end
 	end
 	function ARCPhone.PhoneSys:OnButtonDown(button)
+		if button == KEY_RCONTROL || button == KEY_LCONTROL then return end
 		if #self.MsgBoxs > 0 then
 			ispressinginmanu = true
 		elseif self.ShowOptions then return end
