@@ -303,9 +303,9 @@ function APP:EditContact(tileid)
 	end
 	self.Tiles[5].OnUnPressed = function(tile)
 		tile.color = Color(0,0,255,255)
-		if (ARCPhone.IsValidPhoneNumber(app.Tiles[3].TextInput)) then
+		if (ARCPhone.IsValidPhoneNumber(tile.App.Tiles[3].TextInput)) then
 			if (tileid > 0) then
-				tile.App.Disk[tileid][ARCPHONE_CONTACT_NAME] = app.Tiles[2].TextInput
+				tile.App.Disk[tileid][ARCPHONE_CONTACT_NAME] = tile.App.Tiles[2].TextInput
 				tile.App.Disk[tileid][ARCPHONE_CONTACT_NUMBER] = tile.App.Tiles[3].TextInput
 			else
 				local len = #tile.App.Disk + 1

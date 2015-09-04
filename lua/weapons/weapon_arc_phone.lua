@@ -162,7 +162,7 @@ function SWEP:Holster()
 			self:ResetBonePositions(vm)
 		end
 	end
-	if IsValid(self.Owner) then
+	if IsValid(self.Owner) && IsValid(self.Owner:GetViewModel()) then
 		self.Owner:GetViewModel():SetPlaybackRate(1)
 	end
 	return true
