@@ -253,11 +253,11 @@ function APP:EditContact(tileid)
 	end
 	
 	if (tileid > 0) then
-		self.Tiles[2] = ARCPhone.NewAppTextInputTile(self.Disk[tileid][ARCPHONE_CONTACT_NAME],false,118)
-		self.Tiles[3] = ARCPhone.NewAppTextInputTile(self.Disk[tileid][ARCPHONE_CONTACT_NUMBER],false,118)
+		self.Tiles[2] = ARCPhone.NewAppTextInputTile(self,self.Disk[tileid][ARCPHONE_CONTACT_NAME],false,118)
+		self.Tiles[3] = ARCPhone.NewAppTextInputTile(self,self.Disk[tileid][ARCPHONE_CONTACT_NUMBER],false,118)
 	else
-		self.Tiles[2] = ARCPhone.NewAppTextInputTile("Contact Name",false,118)
-		self.Tiles[3] = ARCPhone.NewAppTextInputTile("Insert Number",false,118)
+		self.Tiles[2] = ARCPhone.NewAppTextInputTile(self,"Contact Name",false,118)
+		self.Tiles[3] = ARCPhone.NewAppTextInputTile(self,"Insert Number",false,118)
 	end
 	self.Tiles[2].y = 24
 	self.Tiles[2].w = 92
