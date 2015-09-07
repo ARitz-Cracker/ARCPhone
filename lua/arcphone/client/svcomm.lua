@@ -148,3 +148,33 @@ net.Receive( "arcphone_comm_text", function(length)
 		MsgN("ARCPhone: Server sent error on text "..hash)
 	end
 end)
+
+
+ARCPhone.PhoneRingers = {}
+net.Receive( "arcphone_ringer", function(length)
+	local pid = net.ReadUInt(16)
+	local url = net.ReadString()
+	if IsValid(ARCPhone.PhoneRingers[pid]) then
+		ARCPhone.PhoneRingers[pid]:EnableLooping(false) 
+		ARCPhone.PhoneRingers[pid]:Stop()
+		ARCPhone.PhoneRingers[pid] = nil
+	end
+	local ply = Entity(pid)
+	if url != "" && IsValid(ply) then
+		sound.PlayURL ( url, "3d noblock", function( station,errid,errstr )
+			if IsValid(ARCPhone.PhoneRingers[pid]) then
+				ARCPhone.PhoneRingers[pid]:Stop()
+			end
+			if ( IsValid( station ) ) then
+				ARCPhone.PhoneRingers[pid] = station
+				ARCPhone.PhoneRingers[pid]:SetPos(ply:GetPos() )
+				ARCPhone.PhoneRingers[pid]:Play()
+				ARCPhone.PhoneRingers[pid]:EnableLooping(true) 
+				ARCPhone.PhoneRingers[pid]:SetVolume(0.5)
+			else
+				MsgN(ply:Nick().."'s ringtone failed. ("..tostring(errid)..") "..tostring(errstr))
+				LocalPlayer():EmitSound("buttons/button8.wav" )
+			end
+		end)
+	end
+end)

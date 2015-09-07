@@ -10,7 +10,7 @@ local RingingSound
 function ARCPhone.OnStatusChanged()
 	local newstatus = ARCPhone.PhoneSys.Status
 	if !ARCPhone.PhoneSys.Booted then return end
-	MsgN("Phone status has been changed to "..ARCPhone.PhoneSys.Status)
+	--MsgN("Phone status has been changed to "..ARCPhone.PhoneSys.Status)
 	if newstatus == ARCPHONE_ERROR_DIALING then
 		if !CallingSound then
 			CallingSound = CreateSound( LocalPlayer(), "arcphone/ringback.wav" )
@@ -24,11 +24,14 @@ function ARCPhone.OnStatusChanged()
 			CallingSound = nil
 		end
 		if IsValid(RingingSound) then
+			net.Start("arcphone_ringer")
+			net.WriteString("")
+			net.SendToServer()
 			RingingSound:EnableLooping(false) 
 			RingingSound:Stop()
 			RingingSound = nil
 		end
-		MsgN("NEW STATUS:"..newstatus)
+		--MsgN("NEW STATUS:"..newstatus)
 		if newstatus > 0 then
 			LocalPlayer():EmitSound("arcphone/errors/"..newstatus..".wav")
 			ARCPhone.PhoneSys:AddMsgBox("ARCPhone",ARCPHONE_ERRORSTRINGS[newstatus],"warning")
@@ -44,12 +47,16 @@ function ARCPhone.OnStatusChanged()
 		if newstatus == ARCPHONE_ERROR_RINGING then
 			notification.AddLegacy( "You are being called! Press the up arrow key to unlock your phone!", NOTIFY_HINT, 10 ) 
 			local lst = ""
+			local contactapp = ARCPhone.PhoneSys:GetApp("contacts")
 			for k,v in pairs(ARCPhone.PhoneSys.CurrentCall.on) do
-				list = lst.."\n"..v
+				lst = lst.."\n"..contactapp:GetNameFromNumber(v).." ("..v..")"
 			end
-			ARCPhone.PhoneSys:AddMsgBox("Incoming call","You're recieving a call from "..lst,"phone",8,function() ARCPhone.PhoneSys:Answer() ARCPhone.PhoneSys:OpenApp("callscreen") end,function() ARCPhone.PhoneSys:HangUp() end,function() ARCPhone.PhoneSys:AddMsgBox("Coming soon!","That feature hasn't been added yet. (You also ignored the call)","info") ARCPhone.PhoneSys:HangUp() end)
+			ARCPhone.PhoneSys:AddMsgBox("Incoming call","You're recieving a call from:"..lst,"phone",8,function() ARCPhone.PhoneSys:Answer() ARCPhone.PhoneSys:OpenApp("callscreen") end,function() ARCPhone.PhoneSys:HangUp() end,function() ARCPhone.PhoneSys:AddMsgBox("Coming soon!","That feature hasn't been added yet. (You also ignored the call)","info") ARCPhone.PhoneSys:HangUp() end)
 			--http://www.aritzcracker.ca/arcphone/ringtones/Reflection.mp3
 			--"http://www.aritzcracker.ca/arcphone/ringtones/generic1.mp3"
+			net.Start("arcphone_ringer")
+			net.WriteString("http://www.aritzcracker.ca/arcphone/ringtones/generic1.mp3")
+			net.SendToServer()
 			sound.PlayURL ( "http://www.aritzcracker.ca/arcphone/ringtones/generic1.mp3", "noblock", function( station,errid,errstr )
 				if IsValid(RingingSound) then
 					RingingSound:Stop()

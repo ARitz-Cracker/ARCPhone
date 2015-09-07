@@ -3,7 +3,7 @@ local APP = ARCPhone.NewAppObject()
 APP.Name = "Messaging"
 APP.Author = "ARitz Cracker"
 APP.Purpose = "Messaging app for ARCPhone"
-
+APP.OpenNumber = ""
 function APP:PhoneStart()
 	ARCPhone.Apps["contacts"]:AddContactOption("Text",function(num)
 		ARCPhone.PhoneSys:OpenApp("messaging")
@@ -25,22 +25,27 @@ function APP:AttachPhoto(thumb,photo)
 end
 
 function APP:OpenConvo(num)
+	table.Empty(self.Tiles)
 	self:AddMenuOption("Attach Photo",self.Phone.ChoosePhoto,self.Phone,self.AttachPhoto,self)
 	self.Home = false
+	self.OpenNumber = num
 	local numdir = ARCPhone.ROOTDIR.."/messaging/"..num..".txt"
 	local len = 0
 	if file.Exists(numdir,"DATA") then
 		local msgs = string.Explode( "\f", file.Read(numdir))
 		len = #msgs
+		local msgpart
 		for i=1,len do
-			self.Tiles[i] = ARCPhone.NewAppTextInputTile(self,string.sub( msgs[i], 2),true,118)
+			msgpart = string.Explode("\v", msgs[i])
+			-- msgpart[2] -- Unix timestamp
+			self.Tiles[i] = ARCPhone.NewAppTextInputTile(self,msgpart[3],true,118)
 			self.Tiles[i].Editable = false
 			if i > 1 then
 				self.Tiles[i].y = self.Tiles[i-1].y + self.Tiles[i-1].h + 4
 			else
 				self.Tiles[i].y = 24
 			end
-			if msgs[i][1] == "s" then
+			if msgpart[1] == "s" then
 				self.Tiles[i].x = 12
 				self.Tiles[i].color = Color(0,0,255,255)
 			else
@@ -108,7 +113,7 @@ function APP:Init()
 	self.Tiles = {}
 	self.InConvo = false
 	self:RemoveMenuOption("Attach Photo")
-	
+	self.OpenNumber = ""
 	
 	local files,_ = file.Find(ARCPhone.ROOTDIR.."/messaging/*", "DATA", "datedesc")
 	--ARCPhone.Apps["contacts"].Disk

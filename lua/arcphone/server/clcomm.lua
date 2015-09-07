@@ -98,7 +98,7 @@ net.Receive( "arcphone_comm_text", function(length,ply)
 	if strlen > 0 then
 		str = net.ReadData(strlen)
 	end
-	
+	--MsgN("NET MSG NET LENGTH: "..(length - strlen))
 	local vnum = ARCPhone.GetPhoneNumber(ply)
 	
 	
@@ -217,3 +217,19 @@ net.Receive( "arcphone_comm_text", function(length,ply)
 	end
 end)
 ]]
+
+util.AddNetworkString( "arcphone_ringer" )
+net.Receive( "arcphone_ringer", function(length,ply)
+	local url = net.ReadString()
+	if ply.ARCPhone_Status == ARCPHONE_ERROR_RINGING then
+		net.Start("arcphone_ringer")
+		net.WriteUInt( 0, 16 )
+		net.WriteString(url)
+		net.SendOmit(ply)
+	else
+		net.Start("arcphone_ringer")
+		net.WriteUInt( 0, 16 )
+		net.WriteString("")
+		net.SendOmit(ply)
+	end
+end)

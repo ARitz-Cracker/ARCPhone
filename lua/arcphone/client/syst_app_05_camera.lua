@@ -32,13 +32,9 @@ function APP:PhoneStart()
 	self.Tiles[1].OnUnPressed = function(tile)
 		tile.color = Color(0,0,255,255)
 		if (tile.App.CameraOn) then
-			if (tile.App.CameraStage == 0) then
-				tile.App:TakePicture()
-			end
+			tile.App:TakePicture()
 		else
-			tile.App.CameraOn = true
-			tile.App.DisableTileSwitching = true
-			tile.App.DisableViewModel = true
+			tile.App:EnableCamera()
 			--tile.App.Phone.Ent.ViewModelFOV = 1
 		end
 	end
@@ -62,8 +58,15 @@ function APP:PhoneStart()
 	
 end
 
+function APP:EnableCamera()
+	self.CameraOn = true
+	self.DisableTileSwitching = true
+	self.DisableViewModel = true
+	self.CameraStage = -1
+end
+
 function APP:TakePicture()
-	if self.CameraOn then
+	if self.CameraOn && self.CameraStage == 0 then
 		self.CameraStage = 1
 		self.PicFileName = "arcphone_"..os.date("%Y-%m-%d_%H-%M-%S", os.time())
 		self.Phone:EmitSound("arcphone/camera.wav")
@@ -72,8 +75,10 @@ function APP:TakePicture()
 end
 
 function APP:ForegroundThink()
-
-	if self.CameraStage == 2 then
+	if self.CameraStage == -1 then
+		self.CameraStage = 0 -- TODO: Replace with transition animation
+	
+	elseif self.CameraStage == 2 then
 		file.Write(ARCPhone.ROOTDIR.."/photos/camera/"..self.PicFileName..".thumb.dat", render.Capture {
 			x = self.FoneXPos - 129,
 			y = self.ScreenYPos+1,
@@ -127,7 +132,7 @@ function APP:Init()
 	
 end
 function APP:DrawHUD()
-	if self.CameraOn && self.Mat then
+	if self.CameraOn && self.Mat && self.CameraStage >= 0 then
 		surface.SetDrawColor(0,0,0,255)
 		for i=1,4 do
 			surface.DrawRect(self.BoxX[i],self.BoxY[i],math.ceil(self.BoxW[i]),math.ceil(self.BoxH[i]))

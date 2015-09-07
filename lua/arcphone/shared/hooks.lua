@@ -13,7 +13,7 @@ end )
 ]]
 if CLIENT then
 	
-	hook.Add("Think","ARCPhone",function()
+	hook.Add("Think","ARCPhone Think",function()
 		if LocalPlayer():GetActiveWeapon().IsDahAwesomePhone then
 			if ARCPhone.PhoneSys:GetActiveApp() then
 				ARCPhone.PhoneSys:GetActiveApp():Think(phone)
@@ -44,6 +44,12 @@ if CLIENT then
 			end
 		end
 		
+		for k,v in pairs(ARCPhone.PhoneRingers) do
+			local ply = Entity(k)
+			if IsValid(ply) then
+				v:SetPos(ply:GetPos())
+			end
+		end
 	end)
 
 	hook.Add( "StartChat", "ARCPhone OpenChat", function(t) 
@@ -54,6 +60,9 @@ if CLIENT then
 			ARCPhone.PhoneSys.PauseInput = false
 		end)
 	end)
+	
+
+	
 	--[[
 	
 	]]
@@ -97,6 +106,14 @@ else
 			end
 		end
 	end )
+	
+	hook.Add( "PlayerDisconnected", "ARCPhone PlayerDisconnect", function(ply) 
+		net.Start("arcphone_ringer")
+		net.WriteUInt( 0, 16 )
+		net.WriteString("")
+		net.SendOmit(ply)
+	end)
+	
 end
 
 

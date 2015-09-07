@@ -53,8 +53,6 @@ function texttile:UpdateText()
 		local matches = {string.gmatch(displaytext, "({{IMG:([^:]*):([^:]*):IMG}})")()} --WHY DOES string.gmatch RETURN A FUNCTION INSTEAD OF A TABLE? WHY DO I HAVE TO CALL THAT FUNCTION TO MAKE A TABLE MYSELF?!
 		local imgnum = 0
 		while #matches > 0 do
-			MsgN("MATCHES:")
-			PrintTable(matches)
 			imgnum = imgnum + 1;
 			self._images[imgnum] = ARCLib.MaterialFromTxt(matches[2],"jpg")
 			displaytext = string.Replace(displaytext, matches[1], "\nIMG_"..imgnum.."\n")
@@ -83,6 +81,9 @@ end
 texttile.Editable = true
 function texttile:OnUnPressed() 
 	if self.Editable then
+		ARCPhone.PhoneSys:KeyBoardInput(self)
+	--[[
+		--Old terrible method
 		self.App.Phone.PauseInput = true
 		--MsgN("SETTING TEXT TO "..tostring(self))
 		--MsgN("UNPRESSED: "..self:GetText())
@@ -92,7 +93,9 @@ function texttile:OnUnPressed()
 		end,function(text)
 			self.App.Phone.PauseInput = false
 		end)
+	]]
 	end
+	
 end
 
 
@@ -158,10 +161,6 @@ function ARCPHONE_APP:AddMenuOption(name,func,...)
 	self.Options[#self.Options].text = name
 	self.Options[#self.Options].func = func
 	self.Options[#self.Options].args = {...}
-	MsgN("Added menu option with arguments: ")
-	for i=1,#self.Options[#self.Options].args do
-		MsgN(self.Options[#self.Options].args[i])
-	end
 end
 function ARCPHONE_APP:RemoveMenuOption(name)
 	for k,v in pairs(self.Options) do
@@ -232,8 +231,15 @@ function ARCPHONE_APP:DrawTiles(mvx,mvy)
 		end
 	end
 	if self.Tiles[self.Phone.SelectedAppTile] then
-		surface.SetDrawColor(255,255,255,255)
-
+		if self.Phone.TextInputTile == self.Tiles[self.Phone.SelectedAppTile] then
+			if math.sin(CurTime()*math.pi*2) > 0 then
+				surface.SetDrawColor(0,0,0,255)
+			else
+				surface.SetDrawColor(255,255,255,255)
+			end
+		else
+			surface.SetDrawColor(255,255,255,255)
+		end
 		if curapptime <= CurTime() then
 			surface.DrawOutlinedRect(self.Tiles[self.Phone.SelectedAppTile].x + mvx,self.Tiles[self.Phone.SelectedAppTile].y + mvy,self.Tiles[self.Phone.SelectedAppTile].w,self.Tiles[self.Phone.SelectedAppTile].h)
 		else
