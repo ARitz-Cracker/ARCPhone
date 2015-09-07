@@ -223,12 +223,12 @@ net.Receive( "arcphone_ringer", function(length,ply)
 	local url = net.ReadString()
 	if ply.ARCPhone_Status == ARCPHONE_ERROR_RINGING then
 		net.Start("arcphone_ringer")
-		net.WriteUInt( 0, 16 )
+		net.WriteUInt( ply:EntIndex(), 16 )
 		net.WriteString(url)
 		net.SendOmit(ply)
 	else
 		net.Start("arcphone_ringer")
-		net.WriteUInt( 0, 16 )
+		net.WriteUInt( ply:EntIndex(), 16 )
 		net.WriteString("")
 		net.SendOmit(ply)
 	end
