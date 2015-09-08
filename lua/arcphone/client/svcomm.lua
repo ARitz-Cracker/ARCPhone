@@ -170,7 +170,7 @@ net.Receive( "arcphone_ringer", function(length)
 				ARCPhone.PhoneRingers[pid]:SetPos(ply:GetPos() )
 				ARCPhone.PhoneRingers[pid]:Play()
 				ARCPhone.PhoneRingers[pid]:EnableLooping(true) 
-				ARCPhone.PhoneRingers[pid]:SetVolume(0.5)
+				ARCPhone.PhoneRingers[pid]:SetVolume(0.4)
 			else
 				MsgN(ply:Nick().."'s ringtone failed. ("..tostring(errid)..") "..tostring(errstr))
 				LocalPlayer():EmitSound("buttons/button8.wav" )

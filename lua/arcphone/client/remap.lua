@@ -10,6 +10,7 @@ local ARCPhone_Keyboard_Remap_default = {}
 ARCPhone_Keyboard_Remap_default.normal = {}
 ARCPhone_Keyboard_Remap_default[KEY_LSHIFT] = {}
 ARCPhone_Keyboard_Remap_default[KEY_RSHIFT] = ARCPhone_Keyboard_Remap_default[KEY_LSHIFT]
+ARCPhone_Keyboard_Remap_default[26] = {} -- CTRL key apperently
 local remap = ARCPhone_Keyboard_Remap_default.normal
 remap[KEY_NONE] = ""
 remap[KEY_0] = "0"
@@ -115,6 +116,13 @@ remap[KEY_LEFT] 		= 19
 remap[KEY_DOWN] 		= 18
 remap[KEY_RIGHT] 		= 20
 
+
+remap = ARCPhone_Keyboard_Remap_default[26]
+remap[KEY_C] = 28
+remap[KEY_V] = 29
+remap[KEY_X] = 30
+remap[KEY_LCONTROL] 	= 26
+remap[KEY_RCONTROL] 	= 26
 
 ----------------------------------------------------------------------
 -- American

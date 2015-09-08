@@ -32,6 +32,21 @@ local function OnButton(b)
 		else
 			ARCPhone.PhoneSys.TextInputTile:SetText(ARCPhone.PhoneSys.TextInputTile:GetText()..b)
 		end
+	elseif b == 28 then -- Copy 
+		SetClipboardText(ARCPhone.PhoneSys.TextInputTile:GetText())
+	elseif b == 29 then -- Paste
+		local dummy = vgui.Create("DTextEntry")
+		dummy:ParentToHUD()
+		dummy:Hide()
+		dummy:SetText("")
+		dummy:Paste()
+		ARCPhone.PhoneSys.TextInputTile:SetText(ARCPhone.PhoneSys.TextInputTile:GetText()..dummy:GetText())
+		dummy:SetText("")
+		dummy:Remove() 
+		return contents
+	elseif b == 30 then -- Cut
+		SetClipboardText(ARCPhone.PhoneSys.TextInputTile:GetText())
+		ARCPhone.PhoneSys.TextInputTile:SetText("")
 	end
 end
 

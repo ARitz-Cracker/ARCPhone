@@ -3,8 +3,9 @@
 -- This file is under copyright, and is bound to the agreement stated in the ELUA.
 -- Any 3rd party content has been used as either public domain or with permission.
 -- © Copyright 2014 Aritz Beobide-Cardinal All rights reserved.
-ARCPhone.CachedPhoneNumbers = {}
 
+--[[
+ARCPhone.CachedPhoneNumbers = {}
 function ARCPhone.SteamIDToPhoneNumber(steamid)
 	if !ARCPhone.CachedPhoneNumbers[steamid] then
 		local hash = util.CRC(steamid)
@@ -40,6 +41,32 @@ function ARCPhone.GetPlayerFromPhoneNumber(number)
 	end
 	return ply
 end
+-- Hashing way...
+]]
+
+function ARCPhone.SteamIDToPhoneNumber(steamid)
+	return string.sub( util.SteamIDTo64(steamid), #steamid-10)
+end
+function ARCPhone.SteamIDFromPhoneNumber(number)
+	return ARCPhone.CachedPhoneNumbers[number]
+end
+function ARCPhone.GetPhoneNumber(ply)
+	if !IsValid(ply) || !ply:IsPlayer() then return "**********" end
+	local steamid = ply:SteamID64()
+	return string.sub( steamid, #steamid-10)
+end
+function ARCPhone.GetPlayerFromPhoneNumber(number)
+	local ply = player.GetBySteamID64( "7656119"..number ) or NULL
+	if !IsValid(ply) then
+		function ply:SteamID() return "STEAM_ID_PENDING" end
+		function ply:Nick() return "[Player Offline]" end
+		function ply:IsPlayer() return false end
+		function ply:IsValid() return false end
+	end
+	return ply
+end
+
+
 function ARCPhone.ValidPhoneNumberChars(txt)
 	local len = #txt
 	local valid = true
