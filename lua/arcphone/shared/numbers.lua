@@ -42,10 +42,11 @@ function ARCPhone.GetPlayerFromPhoneNumber(number)
 	return ply
 end
 -- Hashing way...
+-- lua_run for k,v in pairs(player.GetAll()) do PrintMessage( HUD_PRINTTALK, v:Nick().."'s phone number is "..ARCPhone.GetPhoneNumber(v) ) end
 ]]
 
 function ARCPhone.SteamIDToPhoneNumber(steamid)
-	return string.sub( util.SteamIDTo64(steamid), #steamid-10)
+	return string.sub( util.SteamIDTo64(steamid), #steamid-9)
 end
 function ARCPhone.SteamIDFromPhoneNumber(number)
 	return ARCPhone.CachedPhoneNumbers[number]
@@ -53,7 +54,7 @@ end
 function ARCPhone.GetPhoneNumber(ply)
 	if !IsValid(ply) || !ply:IsPlayer() then return "**********" end
 	local steamid = ply:SteamID64()
-	return string.sub( steamid, #steamid-10)
+	return string.sub( steamid, #steamid-9)
 end
 function ARCPhone.GetPlayerFromPhoneNumber(number)
 	local ply = player.GetBySteamID64( "7656119"..number ) or NULL
