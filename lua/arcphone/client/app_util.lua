@@ -2,7 +2,7 @@
 -- This file is under copyright, and is bound to the agreement stated in the ELUA.
 -- Any 3rd party content has been used as either public domain or with permission.
 -- © Copyright Aritz Beobide-Cardinal 2014 All rights reserved.
-ARCPhone.Apps = {}
+ARCPhone.Apps = ARCPhone.Apps or {}
 local tile = {}
 tile.tile = true
 tile.x = 48
@@ -29,6 +29,10 @@ end
 local texttile = table.Copy(tile)
 
 function texttile:drawfunc(xpos,ypos)
+	local txtcol = color_white
+	if (self.bgcolor) then
+		txtcol = self.color
+	end
 	self._imagedisplay = 0
 	self._nextimagedisplay = 1
 	for i=1,self._MaxLines do
@@ -40,7 +44,7 @@ function texttile:drawfunc(xpos,ypos)
 				self._imagedisplay = self._imagedisplay + 1
 				self._nextimagedisplay = self._nextimagedisplay + 1
 			else
-				draw.SimpleText( self._InputTable[i], "ARCPhoneSmall", xpos+1, ypos-11 + (i-self._imagedisplay)*12 + self._imagedisplay*(self.w - 2), Color(255,255,255,255),TEXT_ALIGN_LEFT , TEXT_ALIGN_BOTTOM )
+				draw.SimpleText( self._InputTable[i], "ARCPhoneSmall", xpos+1, ypos-11 + (i-self._imagedisplay)*12 + self._imagedisplay*(self.w - 2), txtcol,TEXT_ALIGN_LEFT , TEXT_ALIGN_BOTTOM )
 			end
 		end
 	end
@@ -113,6 +117,88 @@ local oldapptime = 0
 
 
 
+
+local coltile = table.Copy(tile)
+coltile._colorinput = true
+coltile._colortab = {"r","g","b","a"}
+coltile._colortabvals = {0,0,0,1}
+coltile._colormtab = {Color(255,0,0,255),Color(0,255,0,255),Color(0,0,255,255),Color(128,128,128,255)}
+function coltile:drawfunc(xpos,ypos)
+	local x,y,w,h
+	draw.SimpleText( self.title, "ARCPhoneSmall", xpos+1, ypos+ 1, self.txtcol,TEXT_ALIGN_LEFT , TEXT_ALIGN_BOTTOM )
+	for i=1,4 do
+		h = self.h - 14
+		w = self.w/4
+		x = xpos + w*(i-1)
+		y = ypos + 14
+		draw.SimpleText( self._colortabvals[i], "ARCPhoneSmall", x + w/2, y + h/2, self.txtcol,TEXT_ALIGN_CENTER , TEXT_ALIGN_CENTER )
+		surface.SetDrawColor(ARCLib.ConvertColor(self._colormtab[i]))
+		
+		local polytab = {}
+		polytab[1] = {}
+		polytab[1].x = x + w/2
+		polytab[1].y = y + h - 2
+		polytab[2] = {}
+		polytab[2].x = x + w - 2
+		polytab[2].y = y + h/2 + 7
+		polytab[3] = {}
+		polytab[3].x = x + 2
+		polytab[3].y = y + h/2 + 7
+		
+		local polytab2 = {}
+		polytab2[1] = {}
+		polytab2[1].x = x + w/2
+		polytab2[1].y = y + 2
+		polytab2[2] = {}
+		polytab2[2].x = x + w - 2
+		polytab2[2].y = y + h/2 - 7
+		polytab2[3] = {}
+		polytab2[3].x = x + 2
+		polytab2[3].y = y + h/2 - 7
+		--draw.NoTexture()
+		
+		--draw.SimpleText( "FUCK", "ARCPhoneSmall", xpos+1, ypos+ 1, self.txtcol,TEXT_ALIGN_LEFT , TEXT_ALIGN_BOTTOM )
+		--surface.SetTexture(1)
+		--draw.NoTexture()
+		surface.DrawPoly(polytab)
+		
+		surface.DrawPoly(polytab2)
+		
+		surface.SetDrawColor(ARCLib.ConvertColor(self.txtcol))
+		surface.DrawLine(polytab[1].x,polytab[1].y,polytab[2].x,polytab[2].y)
+		surface.DrawLine(polytab[2].x,polytab[2].y,polytab[3].x,polytab[3].y)
+		surface.DrawLine(polytab[3].x,polytab[3].y,polytab[1].x,polytab[1].y)
+		
+		surface.SetDrawColor(ARCLib.ConvertColor(self.txtcol))
+		surface.DrawLine(polytab2[1].x,polytab2[1].y,polytab2[2].x,polytab2[2].y)
+		surface.DrawLine(polytab2[2].x,polytab2[2].y,polytab2[3].x,polytab2[3].y)
+		surface.DrawLine(polytab2[3].x,polytab2[3].y,polytab2[1].x,polytab2[1].y)
+		
+	end
+	if self.color.r + self.color.g + self.color.b > 500 then
+		self.txtcol = color_black
+	else
+		self.txtcol = color_white
+	end
+end
+
+function coltile:OnUnPressed() 
+	if self.Editable then
+		ARCPhone.PhoneSys:KeyBoardInput(self)
+	end
+	
+end
+
+
+function ARCPhone.NewAppColorInputTile(app,col,txt)
+	local tab = table.Copy(coltile)
+	tab.title = txt or "Select Colour"
+	tab.App = app
+	tab.color = col or Color(0,0,0,255)
+	tab.txtcol = color_white
+	return tab
+end
+
 local ARCPHONE_APP = {}
 
 function ARCPHONE_APP:CreateNewTile(x,y,h,w)
@@ -120,18 +206,17 @@ function ARCPHONE_APP:CreateNewTile(x,y,h,w)
 	tile.tile = true
 	tile.x = x or 48
 	tile.y = y or 48
-	tile.w = h or 16
+	tile.h = h or 16
 	tile.h = w or 16
 	return tile
 end
 
-function ARCPHONE_APP:CreateNewTileTextInput(x,y,h,w)
-	local tile = ARCPhone.NewAppTextInputTile(self)
+function ARCPHONE_APP:CreateNewTileTextInput(x,y,h,w,txt,resize)
+	local tile = ARCPhone.NewAppTextInputTile(self,txt,resize,w)
 	tile.tile = true
 	tile.x = x or 48
 	tile.y = y or 48
-	tile.w = h or 16
-	tile.h = w or 16
+	tile.h = h or 16
 	return tile
 end
 
@@ -139,7 +224,7 @@ end
 ARCPHONE_APP.ARCPhoneApp = true
 ARCPHONE_APP.Name = "Unnamed App"
 ARCPHONE_APP.Author = "Anonymous"
-ARCPHONE_APP.Purpose = "A brand-new ARCPHONE_APP."
+ARCPHONE_APP.Purpose = "A brand-new ARCPhone app."
 ARCPHONE_APP.DisableTileSwitching = false
 --ARCPHONE_APP.Phone = ARCPhone.PhoneSys -- NOT A GOOD IDEA FOR table.FullCopy!!!
 ARCPHONE_APP.Disk = {}
@@ -157,10 +242,16 @@ function ARCPHONE_APP:GetSelectedTileID()
 	return self.Phone.SelectedAppTile
 end
 function ARCPHONE_APP:AddMenuOption(name,func,...)
-	self.Options[#self.Options+1] = {}
-	self.Options[#self.Options].text = name
-	self.Options[#self.Options].func = func
-	self.Options[#self.Options].args = {...}
+	local place = #self.Options+1
+	for k,v in ipairs(self.Options) do
+		if v.text && v.text == name then
+			place = k
+		end
+	end
+	self.Options[place] = {}
+	self.Options[place].text = name
+	self.Options[place].func = func
+	self.Options[place].args = {...}
 end
 function ARCPHONE_APP:RemoveMenuOption(name)
 	for k,v in pairs(self.Options) do
@@ -168,6 +259,21 @@ function ARCPHONE_APP:RemoveMenuOption(name)
 			self.Options[k] = nil
 		end
 	end
+	self.Options = ARCLib.TableToSequential(self.Options)
+end
+function ARCPHONE_APP:RenameMenuOption(name,new)
+	for k,v in pairs(self.Options) do
+		if v.text && v.text == name then
+			v.text = new
+		end
+	end
+end
+function ARCPHONE_APP:ClearOptions()
+	table.Empty(self.Options)
+	self.Options[1] = {}
+	self.Options[1].text = "About"
+	self.Options[1].func = function(app) app.Phone:AddMsgBox("About",tostring(app.Name).."\nby: "..tostring(app.Author).."\n"..tostring(app.Purpose),"box") end
+	self.Options[1].args = {tab}
 end
 function ARCPHONE_APP:SaveData()
 	file.Write(ARCPhone.ROOTDIR.."/appdata/"..self.sysname..".txt",util.TableToJSON(self.Disk))
@@ -185,19 +291,23 @@ end
 ARCPHONE_APP.BackgroundDraw = NULLFUNC
 ARCPHONE_APP.ForegroundDraw = NULLFUNC
 function ARCPHONE_APP:DrawTiles(mvx,mvy)
+	local FuckingHell
+	local AreYouKiddingMe
 	for k,v in pairs(self.Tiles) do
-		--
 		if ARCLib.TouchingBox(v.x + mvx,v.x + mvx + v.w,v.y + mvy,v.y + mvy + v.h,0,self.Phone.ScreenResX,0,self.Phone.ScreenResY) then
-			
 			if v.drawfunc_override then
 				v:drawfunc_override(v.x + mvx,v.y + mvy)
 			else
 				if (!v.bgcolor) then
-					v.bgcolor = v.color
+					AreYouKiddingMe = v.color
+					FuckingHell = color_white
+				else
+					AreYouKiddingMe = v.bgcolor
+					FuckingHell = v.color
 				end
-				surface.SetDrawColor(ARCLib.ConvertColor(v.bgcolor))
+				surface.SetDrawColor(ARCLib.ConvertColor(AreYouKiddingMe))
 				surface.DrawRect(v.x + mvx,v.y + mvy,v.w,v.h)
-				surface.SetDrawColor(ARCLib.ConvertColor(v.color))
+				surface.SetDrawColor(ARCLib.ConvertColor(FuckingHell))
 				local mfact = 12
 				if v.TextureNoresize then
 					mfact = 0
@@ -225,7 +335,7 @@ function ARCPHONE_APP:DrawTiles(mvx,mvy)
 					v:drawfunc(v.x + mvx,v.y + mvy)
 				end
 				if v.text && string.len(v.text) > 0 then
-					draw.SimpleText( ARCLib.CutOutText(v.text,"ARCPhoneSmall",v.w), "ARCPhoneSmall", v.x + mvx +1, v.y + mvy + v.h -1, Color(255,255,255,255),TEXT_ALIGN_LEFT , TEXT_ALIGN_TOP ) 
+					draw.SimpleText( ARCLib.CutOutText(v.text,"ARCPhoneSmall",v.w), "ARCPhoneSmall", v.x + mvx +1, v.y + mvy + v.h -1, FuckingHell,TEXT_ALIGN_LEFT , TEXT_ALIGN_TOP ) 
 				end
 			end
 		end
@@ -233,12 +343,12 @@ function ARCPHONE_APP:DrawTiles(mvx,mvy)
 	if self.Tiles[self.Phone.SelectedAppTile] then
 		if self.Phone.TextInputTile == self.Tiles[self.Phone.SelectedAppTile] then
 			if math.sin(CurTime()*math.pi*2) > 0 then
-				surface.SetDrawColor(0,0,0,255)
+				surface.SetDrawColor(ARCLib.ConvertColor(ARCLib.ColorNegative(self.Phone.Settings.Personalization.CL_00_CursorColour)))
 			else
-				surface.SetDrawColor(255,255,255,255)
+				surface.SetDrawColor(ARCLib.ConvertColor(self.Phone.Settings.Personalization.CL_00_CursorColour))
 			end
 		else
-			surface.SetDrawColor(255,255,255,255)
+			surface.SetDrawColor(ARCLib.ConvertColor(self.Phone.Settings.Personalization.CL_00_CursorColour))
 		end
 		if curapptime <= CurTime() then
 			surface.DrawOutlinedRect(self.Tiles[self.Phone.SelectedAppTile].x + mvx,self.Tiles[self.Phone.SelectedAppTile].y + mvy,self.Tiles[self.Phone.SelectedAppTile].w,self.Tiles[self.Phone.SelectedAppTile].h)
@@ -428,7 +538,7 @@ function ARCPhone.NewAppObject()
 	tab.Options = {}
 	tab.Options[1] = {}
 	tab.Options[1].text = "About"
-	tab.Options[1].func = function(app) app.Phone:AddMsgBox("About",tostring(app.Name).."\nby: "..tostring(app.Author).."\n\n"..tostring(app.Purpose),"box") end
+	tab.Options[1].func = function(app) app.Phone:AddMsgBox("About",tostring(app.Name).."\nby: "..tostring(app.Author).."\n"..tostring(app.Purpose),"box") end
 	tab.Options[1].args = {tab}
 	return tab
 end

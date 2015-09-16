@@ -74,15 +74,6 @@ function ARCPhone.PhoneSys:Think(wep)
 
 		end
 	end
-		--[[
-		if self.OldStatus != self.Status then
-			self:Print("Call Status has been changed to: "..tostring(ARCPHONE_ERRORSTRINGS[self.Status]))
-			self.OldStatus = self.Status
-		end
-		]]
-		--self.HideWhatsOffTheScreen = true
-
-
 end
 ARCPhone.PhoneSys.icons_reception = {}
 for i = 0,7 do
@@ -134,8 +125,6 @@ function ARCPhone.PhoneSys:Init(wep)
 	self.HalfScreenResX = self.ScreenResX/2
 	self.HalfScreenResY = self.ScreenResY/2
 	self.LastWep = "weapon_physgun"
-	self.CurrentDir = "/"
-	self.CurrentFolderIcon = "phone"
 	self.ActiveApp = "home"
 	self.OldSelectedAppTile = 1
 	self.SelectedAppTile = 1
@@ -146,8 +135,6 @@ function ARCPhone.PhoneSys:Init(wep)
 	self.MoveY = 0
 	self.BigTileX = 0
 	self.BigTileY = 0
-	self.Msgs = ""
-	self.MsgsTab = {}
 
 	self.MsgBoxs = {}
 	self.MsgBoxOption = 1
@@ -163,6 +150,8 @@ function ARCPhone.PhoneSys:Init(wep)
 				-- I have no idea how to stencil, but hey, it works, and doesn't cause significant FPS drop
 				render.ClearStencil() --Clear stencil
 				render.SetStencilEnable( true ) --Enable stencil
+				render.SetStencilWriteMask( 255 )
+				render.SetStencilTestMask( 255 )
 				--STENCILOPERATION_KEEP
 				--STENCILOPERATION_INCR
 				render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_NEVER )
@@ -190,213 +179,198 @@ function ARCPhone.PhoneSys:Init(wep)
 			end
 
 
-			surface.SetDrawColor( 0, 0, 0, 255 )
+			surface.SetDrawColor(ARCLib.ConvertColor(self.Settings.Personalization.CL_13_BackgroundColour))
 			surface.DrawRect( 0, 0, self.ScreenResX, self.ScreenResY )
 
-			if self.ShowConsole then
-				surface.SetDrawColor( 255, 255, 255, 255 )
-				surface.DrawOutlinedRect( 0, 40, 128, 1 )
+			local app = ARCPhone.Apps[self.ActiveApp]
 
-				surface.SetMaterial( ARCLib.Icons16[self.CurrentFolderIcon] )
-				surface.DrawTexturedRect( 2, 22, 16, 16 )
+			if (app && self.Booted && app.Tiles && #app.Tiles > 0) then
 
-				local num = #self.MsgsTab - 15
-				for i = 1,15 do
-					if self.MsgsTab[num+i] then
-						draw.SimpleText( self.MsgsTab[num+i], "ARCPhoneSmall", 2, 35+(i*12), Color(255,255,255,255), TEXT_ALIGN_LEFT , TEXT_ALIGN_CENTER  )
+				local relx1 = app.Tiles[self.SelectedAppTile].x + self.MoveX
+				local relx2 = app.Tiles[self.SelectedAppTile].x + app.Tiles[self.SelectedAppTile].w + self.MoveX
+				local rely1 = app.Tiles[self.SelectedAppTile].y + self.MoveY
+				local rely2 = app.Tiles[self.SelectedAppTile].y + app.Tiles[self.SelectedAppTile].h + self.MoveY
+
+				if app.Tiles[self.SelectedAppTile].w > self.ScreenResX then
+					relx1 = self.BigTileX + self.MoveX
+
+					if relx2 >= self.ScreenResX - 20 then
+						relx2 = self.BigTileX + self.MoveX + self.ScreenResX - 20
+					end
+				end
+				if app.Tiles[self.SelectedAppTile].h > self.ScreenResY then
+					rely1 = self.BigTileY + self.MoveY
+					if rely2 >= self.ScreenResY - 20 then
+						rely2 = self.BigTileY + self.MoveY + self.ScreenResY - 20
 					end
 				end
 
-				--draw.SimpleText( "ARCPhone", "ARCPhone", 0, 0, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_CENTER  )
-				draw.SimpleText( self.CurrentDir, "ARCPhone", 20, 32, Color(255,255,255,255), TEXT_ALIGN_LEFT , TEXT_ALIGN_CENTER  )
-				--draw.SimpleText( self.thing[self.Selection], "ARCPhone", -36, -68, Color(255,255,255,255), TEXT_ALIGN_LEFT , TEXT_ALIGN_CENTER  )
+				if relx1 < 6 then
+					local dist = -relx1+6
+					self.MoveX = self.MoveX + math.ceil(dist*0.2)
+				end
+				if relx2 > self.ScreenResX - 6 then
+					local dist = relx2 - (self.ScreenResX - 6)
+					self.MoveX = self.MoveX - math.ceil(dist*0.2)
+					math.ceil(dist*0.2)
+				end
+
+				if rely1 < 29 then
+					local dist = -rely1+29
+					self.MoveY = self.MoveY + math.ceil(dist*0.2)
+				end
+				if rely2 > self.ScreenResY - 8 then
+					local dist = rely2 - (self.ScreenResY - 8)
+					self.MoveY = self.MoveY - math.ceil(dist*0.2)
+				end
+
+				app:DrawTiles(self.MoveX,self.MoveY)
+				if !self.HideWhatsOffTheScreen then
+					surface.SetDrawColor( 255, 0, 0, 255 )
+					surface.DrawOutlinedRect( relx1, rely1, relx2-relx1, rely2-rely1 )
+				end
+			end
+
+			local multiplier
+			if self.ShowOptions then
+				surface.SetDrawColor(ARCLib.ConvertColor(self.Settings.Personalization.CL_18_FadeColour))
+				surface.DrawOutlinedRect( 0, 0, self.ScreenResX, self.ScreenResY )
+				multiplier = (ARCLib.BetweenNumberScaleReverse(self.OptionAnimStartTime,CurTime(),self.OptionAnimEndTime)^2 -1)*-1
 			else
-				local app = ARCPhone.Apps[self.ActiveApp]
+				multiplier = ARCLib.BetweenNumberScaleReverse(self.OptionAnimStartTime,CurTime(),self.OptionAnimEndTime)^2
+			end
+			if multiplier > 0 then
+			--[[	self.OptionAnimStartTime = 0
+self.OptionAnimEndTime = 1]]
 
-				if (app && self.Booted && app.Tiles && #app.Tiles > 0) then
-
-					local relx1 = app.Tiles[self.SelectedAppTile].x + self.MoveX
-					local relx2 = app.Tiles[self.SelectedAppTile].x + app.Tiles[self.SelectedAppTile].w + self.MoveX
-					local rely1 = app.Tiles[self.SelectedAppTile].y + self.MoveY
-					local rely2 = app.Tiles[self.SelectedAppTile].y + app.Tiles[self.SelectedAppTile].h + self.MoveY
-
-					if app.Tiles[self.SelectedAppTile].w > self.ScreenResX then
-						relx1 = self.BigTileX + self.MoveX
-
-						if relx2 >= self.ScreenResX - 20 then
-							relx2 = self.BigTileX + self.MoveX + self.ScreenResX - 20
-						end
+				local size = #self.Options * 14
+				surface.SetDrawColor(ARCLib.ConvertColor(self.Settings.Personalization.CL_14_ContextMenuMain))
+				surface.DrawRect( 0, self.ScreenResY - size*multiplier, self.ScreenResX, size )
+				for i = 1,#self.Options do
+					if self.CurrentOption == i then
+						surface.SetDrawColor(ARCLib.ConvertColor(self.Settings.Personalization.CL_15_ContextMenuSelect))
+						surface.DrawRect( 0, self.ScreenResY - ((i)*14)*multiplier, self.ScreenResX, 14 )
 					end
-					if app.Tiles[self.SelectedAppTile].h > self.ScreenResY then
-						rely1 = self.BigTileY + self.MoveY
-						if rely2 >= self.ScreenResY - 20 then
-							rely2 = self.BigTileY + self.MoveY + self.ScreenResY - 20
-						end
-					end
-
-					if relx1 < 6 then
-						local dist = -relx1+6
-						self.MoveX = self.MoveX + math.ceil(dist*0.2)
-					end
-					if relx2 > self.ScreenResX - 6 then
-						local dist = relx2 - (self.ScreenResX - 6)
-						self.MoveX = self.MoveX - math.ceil(dist*0.2)
-						math.ceil(dist*0.2)
-					end
-
-					if rely1 < 29 then
-						local dist = -rely1+29
-						self.MoveY = self.MoveY + math.ceil(dist*0.2)
-					end
-					if rely2 > self.ScreenResY - 8 then
-						local dist = rely2 - (self.ScreenResY - 8)
-						self.MoveY = self.MoveY - math.ceil(dist*0.2)
-					end
-
-					app:DrawTiles(self.MoveX,self.MoveY)
-					if !self.HideWhatsOffTheScreen then
-						surface.SetDrawColor( 255, 0, 0, 255 )
-						surface.DrawOutlinedRect( relx1, rely1, relx2-relx1, rely2-rely1 )
-					end
+					draw.SimpleText(self.Options[i].text, "ARCPhoneSmall", 2, self.ScreenResY - (i*14)*multiplier, Color(255,255,255,255), TEXT_ALIGN_LEFT , TEXT_ALIGN_BOTTOM  )
 				end
+				surface.SetDrawColor(ARCLib.ConvertColor(self.Settings.Personalization.CL_16_ContextMenuBorder))
+				surface.DrawOutlinedRect( 0, self.ScreenResY - size*multiplier, self.ScreenResX, size )
+			end
 
-				local multiplier
-				if self.ShowOptions then
-					multiplier = ARCLib.BetweenNumberScale(self.OptionAnimStartTime,CurTime(),self.OptionAnimEndTime)^2
+			local maxmsgbox = #self.MsgBoxs
+			if maxmsgbox > 0 then
+				surface.SetDrawColor( 0, 0, 0, 185 )
+				surface.DrawOutlinedRect( 0, 0, self.ScreenResX, self.ScreenResY )
+				local buttonwidth = self.ScreenResX - 8
+				local maxo = 1
+				local typ = self.MsgBoxs[maxmsgbox].Type
+				if typ < 2 then
+					maxo = 1
+				elseif typ > 1 && typ < 6 then
+					maxo = 2
 				else
-					multiplier = ARCLib.BetweenNumberScaleReverse(self.OptionAnimStartTime,CurTime(),self.OptionAnimEndTime)^2
+					maxo = 3
 				end
-				if multiplier > 0 then
-				--[[	self.OptionAnimStartTime = 0
-	self.OptionAnimEndTime = 1]]
+				local txttab = ARCLib.FitText(self.MsgBoxs[maxmsgbox].Text,"ARCPhoneSmall",buttonwidth)
 
-					local size = #self.Options * 14
-					surface.SetDrawColor( 0, 0, 128, 255 )
-					surface.DrawRect( 0, self.ScreenResY - size*multiplier, self.ScreenResX, size )
-					for i = 1,#self.Options do
-						if self.CurrentOption == i then
-							surface.SetDrawColor( 0, 0, 255, 255 )
-							surface.DrawRect( 0, self.ScreenResY - ((i)*14)*multiplier, self.ScreenResX, 14 )
-						end
-						draw.SimpleText(self.Options[i].text, "ARCPhoneSmall", 2, self.ScreenResY - (i*14)*multiplier, Color(255,255,255,255), TEXT_ALIGN_LEFT , TEXT_ALIGN_BOTTOM  )
-					end
-					surface.SetDrawColor( 50, 50, 255, 255 )
-					surface.DrawOutlinedRect( 0, self.ScreenResY - size*multiplier, self.ScreenResX, size )
+				surface.SetDrawColor( 100, 100, 100, 255 )
+				surface.DrawRect( 0, 22, self.ScreenResX, 34 + 20*maxo + 12*#txttab)
+
+				surface.SetDrawColor(ARCLib.ConvertColor(self.Settings.Personalization.CL_21_PopupBoxText))
+				surface.DrawOutlinedRect( 0, 22, self.ScreenResX, 34 + 20*maxo + 12*#txttab)
+				surface.SetTexture(ARCLib.FlatIcons64[self.MsgBoxs[maxmsgbox].Icon])
+				if self.MsgBoxs[maxmsgbox].Icon == "cross" then
+					surface.SetDrawColor( 255, 32, 16, 255 )
+				elseif self.MsgBoxs[maxmsgbox].Icon == "warning" then
+					surface.SetDrawColor( 200, 200, 0, 255 )
+				elseif self.MsgBoxs[maxmsgbox].Icon == "info" then
+					surface.SetDrawColor( 64, 255, 64, 255 )
+				elseif self.MsgBoxs[maxmsgbox].Icon == "question" then
+					surface.SetDrawColor( 64, 64, 255, 255 )
 				end
+				surface.DrawTexturedRect( 4, 26, 16, 16 )
 
-				local maxmsgbox = #self.MsgBoxs
-				if maxmsgbox > 0 then
+				draw.SimpleText(ARCLib.CutOutText(self.MsgBoxs[maxmsgbox].Title,"ARCPhone",buttonwidth),"ARCPhone", 24, 27, self.Settings.Personalization.CL_21_PopupBoxText, TEXT_ALIGN_LEFT , TEXT_ALIGN_BOTTOM  )
+				for i = 1,#txttab do
+					draw.SimpleText(txttab[i],"ARCPhoneSmall", 4, 34+(i*12), self.Settings.Personalization.CL_21_PopupBoxText, TEXT_ALIGN_LEFT , TEXT_ALIGN_BOTTOM  )
+				end
+				surface.SetDrawColor( self.Settings.Personalization.CL_22_PopupAccept )
+				surface.DrawRect( 4, 46 + 4 + 12*#txttab, buttonwidth, 20)
 
-					local buttonwidth = self.ScreenResX - 8
-					local maxo = 1
-					local typ = self.MsgBoxs[maxmsgbox].Type
-					if typ < 2 then
-						maxo = 1
-					elseif typ > 1 && typ < 6 then
-						maxo = 2
-					else
-						maxo = 3
+				if typ == 1 || typ == 3 then -- Case statements would work really nice here :/
+					draw.SimpleText("OK","ARCPhone", self.HalfScreenResX, 46 + 6 + 12*#txttab, self.Settings.Personalization.CL_23_PopupAcceptText, TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+				end
+				if typ == 2 || typ == 6 then
+					draw.SimpleText("Yes","ARCPhone", self.HalfScreenResX, 46 + 6 + 12*#txttab, self.Settings.Personalization.CL_23_PopupAcceptText, TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+				end
+				if typ == 4 || typ == 7 then
+					draw.SimpleText("Retry","ARCPhone", self.HalfScreenResX, 46 + 6 + 12*#txttab, self.Settings.Personalization.CL_23_PopupAcceptText, TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+				end
+				if typ == 5 then
+					draw.SimpleText("Reply","ARCPhone", self.HalfScreenResX, 46 + 6 + 12*#txttab, self.Settings.Personalization.CL_23_PopupAcceptText, TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+				end
+				if typ == 8 then
+					draw.SimpleText("Answer","ARCPhone", self.HalfScreenResX, 46 + 6 + 12*#txttab, self.Settings.Personalization.CL_23_PopupAcceptText, TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+				end
+				if self.MsgBoxOption == 1 then
+					surface.SetDrawColor(ARCPhone.PhoneSys.Settings.Personalization.CL_00_CursorColour)
+					surface.DrawOutlinedRect( 4, 46 + 4 + 12*#txttab, buttonwidth, 20)
+
+				end
+				if maxo > 1 then
+					surface.SetDrawColor(self.Settings.Personalization.CL_24_PopupDeny)
+					surface.DrawRect( 4, 46 + 24 + 12*#txttab, buttonwidth, 20)
+					if typ == 2 || typ == 6 then -- Case statements would work really nice here :/
+						draw.SimpleText("No","ARCPhone",self.HalfScreenResX,46 + 26 + 12*#txttab, self.Settings.Personalization.CL_25_PopupDenyText, TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
 					end
-					local txttab = ARCLib.FitText(self.MsgBoxs[maxmsgbox].Text,"ARCPhoneSmall",buttonwidth)
-
-					surface.SetDrawColor( 100, 100, 100, 255 )
-					surface.DrawRect( 0, 22, self.ScreenResX, 34 + 20*maxo + 12*#txttab)
-
-					surface.SetDrawColor( 255, 255, 255, 255 )
-					surface.DrawOutlinedRect( 0, 22, self.ScreenResX, 34 + 20*maxo + 12*#txttab)
-					surface.SetTexture(ARCLib.FlatIcons64[self.MsgBoxs[maxmsgbox].Icon])
-					if self.MsgBoxs[maxmsgbox].Icon == "cross" then
-						surface.SetDrawColor( 255, 32, 16, 255 )
-					elseif self.MsgBoxs[maxmsgbox].Icon == "warning" then
-						surface.SetDrawColor( 200, 200, 0, 255 )
-					elseif self.MsgBoxs[maxmsgbox].Icon == "info" then
-						surface.SetDrawColor( 64, 255, 64, 255 )
-					elseif self.MsgBoxs[maxmsgbox].Icon == "question" then
-						surface.SetDrawColor( 64, 64, 255, 255 )
-					end
-					surface.DrawTexturedRect( 4, 26, 16, 16 )
-
-					draw.SimpleText(ARCLib.CutOutText(self.MsgBoxs[maxmsgbox].Title,"ARCPhone",buttonwidth),"ARCPhone", 24, 27, Color(255,255,255,255), TEXT_ALIGN_LEFT , TEXT_ALIGN_BOTTOM  )
-					for i = 1,#txttab do
-						draw.SimpleText(txttab[i],"ARCPhoneSmall", 4, 34+(i*12), Color(255,255,255,255), TEXT_ALIGN_LEFT , TEXT_ALIGN_BOTTOM  )
-					end
-					surface.SetDrawColor( 75, 255, 75, 255 )
-					surface.DrawRect( 4, 46 + 4 + 12*#txttab, buttonwidth, 20)
-
-					if typ == 1 || typ == 3 then -- Case statements would work really nice here :/
-						draw.SimpleText("OK","ARCPhone", self.HalfScreenResX, 46 + 6 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
-					end
-					if typ == 2 || typ == 6 then
-						draw.SimpleText("Yes","ARCPhone", self.HalfScreenResX, 46 + 6 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+					if typ == 3 then
+						draw.SimpleText("Cancel","ARCPhone",self.HalfScreenResX,46 + 26 + 12*#txttab, self.Settings.Personalization.CL_25_PopupDenyText, TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
 					end
 					if typ == 4 || typ == 7 then
-						draw.SimpleText("Retry","ARCPhone", self.HalfScreenResX, 46 + 6 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+						draw.SimpleText("Abort","ARCPhone",self.HalfScreenResX,46 + 26 + 12*#txttab, self.Settings.Personalization.CL_25_PopupDenyText, TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
 					end
 					if typ == 5 then
-						draw.SimpleText("Reply","ARCPhone", self.HalfScreenResX, 46 + 6 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+						draw.SimpleText("Close","ARCPhone",self.HalfScreenResX,46 + 26 + 12*#txttab, self.Settings.Personalization.CL_25_PopupDenyText, TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
 					end
 					if typ == 8 then
-						draw.SimpleText("Answer","ARCPhone", self.HalfScreenResX, 46 + 6 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+						draw.SimpleText("Ignore","ARCPhone",self.HalfScreenResX,46 + 26 + 12*#txttab, self.Settings.Personalization.CL_25_PopupDenyText, TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
 					end
-					if self.MsgBoxOption == 1 then
-						surface.SetDrawColor( 255, 255, 255, 255 )
-						surface.DrawOutlinedRect( 4, 46 + 4 + 12*#txttab, buttonwidth, 20)
-
+					if self.MsgBoxOption == 2 then
+						surface.SetDrawColor(ARCPhone.PhoneSys.Settings.Personalization.CL_00_CursorColour)
+						surface.DrawOutlinedRect( 4, 46 + 24 + 12*#txttab, buttonwidth, 20)
 					end
-					if maxo > 1 then
-						surface.SetDrawColor( 255, 75, 75, 255 )
-						surface.DrawRect( 4, 46 + 24 + 12*#txttab, buttonwidth, 20)
-						if typ == 2 || typ == 6 then -- Case statements would work really nice here :/
-							draw.SimpleText("No","ARCPhone",self.HalfScreenResX,46 + 26 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
-						end
-						if typ == 3 then
-							draw.SimpleText("Cancel","ARCPhone",self.HalfScreenResX,46 + 26 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
-						end
-						if typ == 4 || typ == 7 then
-							draw.SimpleText("Abort","ARCPhone",self.HalfScreenResX,46 + 26 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
-						end
-						if typ == 5 then
-							draw.SimpleText("Close","ARCPhone",self.HalfScreenResX,46 + 26 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
-						end
-						if typ == 8 then
-							draw.SimpleText("Ignore","ARCPhone",self.HalfScreenResX,46 + 26 + 12*#txttab, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
-						end
-						if self.MsgBoxOption == 2 then
-							surface.SetDrawColor( 255, 255, 255, 255 )
-							surface.DrawOutlinedRect( 4, 46 + 24 + 12*#txttab, buttonwidth, 20)
-						end
-					end
-					if maxo > 2 then
-						surface.SetDrawColor( 255, 255, 75, 255 )
-						surface.DrawRect( 4, 46 + 44 + 12*#txttab, buttonwidth, 20)
-						if typ == 6 then -- Case statements would work really nice here :/
-							draw.SimpleText("Cancel","ARCPhone", self.HalfScreenResX,  46 + 46 + 12*#txttab, Color(0,0,0,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
-						end
-						if typ == 7 then
-							draw.SimpleText("Ignore","ARCPhone", self.HalfScreenResX,  46 + 46 + 12*#txttab, Color(0,0,0,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
-						end
-						if typ == 8 then
-							draw.SimpleText("Text Excuse","ARCPhone", self.HalfScreenResX,  46 + 46 + 12*#txttab, Color(0,0,0,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
-						end
-						if self.MsgBoxOption == 3 then
-							surface.SetDrawColor( 255, 255, 255, 255 )
-							surface.DrawOutlinedRect( 4, 46 + 44 + 12*#txttab, buttonwidth, 20)
-						end
-					end
-					--[[
-						self.MsgBoxs[i].Title = title or ""
-						self.MsgBoxs[i].Text = txt or "Message Box"
-						self.MsgBoxs[i].Icon = icon or ""
-						self.MsgBoxs[i].Type = typ or 1
-					]]
-
 				end
+				if maxo > 2 then
+					surface.SetDrawColor(self.Settings.Personalization.CL_26_PopupDefer)
+					surface.DrawRect( 4, 46 + 44 + 12*#txttab, buttonwidth, 20)
+					if typ == 6 then -- Case statements would work really nice here :/
+						draw.SimpleText("Cancel","ARCPhone", self.HalfScreenResX,  46 + 46 + 12*#txttab, self.Settings.Personalization.CL_27_PopupDeferText, TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+					end
+					if typ == 7 then
+						draw.SimpleText("Ignore","ARCPhone", self.HalfScreenResX,  46 + 46 + 12*#txttab, self.Settings.Personalization.CL_27_PopupDeferText, TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+					end
+					if typ == 8 then
+						draw.SimpleText("Text Excuse","ARCPhone", self.HalfScreenResX,  46 + 46 + 12*#txttab, self.Settings.Personalization.CL_27_PopupDeferText, TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+					end
+					if self.MsgBoxOption == 3 then
+						surface.SetDrawColor(ARCPhone.PhoneSys.Settings.Personalization.CL_00_CursorColour)
+						surface.DrawOutlinedRect( 4, 46 + 44 + 12*#txttab, buttonwidth, 20)
+					end
+				end
+				--[[
+					self.MsgBoxs[i].Title = title or ""
+					self.MsgBoxs[i].Text = txt or "Message Box"
+					self.MsgBoxs[i].Icon = icon or ""
+					self.MsgBoxs[i].Type = typ or 1
+				]]
 
 			end
 
-			surface.SetDrawColor( 25*0.7, 25*0.7, 255*0.7, 255 )
+
+
+			surface.SetDrawColor(ARCPhone.PhoneSys.Settings.Personalization.CL_12_HotbarColour)
 			surface.DrawRect( 0, 0, self.ScreenResX, 20 )
-			surface.SetDrawColor( 255, 255, 255, 255 )
+			surface.SetDrawColor( ARCPhone.PhoneSys.Settings.Personalization.CL_12_HotbarBorder )
 			surface.DrawOutlinedRect( 0, 0, self.ScreenResX, self.ScreenResY )
 			surface.DrawOutlinedRect( 0, 0, self.ScreenResX, 21 )
 
@@ -441,12 +415,12 @@ function ARCPhone.PhoneSys:Init(wep)
 
 
 			if self.Loading then
-				surface.SetDrawColor( 0, 0, 0, 185 )
+				surface.SetDrawColor( ARCPhone.PhoneSys.Settings.Personalization.CL_19_MegaFadeColour )
 				surface.DrawOutlinedRect( 0, 0, self.ScreenResX, self.ScreenResY )
 				if self.LoadingPer < 0 then
-					draw.SimpleText("Loading...", "ARCPhone", self.HalfScreenResX, self.HalfScreenResY, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_CENTER  )
+					draw.SimpleText("Loading...", "ARCPhone", self.HalfScreenResX, self.HalfScreenResY, ARCPhone.PhoneSys.Settings.Personalization.CL_03_MainText, TEXT_ALIGN_CENTER , TEXT_ALIGN_CENTER  )
 				else
-					draw.SimpleText("Loading... ("..self.LoadingPer.."%)", "ARCPhone", self.HalfScreenResX, self.HalfScreenResY, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_CENTER  )
+					draw.SimpleText("Loading... ("..self.LoadingPer.."%)", "ARCPhone", self.HalfScreenResX, self.HalfScreenResY, ARCPhone.PhoneSys.Settings.Personalization.CL_03_MainText , TEXT_ALIGN_CENTER , TEXT_ALIGN_CENTER  )
 				end
 			end
 			surface.SetDrawColor( 255, 255, 255, 255 )
@@ -557,13 +531,6 @@ end
 		end
 	end
 
-	function ARCPhone.PhoneSys:Print(msg)
-		self.Msgs = self.Msgs..msg.."\n"
-		if #self.Msgs > 4096 then
-			self.Msgs = string.Right( self.Msgs, 4096 )
-		end
-		self.MsgsTab = ARCLib.FitText(self.Msgs,"ARCPhoneSmall",124)
-	end
 	function ARCPhone.PhoneSys:SendText(number,message)
 		local fil = ARCPhone.ROOTDIR.."/messaging/"..number..".txt"
 		if file.Exists(fil,"DATA") then
@@ -620,7 +587,7 @@ end
 				app:OpenConvo(number)
 			end)
 		end
-		self:EmitSound("buttons/blip1.wav",60,100)
+		ARCPhone.PhoneSys.PlayNotification("TextMsg")
 		//file.Write(ARCPhone.ROOTDIR.."/messaging/"..number..".txt",util.TableToJSON(texts))
 	end
 	function ARCPhone.PhoneSys:Call(number)
@@ -667,6 +634,7 @@ end
 			end
 			net.SendToServer()
 		else
+			self:AddMsgBox("ARCPhone","Not enough numbers.","cross")
 			self:Print("Not enough numbers.")
 		end
 	end
@@ -725,138 +693,7 @@ end
 			net.SendToServer()
 		end
 	end
-	function ARCPhone.PhoneSys:RunCommand(cmdstring)
-		self:Print("$ "..cmdstring)
-		local args = string.Explode( " ", cmdstring )
-		if args[1] == "call" then
-			if args[2] == "-c" then
-				self:Call(args[3])
-			elseif args[2] == "-a" then
-				self:Answer()
-			elseif args[2] == "-m" then
-				local tablel = args
-				table.remove( tablel, 2 )
-				table.remove( tablel, 2 )
-				self:GroupCall(tablel)
-			elseif args[2] == "-add" then
-				self:AddToCall(args[3])
-			elseif args[2] == "-h" || args[2] == "-e" then
-				self:HangUp()
-			else
-				self:Print("Invalid usage.")
-			end
-		elseif args[1] == "app" then
-			if args[2] then
-				self:OpenApp(args[2])
-			else
-				self:Print("No app specified.")
-			end
-		elseif args[1] == "chatlist" then
-			self.Print("--on--")
-			for k,v in pairs(self.CurrentCall.on) do
-				self.Print(v.." - "..ARCPhone.GetPlayerFromPhoneNumber(v):Nick())
-			end
-			self.Print("--pending--")
-			for k,v in pairs(self.CurrentCall.pending) do
-				self.Print(v.." - "..ARCPhone.GetPlayerFromPhoneNumber(v):Nick())
-			end
-		elseif args[1] == "showtext" then
-			if args[2] then
-				local texts
-				if file.Exists(ARCPhone.ROOTDIR.."/messaging/"..args[2]..".txt","DATA") then
-					texts = util.JSONToTable(file.Read(ARCPhone.ROOTDIR.."/messaging/"..args[2]..".txt","DATA"))
-				end
-				for i = 1, #texts do
-					if texts[i][1] then
-						self:Print("---SENT---")
-					else
-						self:Print("-RECIEVED-")
-					end
-					self:Print(texts[i][2])
-				end
-			else
-				self:Print("No number specifiifiied")
-			end
-
-		elseif args[1] == "text" then
-			self:Print("No command line for this thing!")
-			--[[
-			local num = tonumber(args[2])
-			if isnumber(num) then
-				if self.Reception < 16 then
-					self:Print("Not enough reception")
-				else
-					if #args < 3 then
-						self:Print("Send a message, fool!")
-					else
-						local message = ""
-						for i = 3,#args do
-							message = message.." "..args[i]
-						end
-						local texts
-						if file.Exists(ARCPhone.ROOTDIR.."/messaging/"..args[2]..".txt","DATA") then
-							texts = util.JSONToTable(file.Read(ARCPhone.ROOTDIR.."/messaging/"..args[2]..".txt","DATA"))
-						end
-						if !texts then
-							texts = {}
-						end
-						texts[#texts+1] = {true,message}
-						file.Write(ARCPhone.ROOTDIR.."/messaging/"..args[2]..".txt",util.TableToJSON(texts))
-						net.Start("arcphone_comm_text")
-						net.WriteString(args[2])
-						net.WriteString(message)
-						net.SendToServer()
-					end
-				end
-			else
-				self:Print("Invalid phone number.")
-			end
-			]]
-		elseif args[1] == "cd" then
-			if !args[2] || args[2] == "" then return end
-			if args[2] == ".." then
-				if self.CurrentDir == "/" then
-					self:Lock()
-				else
-					local dirs = string.Explode( "/", self.CurrentDir )
-					local len = string.len(self.CurrentDir) - string.len(dirs[#dirs-1].."/")
-					self.CurrentDir = string.Left(self.CurrentDir, len )
-				end
-			else
-				if string.StartWith( args[2], "/" ) then
-					if file.IsDir( ARCPhone.ROOTDIR..args[2], "DATA" ) then
-						self.CurrentDir = args[2]
-					end
-				else
-					if file.IsDir( ARCPhone.ROOTDIR..self.CurrentDir..args[2], "DATA" ) then
-						self.CurrentDir = self.CurrentDir..args[2].."/"
-					end
-				end
-			end
-			return
-		elseif args[1] == "ls" then
-			local files, directories = file.Find( ARCPhone.ROOTDIR..self.CurrentDir.."*", "DATA" )
-			for i = 1,#directories do
-				self:Print("<DIR> "..directories[i])
-			end
-			for i = 1,#files do
-				self:Print(files[i])
-			end
-			return
-		elseif args[1] == "clear" then
-			self.Msgs = ""
-			self.MsgsTab = {}
-			return
-		elseif args[1] == "toggleconsole" then
-			self.ShowConsole = !self.ShowConsole
-		elseif args[1] == "lol" then
-			self:Print("It Works!")
-		elseif args[1] == "help" then
-			self:Print("You don't need no help, this is a dev console!")
-		else
-			self:Print("'"..args[1].."' is not a valid file or command.")
-		end
-	end
+	
 
 	-- KEY_UP,KEY_DOWN,KEY_LEFT,KEY_RIGHT,KEY_ENTER,KEY_BACKSPACE,KEY_RCONTROL
 	local lastback = 0;

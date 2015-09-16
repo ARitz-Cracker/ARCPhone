@@ -2,6 +2,8 @@ local APP = ARCPhone.NewAppObject()
 APP.Name = "Photos"
 APP.Author = "ARitz Cracker"
 APP.Purpose = "Photo viewer for ARCPhone!"
+APP.FlatIconName = "images"
+
 --[[
 function APP:PhoneStart()
 	self.Tiles[1] = ARCPhone.NewAppTile(self)
@@ -60,15 +62,15 @@ function APP:Init()
 	self.Tiles[1].y = 32
 	self.Tiles[1].w = 122
 	self.Tiles[1].h = 18
-	self.Tiles[1].color = Color(0,0,255,255)
+	self.Tiles[1].color = self.Phone.Settings.Personalization.CL_01_MainColour
 	self.Tiles[1].drawfunc = function(tile,x,y)
-		draw.SimpleText("Camera Roll", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+		draw.SimpleText("Camera Roll", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_03_MainText, TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 	end
 	self.Tiles[1].OnPressed = function(tile)
-		tile.color = Color(0,0,255,128)
+		tile.color = self.Phone.Settings.Personalization.CL_02_MainPressed
 	end
 	self.Tiles[1].OnUnPressed = function(tile)
-		tile.color = Color(0,0,255,255)
+		tile.color = self.Phone.Settings.Personalization.CL_01_MainColour
 		tile.App:ListPhotos("camera")
 	end
 	
@@ -77,15 +79,15 @@ function APP:Init()
 	self.Tiles[2].y = 54
 	self.Tiles[2].w = 122
 	self.Tiles[2].h = 18
-	self.Tiles[2].color = Color(0,0,255,255)
+	self.Tiles[2].color = self.Phone.Settings.Personalization.CL_01_MainColour
 	self.Tiles[2].drawfunc = function(tile,x,y)
-		draw.SimpleText("Received Photos", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+		draw.SimpleText("Received Photos", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_03_MainText, TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 	end
 	self.Tiles[2].OnPressed = function(tile)
 		tile.color = Color(0,0,255,128)
 	end
 	self.Tiles[2].OnUnPressed = function(tile)
-		tile.color = Color(0,0,255,255)
+		tile.color = self.Phone.Settings.Personalization.CL_01_MainColour
 		tile.App:ListPhotos("texts")
 	end
 	
@@ -94,15 +96,15 @@ function APP:Init()
 	self.Tiles[3].y = 76
 	self.Tiles[3].w = 122
 	self.Tiles[3].h = 18
-	self.Tiles[3].color = Color(0,0,255,255)
+	self.Tiles[3].color = self.Phone.Settings.Personalization.CL_01_MainColour
 	self.Tiles[3].drawfunc = function(tile,x,y)
-		draw.SimpleText("Saved Photos", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+		draw.SimpleText("Saved Photos", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_03_MainText, TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 	end
 	self.Tiles[3].OnPressed = function(tile)
-		tile.color = Color(0,0,255,128)
+		tile.color = self.Phone.Settings.Personalization.CL_02_MainPressed
 	end
 	self.Tiles[3].OnUnPressed = function(tile)
-		tile.color = Color(0,0,255,255)
+		tile.color = self.Phone.Settings.Personalization.CL_01_MainColour
 		tile.App:ListPhotos("saved")
 	end
 	

@@ -2,9 +2,6 @@
 -- Any 3rd party content has been used as either public domain or with permission.
 -- © Copyright Aritz Beobide-Cardinal 2014 All rights reserved.
 
--- You know, this "Phone" Actually has the base-code for a PCMod or GTerminal like idea I had which I scrapped.
--- Who knows? Maybe one day I can make my own computer system in GMod.... Even though something like that would probably be... boring to make.
--- 
 if SERVER then
 	AddCSLuaFile()
 end
@@ -129,7 +126,9 @@ function SWEP:Initialize()
 		self:CreateModels(self.VElements) // create viewmodels
 		self:CreateModels(self.WElements) // create worldmodels
 		
-		ARCPhone.PhoneSys:Init(self)
+		if self.Owner == LocalPlayer() then
+			ARCPhone.PhoneSys:Init(self)
+		end
 		// init view model bone build function
 		if IsValid(self.Owner) then
 			local vm = self.Owner:GetViewModel()

@@ -7,6 +7,8 @@
 local CallingSound
 local RingingSound
 
+local NotifSound
+
 function ARCPhone.OnStatusChanged()
 	local newstatus = ARCPhone.PhoneSys.Status
 	if !ARCPhone.PhoneSys.Booted then return end
@@ -55,9 +57,9 @@ function ARCPhone.OnStatusChanged()
 			--http://www.aritzcracker.ca/arcphone/ringtones/Reflection.mp3
 			--"http://www.aritzcracker.ca/arcphone/ringtones/generic1.mp3"
 			net.Start("arcphone_ringer")
-			net.WriteString("http://www.aritzcracker.ca/arcphone/ringtones/generic1.mp3")
+			net.WriteString(ARCPhone.PhoneSys.Settings.Ringtones.PhoneCall)
 			net.SendToServer()
-			sound.PlayURL ( "http://www.aritzcracker.ca/arcphone/ringtones/generic1.mp3", "noblock", function( station,errid,errstr )
+			sound.PlayURL ( ARCPhone.PhoneSys.Settings.Ringtones.PhoneCall , "noblock", function( station,errid,errstr )
 				if IsValid(RingingSound) then
 					RingingSound:Stop()
 				end
@@ -75,4 +77,23 @@ function ARCPhone.OnStatusChanged()
 		end
 	end
 	hook.Call( "ARCPhone_StatusChanged",nil,newstatus)
+end
+
+function ARCPhone.PhoneSys.PlayNotification(snd)
+	if isstring(snd) then
+		sound.PlayURL ( ARCPhone.PhoneSys.Settings.Ringtones[snd] , "", function( station,errid,errstr )
+			if IsValid(NotifSound) then
+				NotifSound:Stop()
+			end
+			if ( IsValid( station ) ) then
+				NotifSound = station
+				NotifSound:SetPos(LocalPlayer():GetPos() )
+				NotifSound:Play()
+				NotifSound:SetVolume(0.5)
+			else
+				notification.AddLegacy("ARCPhone.PhoneSys.Ringtones."..snd.." failed. ("..tostring(errid)..") "..tostring(errstr),NOTIFY_ERROR,5) 
+				LocalPlayer():EmitSound("buttons/button8.wav" )
+			end
+		end)
+	end
 end

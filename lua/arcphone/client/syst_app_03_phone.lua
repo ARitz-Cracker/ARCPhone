@@ -1,8 +1,10 @@
 
 local APP = ARCPhone.NewAppObject()
-APP.Name = "Phone Dialer"
+APP.Name = "Call"
 APP.Author = "ARitz Cracker"
-APP.Purpose = "Calling screen for ARCPhone"
+APP.Purpose = "Call menu"
+APP.FlatIconName = "phone"
+
 function APP:AddNumber(num)
 	if num < 10 && num > 0 then
 		self.Dialnum = self.Dialnum..num
@@ -33,38 +35,38 @@ function APP:Init()
 		self.Tiles[i].y = math.floor(i/3)*28 + 64
 		self.Tiles[i].w = 38
 		self.Tiles[i].h = 24
-		self.Tiles[i].color = Color(0,0,128,255)
+		self.Tiles[i].color = self.Phone.Settings.Personalization.CL_03_SecondaryColour
 		self.Tiles[i].OnPressed = function(tile)
-			tile.color = Color(0,0,128,128)
+			tile.color = self.Phone.Settings.Personalization.CL_03_SecondaryColour
 		end
 		self.Tiles[i].OnUnPressed = function(tile)
-			tile.color = Color(0,0,128,255)
+			tile.color = self.Phone.Settings.Personalization.CL_03_SecondaryColour
 			tile.App:AddNumber(i-2)
 		end
 		if i > 1 && i < 12 then
 
 			self.Tiles[i].drawfunc = function(tile,x,y)
-				draw.SimpleText( i-2, "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+				draw.SimpleText( i-2, "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_05_SecondaryText, TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 			end
 		end
 	end
 	self.Tiles[2].drawfunc = function(tile,x,y)
-		draw.SimpleText( "<[x]", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+		draw.SimpleText( "<[x]", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_05_SecondaryText, TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 	end
 	self.Tiles[1].drawfunc = function(tile,x,y)
-		draw.SimpleText( "$", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+		draw.SimpleText( "$", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_05_SecondaryText, TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 	end
 	self.Tiles[0].drawfunc = function(tile,x,y)
-		draw.SimpleText( "$", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+		draw.SimpleText( "$", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_05_SecondaryText, TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 	end
 	self.Tiles[12].drawfunc = function(tile,x,y)
-		draw.SimpleText( "*", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+		draw.SimpleText( "*", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_05_SecondaryText, TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 	end
 	self.Tiles[13].drawfunc = function(tile,x,y)
-		draw.SimpleText( "0", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+		draw.SimpleText( "0", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_05_SecondaryText, TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 	end
 	self.Tiles[14].drawfunc = function(tile,x,y)
-		draw.SimpleText( "#", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+		draw.SimpleText( "#", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_05_SecondaryText, TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 	end
 	
 	self.Tiles[16] = ARCPhone.NewAppTile(self)
@@ -72,15 +74,15 @@ function APP:Init()
 	self.Tiles[16].y = 30
 	self.Tiles[16].w = 122
 	self.Tiles[16].h = 30
-	self.Tiles[16].color = Color(0,0,64,255)
+	self.Tiles[16].color = self.Phone.Settings.Personalization.CL_06_TertiaryColour
 	self.Tiles[16].OnPressed = function(tile)
-		tile.color = Color(0,0,64,128)
+		tile.color = self.Phone.Settings.Personalization.CL_07_TertiaryPressed
 	end
 	self.Tiles[16].OnUnPressed = function(tile)
-		tile.color = Color(0,0,64,255)
+		tile.color = self.Phone.Settings.Personalization.CL_06_TertiaryColour
 	end
 	self.Tiles[16].drawfunc = function(tile,x,y)
-		draw.SimpleText( tile.App.Dialnum, "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+		draw.SimpleText( tile.App.Dialnum, "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_08_TertiaryText, TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 	end
 	
 	self.Tiles[15] = ARCPhone.NewAppTile(self)
@@ -88,16 +90,16 @@ function APP:Init()
 	self.Tiles[15].y = 204
 	self.Tiles[15].w = 122
 	self.Tiles[15].h = 30
-	self.Tiles[15].color = Color(0,0,255,255)
+	self.Tiles[15].color = self.Phone.Settings.Personalization.CL_01_MainColour 
 	self.Tiles[15].OnPressed = function(tile)
-		tile.color = Color(0,0,255,128)
+		tile.color = self.Phone.Settings.Personalization.CL_02_MainPressed 
 	end
 	self.Tiles[15].OnUnPressed = function(tile)
-		tile.color = Color(0,0,255,255)
+		tile.color = self.Phone.Settings.Personalization.CL_01_MainColour 
 		tile.App.Phone:Call(tile.App.Dialnum)
 	end
 	self.Tiles[15].drawfunc = function(tile,x,y)
-		draw.SimpleText( "Call", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+		draw.SimpleText( "Call", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_03_MainText , TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 	end
 end
 function APP:OnBack()
@@ -111,6 +113,9 @@ APP = ARCPhone.NewAppObject()
 APP.Name = "Call Progress"
 APP.Author = "ARitz Cracker"
 APP.Purpose = "Calling screen for ARCPhone"
+APP.FlatIconName = "box"
+APP.Hidden = true
+
 APP.NextCheck = 0;
 function APP:Init()
 	self.Tiles[1] = ARCPhone.NewAppTile(self)
@@ -118,17 +123,17 @@ function APP:Init()
 	self.Tiles[1].y = 224
 	self.Tiles[1].w = 122
 	self.Tiles[1].h = 20
-	self.Tiles[1].color = Color(0,0,255,255)
+	self.Tiles[1].color = self.Phone.Settings.Personalization.CL_01_MainColour 
 	self.Tiles[1].OnPressed = function(tile)
-		tile.color = Color(0,0,255,128)
+		tile.color = self.Phone.Settings.Personalization.CL_02_MainPressed 
 	end
 	self.Tiles[1].OnUnPressed = function(tile)
-		tile.color = Color(0,0,255,255)
+		tile.color = self.Phone.Settings.Personalization.CL_01_MainColour 
 		tile.App.Phone:HangUp()
 		tile.App.Phone:OpenApp("dialer")
 	end
 	self.Tiles[1].drawfunc = function(tile,x,y)
-		draw.SimpleText("End Call", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+		draw.SimpleText("End Call", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_03_MainText , TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 	end
 	self:UpdateCallList()
 end
@@ -147,7 +152,7 @@ function APP:UpdateCallList()
 		self.Tiles[i].y = 10 + (i-1)*32
 		self.Tiles[i].w = 122
 		self.Tiles[i].h = 28
-		self.Tiles[i].color = Color(0,0,255,255)
+		self.Tiles[i].color = self.Phone.Settings.Personalization.CL_01_MainColour 
 		self.Tiles[i].ContactEditable = true
 		local diski = ARCPhone.Apps["contacts"]:GetDiskIDFromNumber(ARCPhone.PhoneSys.CurrentCall.on[i-1])
 		--
@@ -159,8 +164,8 @@ function APP:UpdateCallList()
 				surface.SetMaterial(ARCPhone.Apps["contacts"].ProfilePics[0])
 			end
 			surface.DrawTexturedRect( x + 2, y + 2, 24, 24 )
-			draw.SimpleText(ARCPhone.Apps["contacts"]:GetNameFromNumber(ARCPhone.PhoneSys.CurrentCall.on[i-1]), "ARCPhone", x + 28, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
-			draw.SimpleText(ARCPhone.PhoneSys.CurrentCall.on[i-1], "ARCPhone", x + 28, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
+			draw.SimpleText(ARCPhone.Apps["contacts"]:GetNameFromNumber(ARCPhone.PhoneSys.CurrentCall.on[i-1]), "ARCPhone", x + 28, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_03_MainText, TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
+			draw.SimpleText(ARCPhone.PhoneSys.CurrentCall.on[i-1], "ARCPhone", x + 28, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_03_MainText, TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
 		end
 		--[[
 		self.Tiles[i].OnPressed = function(app)
@@ -180,9 +185,9 @@ function APP:UpdateCallList()
 		self.Tiles[i].y = 10 + (i-1)*32
 		self.Tiles[i].w = 122
 		self.Tiles[i].h = 28
-		self.Tiles[i].color = Color(0,0,128,255)
+		self.Tiles[i].color = self.Phone.Settings.Personalization.CL_03_SecondaryColour
 		self.Tiles[i].ContactEditable = true
-		local diski = ARCPhone.Apps["contacts"]:GetDiskIDFromNumber(ARCPhone.PhoneSys.CurrentCall.pending[i-1-len])
+		local diski = ARCPhone.Apps["contacts"]:GetDiskIDFromNumber(self.Phone.CurrentCall.pending[i-1-len])
 		--
 		self.Tiles[i].drawfunc = function(tile,x,y)
 			surface.SetDrawColor(255,255,255,255)
@@ -192,8 +197,8 @@ function APP:UpdateCallList()
 				surface.SetMaterial(ARCPhone.Apps["contacts"].ProfilePics[0])
 			end
 			surface.DrawTexturedRect( x + 2, y + 2, 24, 24 )
-			draw.SimpleText(ARCPhone.Apps["contacts"]:GetNameFromNumber(ARCPhone.PhoneSys.CurrentCall.pending[i-1-len]), "ARCPhone", x + 28, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
-			draw.SimpleText(ARCPhone.PhoneSys.CurrentCall.pending[i-1-len], "ARCPhone", x + 28, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
+			draw.SimpleText(ARCPhone.Apps["contacts"]:GetNameFromNumber(self.Phone.CurrentCall.pending[i-1-len]), "ARCPhone", x + 28, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_05_SecondaryText, TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
+			draw.SimpleText(self.Phone.CurrentCall.pending[i-1-len], "ARCPhone", x + 28, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_05_SecondaryText, TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
 		end
 		--[[
 		self.Tiles[i].OnPressed = function(app)

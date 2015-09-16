@@ -3,6 +3,8 @@ local APP = ARCPhone.NewAppObject()
 APP.Name = "Messaging"
 APP.Author = "ARitz Cracker"
 APP.Purpose = "Messaging app for ARCPhone"
+APP.FlatIconName = "comments"
+
 APP.OpenNumber = ""
 function APP:PhoneStart()
 	ARCPhone.Apps["contacts"]:AddContactOption("Text",function(num)
@@ -47,10 +49,12 @@ function APP:OpenConvo(num)
 			end
 			if msgpart[1] == "s" then
 				self.Tiles[i].x = 12
-				self.Tiles[i].color = Color(0,0,255,255)
+				self.Tiles[i].bgcolor = self.Phone.Settings.Personalization.CL_01_MainColour
+				self.Tiles[i].color = self.Phone.Settings.Personalization.CL_03_MainText
 			else
 				self.Tiles[i].x = 4
-				self.Tiles[i].color = Color(0,0,128,255)
+				self.Tiles[i].bgcolor = self.Phone.Settings.Personalization.CL_03_SecondaryColour
+				self.Tiles[i].color = self.Phone.Settings.Personalization.CL_05_SecondaryText
 			end
 		end
 	end
@@ -64,7 +68,8 @@ function APP:OpenConvo(num)
 	end
 	self.Tiles[len].w = 118
 	self.Tiles[len].x = 12
-	self.Tiles[len].color = Color(72,72,72,255)
+	self.Tiles[len].bgcolor = self.Phone.Settings.Personalization.CL_09_QuaternaryColour
+	self.Tiles[len].color = self.Phone.Settings.Personalization.CL_11_QuaternaryText
 	self:SetCurPos(len)
 	
 	
@@ -77,15 +82,13 @@ function APP:OpenConvo(num)
 	self.Tiles[len].y = self.Tiles[len-1].y + self.Tiles[len-1].h + 2
 	self.Tiles[len].w = 118
 	self.Tiles[len].h = 18
-	self.Tiles[len].color = Color(75, 255, 75,255)
+	self.Tiles[len].color = self.Phone.Settings.Personalization.CL_22_PopupAccept
 	self.Tiles[len].drawfunc = function(tile,x,y)
-		draw.SimpleText("SEND", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+		draw.SimpleText("SEND", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_23_PopupAcceptText, TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 	end
-	self.Tiles[len].OnPressed = function(tile)
-		tile.color = Color(75, 255, 75,128)
-	end
+	--self.Tiles[len].OnPressed = function(tile)
+	--end
 	self.Tiles[len].OnUnPressed = function(tile)
-		tile.color = Color(75, 255, 75,255)
 		local msg = tile.App.Tiles[tile.App.SendIcon-1].TextInput
 		tile.App.Phone:SendText(num,msg)
 		tile.App:OpenConvo(num)
@@ -129,15 +132,15 @@ function APP:Init()
 		self.Tiles[i].y = 10 + i*22
 		self.Tiles[i].w = 122
 		self.Tiles[i].h = 18
-		self.Tiles[i].color = Color(0,0,255,255)
+		self.Tiles[i].color = self.Phone.Settings.Personalization.CL_01_MainColour
 		self.Tiles[i].drawfunc = function(tile,x,y)
-			draw.SimpleText(disp, "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+			draw.SimpleText(disp, "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_03_MainText, TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 		end
 		self.Tiles[i].OnPressed = function(tile)
-			tile.color = Color(0,0,255,128)
+			tile.color = self.Phone.Settings.Personalization.CL_02_MainPressed
 		end
 		self.Tiles[i].OnUnPressed = function(tile)
-			tile.color = Color(0,0,255,255)
+			tile.color = self.Phone.Settings.Personalization.CL_01_MainColour
 			tile.App:OpenConvo(num)
 		end
 	end
@@ -147,15 +150,15 @@ function APP:Init()
 	self.Tiles[len].y = 10 + len*22
 	self.Tiles[len].w = 122
 	self.Tiles[len].h = 18
-	self.Tiles[len].color = Color(0,0,64,255)
+	self.Tiles[len].color = self.Phone.Settings.Personalization.CL_06_TertiaryColour
 	self.Tiles[len].drawfunc = function(tile,x,y)
-		draw.SimpleText("**New Conversation**", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+		draw.SimpleText("**New Conversation**", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_08_TertiaryText, TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 	end
 	self.Tiles[len].OnPressed = function(tile)
-		tile.color = Color(0,0,64,128)
+		tile.color = self.Phone.Settings.Personalization.CL_07_TertiaryPressed
 	end
 	self.Tiles[len].OnUnPressed = function(tile)
-		tile.color = Color(0,0,64,255)
+		tile.color = self.Phone.Settings.Personalization.CL_06_TertiaryColour
 		tile.App:NewConvo()
 	end
 	--[[

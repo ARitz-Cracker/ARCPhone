@@ -2,6 +2,7 @@ local APP = ARCPhone.NewAppObject()
 APP.Name = "Camera"
 APP.Author = "ARitz Cracker"
 APP.Purpose = "Camera ARCPhone"
+APP.FlatIconName = "camera"
 --APP.FoneWidth = 903 -- 1.996677740863787
 
 --APP.FoneHight = 1803 -- 0.5008319467554077
@@ -22,15 +23,15 @@ function APP:PhoneStart()
 	self.Tiles[1].y = 32
 	self.Tiles[1].w = 122
 	self.Tiles[1].h = 18
-	self.Tiles[1].color = Color(0,0,255,255)
+	self.Tiles[1].color = self.Phone.Settings.Personalization.CL_01_MainColour
 	self.Tiles[1].drawfunc = function(tile,x,y)
-		draw.SimpleText("Enable Camera", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+		draw.SimpleText("Enable Camera", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_03_MainText, TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 	end
 	self.Tiles[1].OnPressed = function(tile)
-		tile.color = Color(0,0,255,128)
+		tile.color = self.Phone.Settings.Personalization.CL_02_MainPressed
 	end
 	self.Tiles[1].OnUnPressed = function(tile)
-		tile.color = Color(0,0,255,255)
+		tile.color = self.Phone.Settings.Personalization.CL_01_MainColour
 		if (tile.App.CameraOn) then
 			tile.App:TakePicture()
 		else
@@ -44,15 +45,15 @@ function APP:PhoneStart()
 	self.Tiles[2].y = 52
 	self.Tiles[2].w = 122
 	self.Tiles[2].h = 18
-	self.Tiles[2].color = Color(0,0,255,255)
+	self.Tiles[2].color = self.Phone.Settings.Personalization.CL_01_MainColour
 	self.Tiles[2].drawfunc = function(tile,x,y)
-		draw.SimpleText("Selfie Camera", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, Color(255,255,255,255), TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+		draw.SimpleText("Selfie Camera", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_03_MainText, TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 	end
 	self.Tiles[2].OnPressed = function(tile)
-		tile.color = Color(0,0,255,128)
+		tile.color = self.Phone.Settings.Personalization.CL_02_MainPressed
 	end
 	self.Tiles[2].OnUnPressed = function(tile)
-		tile.color = Color(0,0,255,255)
+		tile.color = self.Phone.Settings.Personalization.CL_01_MainColour
 		tile.App.Phone:AddMsgBox("Coming soon!","This feature has not been implemented yet, it will be available in a later version of ARCPhone","info")
 	end
 	

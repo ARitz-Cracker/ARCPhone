@@ -1,4 +1,55 @@
 
+surface.CreateFont( "ARCPhoneSBig", {
+	font = "Arial",
+	size = 28,
+	weight = 200,
+	blursize = 0,
+	scanlines = 0,
+	antialias = true,
+	underline = false,
+	italic = false,
+	strikeout = false,
+	symbol = false,
+	rotary = false,
+	shadow = false,
+	additive = false,
+	outline = false
+} )
+
+surface.CreateFont( "ARCPhoneBig", {
+	font = "Arial",
+	size = 24,
+	weight = 200,
+	blursize = 0,
+	scanlines = 0,
+	antialias = true,
+	underline = false,
+	italic = false,
+	strikeout = false,
+	symbol = false,
+	rotary = false,
+	shadow = false,
+	additive = false,
+	outline = false
+} )
+
+surface.CreateFont( "ARCPhoneBigish", {
+	font = "Arial",
+	size = 18,
+	weight = 200,
+	blursize = 0,
+	scanlines = 0,
+	antialias = true,
+	underline = false,
+	italic = false,
+	strikeout = false,
+	symbol = false,
+	rotary = false,
+	shadow = false,
+	additive = false,
+	outline = false
+} )
+
 surface.CreateFont( "ARCPhone", {
 	font = "Arial",
 	size = 14,

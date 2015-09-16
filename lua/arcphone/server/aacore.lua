@@ -326,7 +326,19 @@ function ARCPhone.SendTextMsg(tonum,fromnum,msg)
 	ARCPhone.Disk.Texts[tonum][hash] = {}
 	ARCPhone.Disk.Texts[tonum][hash].msg = ARCLib.SplitString(util.Compress(fromnum.."\v"..os.time().."\v"..msg),16384)
 	ARCPhone.Disk.Texts[tonum][hash].number = fromnum
-	ARCPhone.Disk.Texts[tonum][hash].place = -1
+	local ply = ARCPhone.GetPlayerFromPhoneNumber(tonum)
+	if ply.ARCPhone_Reception > 10 then
+		ARCPhone.Disk.Texts[tonum][hash].place = 0
+		net.Start("arcphone_comm_text")
+		net.WriteInt(0,8)
+		net.WriteUInt(0,32)
+		net.WriteUInt(#ARCPhone.Disk.Texts[tonum][hash].msg,32)
+		net.WriteString(hash) --Hash
+		net.WriteUInt(0,32)
+		net.Send(ply)
+	else
+		ARCPhone.Disk.Texts[tonum][hash].place = -1
+	end
 end
 
 local refr = -15
@@ -597,7 +609,7 @@ function ARCPhone.Load()
 				ARCPhone.Calls = {}
 				ARCPhoneMsg("CRITICAL ERROR: Think function has errored!\r\n"..err)
 				ARCLib.NotifyBroadcast("ARCPhone experienced a critical error! You must type \"arcphone reset\" in console to re-start it!",NOTIFY_ERROR,30,true)
-				ARCLib.NotifyBroadcast("Please look in garrysmod/data/"..ARCPhone.LogFile.." to see why the error occured.",NOTIFY_ERROR,30,true)
+				ARCLib.NotifyBroadcast("Please look in garrysmod/data/"..ARCPhone.LogFile.." on the SERVER to see why the error occured.",NOTIFY_ERROR,30,true)
 				timer.Destroy( "ARCPHONE_THINK" ) 
 			end
 		end)
