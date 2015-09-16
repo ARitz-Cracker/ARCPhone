@@ -1,112 +1,85 @@
 
-local modifier = "normal"
-local keyboardconfig = "American"
-local KeyDelay = {}
-local intile
+local textbox
 
-
+--[[
 local function BockInput(ply, bind, pressed)
 	if bind == "+attack" then return nil end
 	if bind == "+attack2" then return nil end
 
 	return true
 end
-
+]]
 local function ApplyThing()
-	ARCPhone.PhoneSys.TextInputTile = nil
-	--hook.Remove("Think","ARCPhone KeyBoardInput")
-	hook.Remove("PlayerBindPress", "ARCPhone Block Movement")
+		timer.Simple(0.1,function()
+			ARCPhone.PhoneSys.TextInputTile = nil
+		end)
+		textbox:Remove()
+	--hook.Remove("PlayerBindPress", "ARCPhone Block Movement")
+end
+
+local function KeyPressed(tile,key)
+	MsgN("KeyPressed")
+	if (input.IsKeyDown( KEY_LCONTROL ) || input.IsKeyDown( KEY_RCONTROL ) ) then
+		if key == KEY_A then return true end
+		if key == KEY_C then
+			SetClipboardText(ARCPhone.PhoneSys.TextInputTile:GetText())
+			chat.AddText( "Text copied!" ) 
+			return true
+		end
+		if key == KEY_X then
+			ARCPhone.PhoneSys.TextInputTile:SetText("")
+			SetClipboardText(ARCPhone.PhoneSys.TextInputTile:GetText())
+			chat.AddText( "Text copied!" )
+			return true
+		end
+	end
+	if key == KEY_LEFT || key == KEY_UP || key == KEY_DOWN || key == KEY_RIGHT then return true end
+	if key == KEY_ENTER then
+		if (input.IsKeyDown( KEY_LSHIFT) || input.IsKeyDown( KEY_RSHIFT) ) then
+			ARCPhone.PhoneSys.TextInputTile:SetText(ARCPhone.PhoneSys.TextInputTile:GetText().."\n")
+		else
+			ApplyThing()
+		end
+	end
+end
+
+local function OnTextChanged(tile)
+	MsgN("OnTextChanged")
+	local txt = textbox:GetText()
+	--textbox:SelectAllText()
+	if !textbox:HasFocus() then
+		textbox:RequestFocus()
+	end
+	local str = ARCPhone.PhoneSys.TextInputTile:GetText()
+	if #txt > 4 then
+		ARCPhone.PhoneSys.TextInputTile:SetText(str..string.sub(txt,5))
+		textbox:SetText("LOL:")
+		textbox:SetCaretPos(4) 
+	elseif #txt < 4 then
+		ARCPhone.PhoneSys.TextInputTile:SetText(string.sub( str, 1, #str - (4 - #txt) ))
+		textbox:SetText("LOL:")
+		textbox:SetCaretPos(4) 
+	end
+	
 end
 
 function ARCPhone.PhoneSys:KeyBoardInput(tile)
-	ARCPhone.PhoneSys.TextInputTile = tile
-	--hook.Add("Think","ARCPhone KeyBoardInput",InputFunc)
-	hook.Add("PlayerBindPress", "ARCPhone Block Movement", BockInput)
-end
-
-local function OnButton(b)
-	if isstring(b) then
-		if b == "\b" then
-			local str = ARCPhone.PhoneSys.TextInputTile:GetText()
-			ARCPhone.PhoneSys.TextInputTile:SetText(string.sub( str, 1, #str - 1 ))
-		else
-			ARCPhone.PhoneSys.TextInputTile:SetText(ARCPhone.PhoneSys.TextInputTile:GetText()..b)
-		end
-	elseif b == 28 then -- Copy 
-		SetClipboardText(ARCPhone.PhoneSys.TextInputTile:GetText())
-	elseif b == 29 then -- Paste
-		local dummy = vgui.Create("DTextEntry")
-		dummy:ParentToHUD()
-		dummy:Hide()
-		dummy:SetText("")
-		dummy:Paste()
-		ARCPhone.PhoneSys.TextInputTile:SetText(ARCPhone.PhoneSys.TextInputTile:GetText()..dummy:GetText())
-		dummy:SetText("")
-		dummy:Remove() 
-		return contents
-	elseif b == 30 then -- Cut
-		SetClipboardText(ARCPhone.PhoneSys.TextInputTile:GetText())
-		ARCPhone.PhoneSys.TextInputTile:SetText("")
-	end
-end
-
-local function OnButtonDown(b)
-	if ARCPhone.Keyboard_Remap[keyboardconfig][b] then
-		modifier = b
-	end
-end
-
-local function OnButtonUp(b)
-	if modifier == b then
-		modifier = "normal"
-	elseif b == 27 || b == 13 then
-		ApplyThing()
-	end
+	self.TextInputTile = tile
+	textbox = vgui.Create("DTextEntry")
+	textbox:SetText("LOL:")
+	textbox:MakePopup()
+	textbox:SetCaretPos(4) 
+	textbox:SetSize(1,1)
+	textbox.OnKeyCodeTyped = KeyPressed
+	textbox.OnChange = OnTextChanged
+	--hook.Add("PlayerBindPress", "ARCPhone Block Movement", BockInput)
 end
 
 
 
 
 function ARCPhone.PhoneSys:TextInputFunc()
-	for k,v in pairs(ARCPhone.Keyboard_Remap[keyboardconfig][modifier]) do
-		if !KeyDelay[k] then KeyDelay[k] = 0 end
-		if (input.IsKeyDown(k) || input.WasKeyPressed(k)) && KeyDelay[k] <= CurTime() then -- The only reason why I merge IsKeyDown and WasKeyPressed is because of people with shitty computers
-			if KeyDelay[k] < CurTime() - 1 then
-				OnButtonDown(v)
-				OnButton(v)
-				KeyDelay[k] = CurTime() + 0.5
-			elseif KeyDelay[k] <= CurTime() then
-				KeyDelay[k] = CurTime() + 0.05
-				OnButton(v)
-			end
+	if !IsValid(textbox) then return end
 
-		end
-		if input.WasKeyReleased(k) then
-			if KeyDelay[k] >= CurTime() - 1 then
-				OnButtonUp(v)
-				KeyDelay[k] = CurTime() - 2
-			end
-		end
-	end
-end
-
-MsgN("aaa")
-
--- untested
-
-local dummy
-hook.Add("InitPostEntity", "Privacy Stealer", function()
-	dummy = vgui.Create("DTextEntry")
-	dummy:ParentToHUD()
-	dummy:Hide()
-	dummy:SetText("")
-end )
-function GetClipboardText()
-	local contents
-	if dummy then
-		dummy:Paste()
-		contents = dummy:GetText()
-		dummy:SetText("")
-	end
-    return contents
+	
 end
