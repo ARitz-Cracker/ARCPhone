@@ -49,9 +49,9 @@ end
 function ARCPhone.PhoneSys:Think(wep)
 	if !gui.IsGameUIVisible() && !self.PauseInput then
 		if self.TextInputTile then
-			self:TextInputFunc()
 			return
-		elseif !self.Loading && !self.ShowConsole then
+		end
+		if !self.Loading && !self.ShowConsole then
 			for k,v in pairs(self.ValidKeys) do
 				if (input.IsKeyDown(v) || input.WasKeyPressed(v)) && self.KeyDelay[v] <= CurTime() then -- The only reason why I merge IsKeyDown and WasKeyPressed is because of people with shitty computers
 					if self.KeyDelay[v] < CurTime() - 1 then
@@ -698,6 +698,14 @@ end
 	-- KEY_UP,KEY_DOWN,KEY_LEFT,KEY_RIGHT,KEY_ENTER,KEY_BACKSPACE,KEY_RCONTROL
 	local lastback = 0;
 	function ARCPhone.PhoneSys:OnButton(button)
+		if self.ColourInputTile then
+			self:ColourInputFunc(button)
+			return
+		end
+		if self.ChoiceInputTile then
+			self:ChoiceInputFunc(button)
+			return
+		end
 		local app = ARCPhone.Apps[self.ActiveApp]
 		if #self.MsgBoxs > 0 then
 			local i = #self.MsgBoxs
@@ -792,6 +800,16 @@ end
 	local ispressinginmanu = false
 	function ARCPhone.PhoneSys:OnButtonUp(button)
 		if button == KEY_RCONTROL || button == KEY_LCONTROL then return end
+		if self.ColourInputTile && button == KEY_ENTER then
+			self.ColourInputTile = nil
+			return
+		end
+		if self.ChoiceInputTile && button == KEY_ENTER then
+			self.ChoiceInputTile.AnimStart = CurTime()
+			self.ChoiceInputTile.AnimEnd = CurTime() + 0.5
+			self.ChoiceInputTile = nil
+			return
+		end
 		local app = ARCPhone.Apps[self.ActiveApp]
 		if #self.MsgBoxs > 0 then
 			if ispressinginmanu then
@@ -836,7 +854,7 @@ end
 		end
 	end
 	function ARCPhone.PhoneSys:OnButtonDown(button)
-		if button == KEY_RCONTROL || button == KEY_LCONTROL then return end
+		if self.ColourInputTile || self.ChoiceInputTile || button == KEY_RCONTROL || button == KEY_LCONTROL then return end
 		if #self.MsgBoxs > 0 then
 			ispressinginmanu = true
 		elseif self.ShowOptions then return end

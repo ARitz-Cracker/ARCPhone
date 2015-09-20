@@ -3,201 +3,9 @@
 -- Any 3rd party content has been used as either public domain or with permission.
 -- © Copyright Aritz Beobide-Cardinal 2014 All rights reserved.
 ARCPhone.Apps = ARCPhone.Apps or {}
-local tile = {}
-tile.tile = true
-tile.x = 48
-tile.y = 48
-tile.w = 16
-tile.h = 16
-tile.color = color_white
-tile.tex = false
-tile.mat = false
-tile.drawfunc_override = false
-tile.drawfunc = false
-tile.text = ""
-tile.OnPressed = NULLFUNC -- (self)
-tile.OnUnPressed = NULLFUNC -- (self)
-tile.OnSelected = NULLFUNC -- (self)
-tile.OnUnSelected = NULLFUNC -- (self)
-function ARCPhone.NewAppTile(app)
-	local tab = table.Copy(tile)
-	tab.App = app
-	return tab
-end
-
-
-local texttile = table.Copy(tile)
-
-function texttile:drawfunc(xpos,ypos)
-	local txtcol = color_white
-	if (self.bgcolor) then
-		txtcol = self.color
-	end
-	self._imagedisplay = 0
-	self._nextimagedisplay = 1
-	for i=1,self._MaxLines do
-		if self._InputTable[i] then
-			if (self._InputTable[i] == "IMG_"..self._nextimagedisplay) && self._images[self._nextimagedisplay] then
-				surface.SetDrawColor(255,255,255,255)
-				surface.SetMaterial(self._images[self._nextimagedisplay])
-				surface.DrawTexturedRect(xpos+1,ypos-11 + i*12 + self._imagedisplay*(self.w - 2),self.w - 2,self.w - 2)
-				self._imagedisplay = self._imagedisplay + 1
-				self._nextimagedisplay = self._nextimagedisplay + 1
-			else
-				draw.SimpleText( self._InputTable[i], "ARCPhoneSmall", xpos+1, ypos-11 + (i-self._imagedisplay)*12 + self._imagedisplay*(self.w - 2), txtcol,TEXT_ALIGN_LEFT , TEXT_ALIGN_BOTTOM )
-			end
-		end
-	end
-end
-texttile._images = {}
-function texttile:UpdateText()
-	if self.CanResize then
-		table.Empty(self._images)
-		local displaytext = self.TextInput
-		local matches = {string.gmatch(displaytext, "({{IMG:([^:]*):([^:]*):IMG}})")()} --WHY DOES string.gmatch RETURN A FUNCTION INSTEAD OF A TABLE? WHY DO I HAVE TO CALL THAT FUNCTION TO MAKE A TABLE MYSELF?!
-		local imgnum = 0
-		while #matches > 0 do
-			imgnum = imgnum + 1;
-			self._images[imgnum] = ARCLib.MaterialFromTxt(matches[2],"jpg")
-			displaytext = string.Replace(displaytext, matches[1], "\nIMG_"..imgnum.."\n")
-			matches = {string.gmatch(displaytext, "({{IMG:([^:]*):([^:]*):IMG}})")()}
-		end
-		self._InputTable = ARCLib.FitText(displaytext,"ARCPhoneSmall",self.w - 2)
-
-		self._MaxLines = #self._InputTable
-		self.h = (self._MaxLines-imgnum) * 12 + 2 + (imgnum*(self.w - 2))
-
-	else
-		self._MaxLines = math.floor((self.h-2)/12)
-		self._InputTable = ARCLib.FitText(self.TextInput,"ARCPhoneSmall",self.w - 2)
-	end
-end
-
-function texttile:GetText()
-	return self.TextInput
-end
-
-function texttile:SetText(text)
-	self.TextInput = text
-	self:UpdateText()
-end
-
-texttile.Editable = true
-function texttile:OnUnPressed() 
-	if self.Editable then
-		ARCPhone.PhoneSys:KeyBoardInput(self)
-	--[[
-		--Old terrible method
-		self.App.Phone.PauseInput = true
-		--MsgN("SETTING TEXT TO "..tostring(self))
-		--MsgN("UNPRESSED: "..self:GetText())
-		Derma_StringRequest( "ARCPhone", "Text input", self.TextInput, function(text) 
-			self.App.Phone.PauseInput = false
-			self:SetText(text)
-		end,function(text)
-			self.App.Phone.PauseInput = false
-		end)
-	]]
-	end
-	
-end
-
-
-function ARCPhone.NewAppTextInputTile(app,txt,resize,w)
-	local tab = table.Copy(texttile)
-	tab.App = app
-	tab.w = w or 100
-	tab.CanResize = resize
-	tab:SetText(txt or "")
-	return tab
-end
 
 local curapptime = 0
 local oldapptime = 0
-
-
-
-
-local coltile = table.Copy(tile)
-coltile._colorinput = true
-coltile._colortab = {"r","g","b","a"}
-coltile._colortabvals = {0,0,0,1}
-coltile._colormtab = {Color(255,0,0,255),Color(0,255,0,255),Color(0,0,255,255),Color(128,128,128,255)}
-function coltile:drawfunc(xpos,ypos)
-	local x,y,w,h
-	draw.SimpleText( self.title, "ARCPhoneSmall", xpos+1, ypos+ 1, self.txtcol,TEXT_ALIGN_LEFT , TEXT_ALIGN_BOTTOM )
-	for i=1,4 do
-		h = self.h - 14
-		w = self.w/4
-		x = xpos + w*(i-1)
-		y = ypos + 14
-		draw.SimpleText( self._colortabvals[i], "ARCPhoneSmall", x + w/2, y + h/2, self.txtcol,TEXT_ALIGN_CENTER , TEXT_ALIGN_CENTER )
-		surface.SetDrawColor(ARCLib.ConvertColor(self._colormtab[i]))
-		
-		local polytab = {}
-		polytab[1] = {}
-		polytab[1].x = x + w/2
-		polytab[1].y = y + h - 2
-		polytab[2] = {}
-		polytab[2].x = x + w - 2
-		polytab[2].y = y + h/2 + 7
-		polytab[3] = {}
-		polytab[3].x = x + 2
-		polytab[3].y = y + h/2 + 7
-		
-		local polytab2 = {}
-		polytab2[1] = {}
-		polytab2[1].x = x + w/2
-		polytab2[1].y = y + 2
-		polytab2[2] = {}
-		polytab2[2].x = x + w - 2
-		polytab2[2].y = y + h/2 - 7
-		polytab2[3] = {}
-		polytab2[3].x = x + 2
-		polytab2[3].y = y + h/2 - 7
-		--draw.NoTexture()
-		
-		--draw.SimpleText( "FUCK", "ARCPhoneSmall", xpos+1, ypos+ 1, self.txtcol,TEXT_ALIGN_LEFT , TEXT_ALIGN_BOTTOM )
-		--surface.SetTexture(1)
-		--draw.NoTexture()
-		surface.DrawPoly(polytab)
-		
-		surface.DrawPoly(polytab2)
-		
-		surface.SetDrawColor(ARCLib.ConvertColor(self.txtcol))
-		surface.DrawLine(polytab[1].x,polytab[1].y,polytab[2].x,polytab[2].y)
-		surface.DrawLine(polytab[2].x,polytab[2].y,polytab[3].x,polytab[3].y)
-		surface.DrawLine(polytab[3].x,polytab[3].y,polytab[1].x,polytab[1].y)
-		
-		surface.SetDrawColor(ARCLib.ConvertColor(self.txtcol))
-		surface.DrawLine(polytab2[1].x,polytab2[1].y,polytab2[2].x,polytab2[2].y)
-		surface.DrawLine(polytab2[2].x,polytab2[2].y,polytab2[3].x,polytab2[3].y)
-		surface.DrawLine(polytab2[3].x,polytab2[3].y,polytab2[1].x,polytab2[1].y)
-		
-	end
-	if self.color.r + self.color.g + self.color.b > 500 then
-		self.txtcol = color_black
-	else
-		self.txtcol = color_white
-	end
-end
-
-function coltile:OnUnPressed() 
-	if self.Editable then
-		ARCPhone.PhoneSys:KeyBoardInput(self)
-	end
-	
-end
-
-
-function ARCPhone.NewAppColorInputTile(app,col,txt)
-	local tab = table.Copy(coltile)
-	tab.title = txt or "Select Colour"
-	tab.App = app
-	tab.color = col or Color(0,0,0,255)
-	tab.txtcol = color_white
-	return tab
-end
 
 local ARCPHONE_APP = {}
 
@@ -208,6 +16,8 @@ function ARCPHONE_APP:CreateNewTile(x,y,h,w)
 	tile.y = y or 48
 	tile.h = h or 16
 	tile.h = w or 16
+	self.Tiles[#self.Tiles + 1] = tile
+	tile.ID = #self.Tiles
 	return tile
 end
 
@@ -217,9 +27,45 @@ function ARCPHONE_APP:CreateNewTileTextInput(x,y,h,w,txt,resize)
 	tile.x = x or 48
 	tile.y = y or 48
 	tile.h = h or 16
+	self.Tiles[#self.Tiles + 1] = tile
+	tile.ID = #self.Tiles
+	return tile
+end
+function ARCPHONE_APP:CreateNewTileColor(x,y,h,w,col,txt)
+	local tile = ARCPhone.NewAppColorInputTile(self,col,txt)
+	tile.tile = true
+	tile.x = x or 48
+	tile.y = y or 48
+	tile.h = h or 16
+	tile.h = w or 16
+	self.Tiles[#self.Tiles + 1] = tile
+	tile.ID = #self.Tiles
 	return tile
 end
 
+function ARCPHONE_APP:CreateNewTileChoice(x,y,h,w)
+	local tile = ARCPhone.NewAppChoiceInputTile(self)
+	tile.tile = true
+	tile.x = x or 48
+	tile.y = y or 48
+	tile.h = h or 16
+	tile.h = w or 16
+	self.Tiles[#self.Tiles + 1] = tile
+	tile.ID = #self.Tiles
+	return tile
+end
+
+function ARCPHONE_APP:CreateNewNumberInput(x,y,h,w,txt)
+	local tile = ARCPhone.NewAppNumberInputTile(self,txt)
+	tile.tile = true
+	tile.x = x or 48
+	tile.y = y or 48
+	tile.h = h or 16
+	tile.h = w or 16
+	self.Tiles[#self.Tiles + 1] = tile
+	tile.ID = #self.Tiles
+	return tile
+end
 
 ARCPHONE_APP.ARCPhoneApp = true
 ARCPHONE_APP.Name = "Unnamed App"
@@ -278,15 +124,13 @@ end
 function ARCPHONE_APP:SaveData()
 	file.Write(ARCPhone.ROOTDIR.."/appdata/"..self.sysname..".txt",util.TableToJSON(self.Disk))
 end
-function ARCPHONE_APP:AddTile(tile)
-	assert( tile.tile, "ARCPHONE_APP.AddTile: Bad argument #1; Invalid tile object" )
-	self.Tiles[#self.Tiles + 1] = tile
-end
+
 function ARCPHONE_APP:RemoveTile(tileid)
 	self.Tiles[tileid] = nil
 end
 function ARCPHONE_APP:ResetTiles(tileid)
-	self.Tiles = {}
+	table.Empty(self.Tiles)
+	self:ResetCurPos()
 end
 ARCPHONE_APP.BackgroundDraw = NULLFUNC
 ARCPHONE_APP.ForegroundDraw = NULLFUNC
@@ -335,13 +179,27 @@ function ARCPHONE_APP:DrawTiles(mvx,mvy)
 					v:drawfunc(v.x + mvx,v.y + mvy)
 				end
 				if v.text && string.len(v.text) > 0 then
-					draw.SimpleText( ARCLib.CutOutText(v.text,"ARCPhoneSmall",v.w), "ARCPhoneSmall", v.x + mvx +1, v.y + mvy + v.h -1, FuckingHell,TEXT_ALIGN_LEFT , TEXT_ALIGN_TOP ) 
+					if v.mat || v.tex then
+						draw.SimpleText( ARCLib.CutOutText(v.text,"ARCPhoneSmall",v.w-1), "ARCPhoneSmall", v.x + mvx +1, v.y + mvy + v.h -1, FuckingHell,TEXT_ALIGN_LEFT , TEXT_ALIGN_TOP ) 
+					else
+						--MsgN("TXT:"..ARCLib.CutOutText(v.text,"ARCPhone",v.w-1))
+						draw.SimpleText(ARCLib.CutOutText(v.text,"ARCPhone",v.w-1), "ARCPhone", v.x + mvx+v.w*0.5, v.y + mvy+v.h*0.5, FuckingHell, TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+					end
 				end
 			end
 		end
 	end
-	if self.Tiles[self.Phone.SelectedAppTile] then
-		if self.Phone.TextInputTile == self.Tiles[self.Phone.SelectedAppTile] then
+	
+	for k,v in pairs(self.Tiles) do
+		if ARCLib.TouchingBox(v.x + mvx,v.x + mvx + v.w,v.y + mvy,v.y + mvy + v.h,0,self.Phone.ScreenResX,0,self.Phone.ScreenResY) then
+			if v.drawfunc2 then
+				v:drawfunc2(v.x + mvx,v.y + mvy)
+			end
+		end
+	end
+	
+	if self.Tiles[self.Phone.SelectedAppTile] && self.Phone.ChoiceInputTile == nil then
+		if self.Phone.TextInputTile == self.Tiles[self.Phone.SelectedAppTile] || self.Phone.ColourInputTile == self.Tiles[self.Phone.SelectedAppTile] then
 			if math.sin(CurTime()*math.pi*2) > 0 then
 				surface.SetDrawColor(ARCLib.ConvertColor(ARCLib.ColorNegative(self.Phone.Settings.Personalization.CL_00_CursorColour)))
 			else
@@ -412,6 +270,9 @@ function ARCPHONE_APP:_OnEnterUp()
 	self.Tiles[self.Phone.SelectedAppTile]:OnUnPressed()
 end
 
+local function searcheq(x)
+	return math.sin((x+1.5) * math.pi) * math.floor((x+1.5)/2)
+end
 function ARCPHONE_APP:_SwitchTile(butt) 
 	local ignoresound = false
 	local currenttile = self.Tiles[self.Phone.SelectedAppTile]
@@ -423,60 +284,99 @@ function ARCPHONE_APP:_SwitchTile(butt)
 	
 	
 	local ti = {}
+	local potential = {}
 	local bti = false
 	local mvscr = false
 	if butt == KEY_RIGHT then
 		if currenttile.x + currenttile.w + self.Phone.MoveX > self.Phone.ScreenResX - 8 && currenttile.w > self.Phone.ScreenResX then
 			self.Phone.BigTileX = self.Phone.BigTileX + self.Phone.ScreenResX - 20
-			
-		
 			mvscr = true
 		else
-			for k,v in pairs(self.Tiles) do
+
+			for k,v in ipairs(self.Tiles) do
 				if v.x > currenttile.x + currenttile.w then
-					ti[#ti+1] = v
-					ti[#ti]._number = k
+					potential[#potential+1] = v
+					potential[#potential]._number = k
+				end
+			end
+			local srch = 0
+			if #potential > 0 then
+				while #ti == 0 do
+					for k,v in ipairs(potential) do
+						if ARCLib.InBetween(currenttile.y + currenttile.h*searcheq(srch),v.y,currenttile.y + currenttile.h + currenttile.h*searcheq(srch)) || ARCLib.InBetween(currenttile.y + currenttile.h*searcheq(srch),v.y + v.h,currenttile.y + currenttile.h + currenttile.h*searcheq(srch)) then
+							ti[#ti+1] = v
+						end
+					end
+					srch = srch + 1
 				end
 			end
 		end
 	elseif butt == KEY_LEFT then
 		if currenttile.x + self.Phone.MoveX < 8 && currenttile.w > self.Phone.ScreenResX then
-
 			self.Phone.BigTileX = self.Phone.BigTileX - self.Phone.ScreenResX + 20
-
 			mvscr = true
 		else
-			for k,v in pairs(self.Tiles) do
+			for k,v in ipairs(self.Tiles) do
 				if v.x + v.w < currenttile.x then
-					ti[#ti+1] = v
-					ti[#ti]._number = k
+					potential[#potential+1] = v
+					potential[#potential]._number = k
+				end
+			end
+			local srch = 0
+			if #potential > 0 then
+				while #ti == 0 do
+					for k,v in ipairs(potential) do
+						if ARCLib.InBetween(currenttile.y + currenttile.h*searcheq(srch),v.y,currenttile.y + currenttile.h + currenttile.h*searcheq(srch)) || ARCLib.InBetween(currenttile.y + currenttile.h*searcheq(srch),v.y + v.h,currenttile.y + currenttile.h + currenttile.h*searcheq(srch)) then
+							ti[#ti+1] = v
+						end
+					end
+					srch = srch + 1
 				end
 			end
 		end
 	elseif butt == KEY_DOWN then
 		if currenttile.y + currenttile.h + self.Phone.MoveY > self.Phone.ScreenResY - 8 && currenttile.h > self.Phone.ScreenResX then
 			self.Phone.BigTileY = self.Phone.BigTileY + self.Phone.ScreenResY - 20
-
 			mvscr = true
 		else
-			for k,v in pairs(self.Tiles) do
+			for k,v in ipairs(self.Tiles) do
 				if v.y > currenttile.y + currenttile.h then
-					ti[#ti+1] = v
-					ti[#ti]._number = k
+					potential[#potential+1] = v
+					potential[#potential]._number = k
+				end
+			end
+			local srch = 0
+			if #potential > 0 then
+				while #ti == 0 do
+					for k,v in ipairs(potential) do
+						if ARCLib.InBetween(currenttile.x + currenttile.w*searcheq(srch),v.x,currenttile.x + currenttile.w + currenttile.w*searcheq(srch)) || ARCLib.InBetween(currenttile.x + currenttile.w*searcheq(srch),v.x + v.w,currenttile.x + currenttile.w + currenttile.w*searcheq(srch)) then
+							ti[#ti+1] = v
+						end
+					end
+					srch = srch + 1
 				end
 			end
 		end
 	elseif butt == KEY_UP then
 		if currenttile.y + self.Phone.MoveY < 29 && currenttile.h > self.Phone.ScreenResX then
 			self.Phone.BigTileY = self.Phone.BigTileY - self.Phone.ScreenResY + 41
-		
-
 			mvscr = true
 		else
-			for k,v in pairs(self.Tiles) do
+			for k,v in ipairs(self.Tiles) do
 				if v.y + v.h < currenttile.y then
-					ti[#ti+1] = v
-					ti[#ti]._number = k
+					potential[#potential+1] = v
+					potential[#potential]._number = k
+				end
+			end
+			local srch = 0
+			if #potential > 0 then
+				while #ti == 0 do
+					for k,v in ipairs(potential) do
+						if ARCLib.InBetween(currenttile.x + currenttile.w*searcheq(srch),v.x,currenttile.x + currenttile.w + currenttile.w*searcheq(srch)) || ARCLib.InBetween(currenttile.x + currenttile.w*searcheq(srch),v.x + v.w,currenttile.x + currenttile.w + currenttile.w*searcheq(srch)) then
+							ti[#ti+1] = v
+						end
+					end
+					srch = srch + 1
 				end
 			end
 		end
@@ -484,16 +384,17 @@ function ARCPHONE_APP:_SwitchTile(butt)
 	
 	if #ti > 0 then
 		local di = math.huge
+		
 		for i = 1,#ti do
 			local curdis = 0
 			if butt == KEY_RIGHT then
-				curdis = math.Distance((currenttile.x + currenttile.w), (currenttile.y + currenttile.h*0.5), ti[i].x , (ti[i].y + ti[i].h*0.5) )
+				curdis = ARCLib.PointDistToLine(currenttile.x + currenttile.w,currenttile.y,currenttile.x + currenttile.w,currenttile.y + currenttile.h,ti[i].x,ti[i].y)
 			elseif butt == KEY_LEFT then
-				curdis = math.Distance(currenttile.x, (currenttile.y + currenttile.h*0.5), ti[i].x + ti[i].w, (ti[i].y + ti[i].h*0.5) )
+				curdis = ARCLib.PointDistToLine(currenttile.x, currenttile.y, currenttile.x, currenttile.y + currenttile.h,ti[i].x + ti[i].w,ti[i].y + ti[i].h)
 			elseif butt == KEY_DOWN then
-				curdis = math.Distance((currenttile.x + currenttile.w*0.5), (currenttile.y + currenttile.h), (ti[i].x + ti[i].w*0.5), ti[i].y )
+				curdis = ARCLib.PointDistToLine(currenttile.x, currenttile.y + currenttile.h, currenttile.x + currenttile.w, currenttile.y + currenttile.h,ti[i].x,ti[i].y)
 			elseif butt == KEY_UP then
-				curdis = math.Distance((currenttile.x + currenttile.w*0.5), currenttile.y , (ti[i].x + ti[i].w*0.5), ti[i].y + ti[i].h) 
+				curdis = ARCLib.PointDistToLine(currenttile.x, currenttile.y, currenttile.x + currenttile.w, currenttile.y,ti[i].x + ti[i].w,ti[i].y + ti[i].h)
 			end
 			
 			if curdis < di then

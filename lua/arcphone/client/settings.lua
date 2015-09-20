@@ -1,10 +1,16 @@
 ARCPhone.PhoneSys.Settings = {}
+ARCPhone.PhoneSys.SettingChoices = {}
+
 ARCPhone.PhoneSys.Settings.Ringtones = {}
+ARCPhone.PhoneSys.SettingChoices.Ringtones = {}
 ARCPhone.PhoneSys.Settings.Ringtones.PhoneCall = "http://www.aritzcracker.ca/arcphone/ringtones/generic1.mp3"
+ARCPhone.PhoneSys.SettingChoices.Ringtones.PhoneCall = {{"Default","http://www.aritzcracker.ca/arcphone/ringtones/generic1.mp3"}}
 ARCPhone.PhoneSys.Settings.Ringtones.TextMsg = "http://www.aritzcracker.ca/arcphone/notifications/162464__kastenfrosch__message.mp3"
 ARCPhone.PhoneSys.Settings.Ringtones.Popup = "http://www.aritzcracker.ca/arcphone/notifications/162464__kastenfrosch__message.mp3"
+ARCPhone.PhoneSys.Settings.Ringtones.Test = 1
 
 ARCPhone.PhoneSys.Settings.Personalization = {}
+ARCPhone.PhoneSys.SettingChoices.Personalization = {}
 ARCPhone.PhoneSys.Settings.Personalization.CL_00_CursorColour = Color(255,255,255,255)
 
 ARCPhone.PhoneSys.Settings.Personalization.CL_01_MainColour = Color(25,25,255,255)
@@ -32,8 +38,8 @@ ARCPhone.PhoneSys.Settings.Personalization.CL_15_ContextMenuSelect = Color(0,0,2
 ARCPhone.PhoneSys.Settings.Personalization.CL_16_ContextMenuBorder = Color(50,50,255,255)
 ARCPhone.PhoneSys.Settings.Personalization.CL_17_ContextMenuText = Color(255,255,255,255)
 
-ARCPhone.PhoneSys.Settings.Personalization.CL_18_FadeColour = Color(0,0,0,50)
-ARCPhone.PhoneSys.Settings.Personalization.CL_19_MegaFadeColour = Color(0,0,0,185)
+ARCPhone.PhoneSys.Settings.Personalization.CL_18_FadeColour = Color(0,0,0,150)
+ARCPhone.PhoneSys.Settings.Personalization.CL_19_MegaFadeColour = Color(0,0,0,225)
 
 ARCPhone.PhoneSys.Settings.Personalization.CL_20_PopupBoxMain = Color(100,100,100,255)
 ARCPhone.PhoneSys.Settings.Personalization.CL_21_PopupBoxText = Color(255,255,255,255)
@@ -47,4 +53,7 @@ ARCPhone.PhoneSys.Settings.Personalization.CL_27_PopupDeferText = Color(0,0,0,25
 
 
 ARCPhone.PhoneSys.Settings.Privacy = {}
+ARCPhone.PhoneSys.SettingChoices.Privacy = {}
+
 ARCPhone.PhoneSys.Settings.System = {}
+ARCPhone.PhoneSys.SettingChoices.System = {}

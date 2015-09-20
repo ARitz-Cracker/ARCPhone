@@ -23,6 +23,7 @@ function APP:NewAppIcon()
 	self:StartCustomization()
 	self.Tiles[#self.Tiles]:OnUnPressed()
 	self:SetCurPos(#self.Tiles)
+	self:RenameMenuOption("Customize","Finish customizing")
 end
 
 function APP:AllAppsScreen()

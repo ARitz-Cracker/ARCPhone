@@ -102,7 +102,7 @@ function ARCPhone.MakeCall(caller,reciever)
 		plycall.ARCPhone_Status = ARCPHONE_ERROR_BUSY
 		return 
 	end
-	if ARCLib.TableAmount(ARCPhone.Calls) >= ARCPhone.Settings["max_lines"] then
+	if table.Count(ARCPhone.Calls) >= ARCPhone.Settings["max_lines"] then
 		plycall.ARCPhone_Status = ARCPHONE_ERROR_TOO_MANY_CALLS
 		return 
 	end

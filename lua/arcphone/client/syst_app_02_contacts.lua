@@ -260,6 +260,8 @@ function APP:EditContact(tileid)
 		self.Tiles[2] = ARCPhone.NewAppTextInputTile(self,"Contact Name",false,118)
 		self.Tiles[3] = ARCPhone.NewAppTextInputTile(self,"Insert Number",false,118)
 	end
+	self.Tiles[2].SingleLine = true
+	self.Tiles[3].SingleLine = true
 	self.Tiles[2].y = 24
 	self.Tiles[2].w = 92
 	self.Tiles[2].x = 34

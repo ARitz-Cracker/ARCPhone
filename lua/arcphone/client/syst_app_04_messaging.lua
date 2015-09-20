@@ -70,6 +70,7 @@ function APP:OpenConvo(num)
 	self.Tiles[len].x = 12
 	self.Tiles[len].bgcolor = self.Phone.Settings.Personalization.CL_09_QuaternaryColour
 	self.Tiles[len].color = self.Phone.Settings.Personalization.CL_11_QuaternaryText
+	self.Tiles[len].Editable = true
 	self:SetCurPos(len)
 	
 	
