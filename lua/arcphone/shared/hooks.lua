@@ -114,6 +114,33 @@ else
 		net.SendOmit(ply)
 	end)
 	
+	hook.Add( "ShutDown", "ARCBank Shutdown", function()
+		for _, oldatms in pairs( ents.FindByClass("sent_arc_phone_antenna") ) do
+			oldatms.ARCPhone_MapEntity = false
+			--oldatms:Remove()
+		end
+		ARCPhone.SaveDisk()
+	end)
+	
+	
+	hook.Add( "ARCLoad_OnLoaded", "ARCPhone SpawnAntennas", function(loaded)
+		if loaded != true && loaded != "ARCPhone" then return end
+			ARCPhone.Load()
+			ARCPhone.SpawnAntennas()
+	end )
+	
+	hook.Add( "CanTool", "ARCPhone Tool", function( ply, tr, tool )
+		if IsValid(tr.Entity) then -- Overrides shitty FPP
+			if tr.Entity.ARCPhone_MapEntity then return false end 
+		end
+	end)
+	hook.Add( "CanPlayerUnfreeze", "ARCPhone BlockUnfreeze", function( ply, ent, phys )
+		if ent.ARCPhone_MapEntity then return false end 
+	end )
+	hook.Add( "CanProperty", "ARCPhone BlockProperties", function( ply, property, ent )
+		if ent.ARCPhone_MapEntity then return false end 
+	end )
+	
 end
 
 
@@ -123,6 +150,8 @@ hook.Add( "ARCLoad_OnUpdate", "ARCPhone Remuv",function(loaded)
 		for k,v in pairs(player.GetAll()) do 
 			ARCPhoneMsgCL(v,"Updating...") 
 		end
+		ARCPhone.SaveDisk()
+		ARCPhone.ClearAntennas()
 	else
 		ARCPhone.PhoneSys:AddMsgBox("Update","This phone will re-start for an update in 5 seconds and there's nothing you can do about it.","warning")
 	end

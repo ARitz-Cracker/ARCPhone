@@ -88,9 +88,13 @@ function ENT:Think()
 end
 
 function ENT:OnRemove()
-
+	if self.ARCPhone_MapEntity then
+		timer.Simple(1,function()
+			ARCPhone.SpawnAntennas()
+		end)
+	end
 end
-
+--[[
 function ENT:Use( ply, caller )--self:StopHack()
 	for i = 1,180 do
 		local pos = Vector(math.cos(math.rad(i*2)),math.sin(math.rad(i*2)),math.tan(math.rad(i*2)))
@@ -99,3 +103,4 @@ function ENT:Use( ply, caller )--self:StopHack()
 		e:Spawn()
 	end
 end
+]]

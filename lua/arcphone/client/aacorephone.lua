@@ -223,8 +223,10 @@ function ARCPhone.PhoneSys:Init(wep)
 					local dist = rely2 - (self.ScreenResY - 8)
 					self.MoveY = self.MoveY - math.ceil(dist*0.2)
 				end
-
+				app:BackgroundDraw(self.MoveX,self.MoveY)
+				app:DrawLabels(self.MoveX,self.MoveY)
 				app:DrawTiles(self.MoveX,self.MoveY)
+				app:ForegroundDraw(self.MoveX,self.MoveY)
 				if !self.HideWhatsOffTheScreen then
 					surface.SetDrawColor( 255, 0, 0, 255 )
 					surface.DrawOutlinedRect( relx1, rely1, relx2-relx1, rely2-rely1 )

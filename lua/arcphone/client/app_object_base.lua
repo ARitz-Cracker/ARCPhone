@@ -55,7 +55,7 @@ function ARCPHONE_APP:CreateNewTileChoice(x,y,h,w)
 	return tile
 end
 
-function ARCPHONE_APP:CreateNewNumberInput(x,y,h,w,txt)
+function ARCPHONE_APP:CreateNewTileNumberInput(x,y,h,w,txt)
 	local tile = ARCPhone.NewAppNumberInputTile(self,txt)
 	tile.tile = true
 	tile.x = x or 48
@@ -67,6 +67,14 @@ function ARCPHONE_APP:CreateNewNumberInput(x,y,h,w,txt)
 	return tile
 end
 
+function ARCPHONE_APP:CreateNewLabel(x,y,w,h,tex,font,color,bgcolor,xAlign,yAlign)
+	local tile = ARCPhone.NewAppLabel(self,x,y,w,h,tex,font,color,bgcolor,xAlign,yAlign)
+	tile.label = true
+	self.Labels[#self.Labels + 1] = tile
+	tile.ID = #self.Labels
+	return tile
+end
+
 ARCPHONE_APP.ARCPhoneApp = true
 ARCPHONE_APP.Name = "Unnamed App"
 ARCPHONE_APP.Author = "Anonymous"
@@ -75,6 +83,7 @@ ARCPHONE_APP.DisableTileSwitching = false
 --ARCPHONE_APP.Phone = ARCPhone.PhoneSys -- NOT A GOOD IDEA FOR table.FullCopy!!!
 ARCPHONE_APP.Disk = {}
 ARCPHONE_APP.Tiles = {}
+ARCPHONE_APP.Labels = {}
 ARCPHONE_APP.Init = NULLFUNC
 ARCPHONE_APP.PhoneStart = NULLFUNC
 ARCPHONE_APP.OnClose = NULLFUNC
@@ -128,16 +137,23 @@ end
 function ARCPHONE_APP:RemoveTile(tileid)
 	self.Tiles[tileid] = nil
 end
-function ARCPHONE_APP:ResetTiles(tileid)
+function ARCPHONE_APP:ClearTiles()
 	table.Empty(self.Tiles)
 	self:ResetCurPos()
+end
+function ARCPHONE_APP:ClearLabels()
+	table.Empty(self.Labels)
+end
+function ARCPHONE_APP:ClearScreen()
+	self:ClearTiles()
+	self:ClearLabels()
 end
 ARCPHONE_APP.BackgroundDraw = NULLFUNC
 ARCPHONE_APP.ForegroundDraw = NULLFUNC
 function ARCPHONE_APP:DrawTiles(mvx,mvy)
 	local FuckingHell
 	local AreYouKiddingMe
-	for k,v in pairs(self.Tiles) do
+	for k,v in ipairs(self.Tiles) do
 		if ARCLib.TouchingBox(v.x + mvx,v.x + mvx + v.w,v.y + mvy,v.y + mvy + v.h,0,self.Phone.ScreenResX,0,self.Phone.ScreenResY) then
 			if v.drawfunc_override then
 				v:drawfunc_override(v.x + mvx,v.y + mvy)
@@ -190,7 +206,7 @@ function ARCPHONE_APP:DrawTiles(mvx,mvy)
 		end
 	end
 	
-	for k,v in pairs(self.Tiles) do
+	for k,v in ipairs(self.Tiles) do
 		if ARCLib.TouchingBox(v.x + mvx,v.x + mvx + v.w,v.y + mvy,v.y + mvy + v.h,0,self.Phone.ScreenResX,0,self.Phone.ScreenResY) then
 			if v.drawfunc2 then
 				v:drawfunc2(v.x + mvx,v.y + mvy)
@@ -215,6 +231,15 @@ function ARCPHONE_APP:DrawTiles(mvx,mvy)
 			local negthing = -thing + 1
 			
 			surface.DrawOutlinedRect((self.Tiles[self.Phone.SelectedAppTile].x*thing + self.Tiles[self.Phone.OldSelectedAppTile].x*negthing) + mvx,(self.Tiles[self.Phone.SelectedAppTile].y*thing + self.Tiles[self.Phone.OldSelectedAppTile].y*negthing) + mvy,self.Tiles[self.Phone.SelectedAppTile].w*thing + self.Tiles[self.Phone.OldSelectedAppTile].w*negthing,self.Tiles[self.Phone.SelectedAppTile].h*thing + self.Tiles[self.Phone.OldSelectedAppTile].h*negthing)
+		end
+	end
+end
+function ARCPHONE_APP:DrawLabels(mvx,mvy)
+	for k,v in pairs(self.Labels) do
+		surface.SetDrawColor(v.bgcolor)
+		surface.DrawRect(mvx + v.x,mvy + v.y,v.w,v.h)
+		for i=1,#v.Texts do
+			draw.DrawText(unpack(v.Texts[i]))
 		end
 	end
 end
@@ -281,7 +306,9 @@ function ARCPHONE_APP:_SwitchTile(butt)
 		self.Phone.SelectedAppTile = 1
 		self.Phone.OldSelectedAppTile = self.Phone.SelectedAppTile
 	end
-	
+	if (!currenttile) then
+		self.Phone:EmitSound("common/wpn_denyselect.wav")
+	end
 	
 	local ti = {}
 	local potential = {}

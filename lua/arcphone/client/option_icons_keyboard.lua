@@ -89,7 +89,7 @@ function ARCPhone.PhoneSys:KeyBoardInput(tile)
 	textbox:SetText(basestr)
 	textbox:MakePopup()
 	textbox:SetCaretPos(basestrlen) 
-	--textbox:SetSize(1,1)
+	textbox:SetSize(1,1)
 	textbox.OnKeyCodeTyped = KeyPressed
 	textbox.OnChange = OnTextChanged
 	--hook.Add("PlayerBindPress", "ARCPhone Block Movement", BockInput)

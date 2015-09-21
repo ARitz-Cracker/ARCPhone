@@ -85,45 +85,6 @@ ARCPHONE_MSGBOX_CALL = 8
 ARCPhoneMsg("Version: "..ARCPhone.Version)
 ARCPhoneMsg("Updated on: "..ARCPhone.Update)
 if SERVER then
-	AddCSLuaFile() -----------------------------------------
-	ARCPhoneMsg("####    Loading ARCPhone Lua files..     ####")
-	local sharedfiles, _ = file.Find( "arcphone/shared/*.lua", "LUA" )
-	for i, v in ipairs( sharedfiles ) do
-		ARCPhoneMsg("#### Loading: /arcphone/shared/"..v)
-		AddCSLuaFile( "arcphone/shared/"..v )
-		include( "arcphone/shared/"..v )
-	end
-	local serverfiles, _ = file.Find( "arcphone/server/*.lua", "LUA" )
-	for i, v in ipairs( serverfiles ) do
-		ARCPhoneMsg("#### Loading: /arcphone/server/"..v)
-		include( "arcphone/server/"..v )
-	end
-	local clientfiles, _ = file.Find( "arcphone/client/*.lua", "LUA" )
-	for i, v in ipairs( clientfiles ) do
-		ARCPhoneMsg("#### Sending: /arcphone/client/"..v)
-		AddCSLuaFile( "arcphone/client/"..v )
-		--include( "arcphone/client/"..v )
-	end
-	ARCPhoneMsg("####     Loading ARCPhone Plugins...     ####")
-	local sharedfiles, _ = file.Find( "arcphone_plugins/shared/*.lua", "LUA" )
-	for i, v in ipairs( sharedfiles ) do
-		ARCPhoneMsg("#### Loading: /arcphone_plugins/shared/"..v)
-		AddCSLuaFile( "arcphone_plugins/shared/"..v )
-		include( "arcphone/shared/"..v )
-	end
-	local serverfiles, _ = file.Find( "arcphone_plugins/server/*.lua", "LUA" )
-	for i, v in ipairs( serverfiles ) do
-		ARCPhoneMsg("#### Loading: /arcphone_plugins/server/"..v)
-		include( "arcphone_plugins/server/"..v )
-	end
-	
-	local clientfiles, _ = file.Find( "arcphone_plugins/client/*.lua", "LUA" )
-	for i, v in ipairs( clientfiles ) do
-		ARCPhoneMsg("#### Sending: /arcphone_plugins/client/"..v)
-		AddCSLuaFile( "arcphone_plugins/client/"..v )
-		--include( "arcphone/client/"..v )
-	end
-	
 	util.AddNetworkString( "ARCPhone_Msg" )
 	function ARCPhoneMsgCL(ply,msg)
 		--net.Start( "ARCPhone_Msg" )
@@ -139,30 +100,8 @@ if SERVER then
 		local msg = net.ReadString() 
 		MsgN("ARCPhone - "..ply:Nick().." ("..ply:SteamID().."): "..msg)
 	end)
-	ARCPhoneMsg("####  Serverside Lua Loading Complete.  ####")
 else
-	ARCPhoneMsg("####     Loading Clientside Files..     ####")
-	local sharedfiles, _ = file.Find( "arcphone/shared/*.lua", "LUA" )
-	for i, v in pairs( sharedfiles ) do
-		ARCPhoneMsg("#### Loading: /arcphone/shared/"..v)
-		include( "arcphone/shared/"..v )
-	end
-	local clientfiles, _ = file.Find( "arcphone/client/*.lua", "LUA" )
-	for i, v in pairs( clientfiles ) do
-		ARCPhoneMsg("#### Loading: /arcphone/client/"..v)
-		include( "arcphone/client/"..v )
-	end
-	ARCPhoneMsg("####    Loading Clientside Plugins..    ####")
-	local sharedfiles, _ = file.Find( "arcphone_plugins/shared/*.lua", "LUA" )
-	for i, v in pairs( sharedfiles ) do
-		ARCPhoneMsg("#### Loading: /arcphone_plugins/shared/"..v)
-		include( "arcphone_plugins/shared/"..v )
-	end
-	local clientfiles, _ = file.Find( "arcphone_plugins/client/*.lua", "LUA" )
-	for i, v in pairs( clientfiles ) do
-		ARCPhoneMsg("#### Loading: /arcphone_plugins/client/"..v)
-		include( "arcphone_plugins/client/"..v )
-	end
+
 	net.Receive( "ARCPhone_Msg", function(length)
 		local msg = net.ReadString() 
 		MsgC(Color(255,255,255,255),"ARCPhone Server: "..tostring(msg).."\n")
@@ -172,7 +111,5 @@ else
 		net.WriteString( msg )
 		net.SendToServer()
 	end
-	
-	ARCPhoneMsg("####  Clientside Lua Loading Complete.  ####")
 end
 

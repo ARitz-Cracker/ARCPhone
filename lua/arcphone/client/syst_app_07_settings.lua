@@ -13,14 +13,16 @@ end
 
 function APP:SelectCategory(a)
 	self.Section = a
-	table.Empty(self.Tiles)
-	self:ResetCurPos()
+	self:ClearScreen()
 	local i = 0
 	local ypos = 32
 	for k,v in SortedPairs(self.Phone.Settings[a]) do
 		--PrintTable(self.Phone.SettingChoices[a][v])
 		if self.Phone.SettingChoices[a] && self.Phone.SettingChoices[a][k] then
 			i = i + 1
+			self:CreateNewLabel(8,ypos,0,0,k,"ARCPhone",self.Phone.Settings.Personalization.CL_03_MainText,self.Phone.Settings.Personalization.CL_01_MainColour)
+			ypos = ypos + 16
+			
 			self.Tiles[i] = ARCPhone.NewAppChoiceInputTile(self)
 			self.Tiles[i].x = 8
 			self.Tiles[i].y = ypos
@@ -31,7 +33,7 @@ function APP:SelectCategory(a)
 			for i=1,#self.Phone.SettingChoices[a][k] do
 				self.Tiles[i]:AddChoice(self.Phone.SettingChoices[a][k][i][1],self.Phone.SettingChoices[a][k][i][2])
 			end
-			ypos = ypos + 22
+			ypos = ypos + 22 + 5
 			self.Tiles[i].Setting = k
 		elseif IsColor(v) then
 			i = i + 1
@@ -41,19 +43,22 @@ function APP:SelectCategory(a)
 			self.Tiles[i].w = 122
 			self.Tiles[i].h = 48
 			self.Tiles[i].Setting = k
-			ypos = ypos + 50
+			ypos = ypos + 50 + 5
 		elseif isnumber(v) then
+			self:CreateNewLabel(8,ypos,90,30,k,"ARCPhone",self.Phone.Settings.Personalization.CL_03_MainText,self.Phone.Settings.Personalization.CL_01_MainColour)
 			i = i + 1
 			self.Tiles[i] = ARCPhone.NewAppNumberInputTile(self,v)
-			self.Tiles[i].x = 8
+			self.Tiles[i].x = 100
 			self.Tiles[i].y = ypos
 			self.Tiles[i].w = 24
 			self.Tiles[i].h = 30
 			self.Tiles[i].Setting = k
 			self.Tiles[i].color = self.Phone.Settings.Personalization.CL_03_MainText
 			self.Tiles[i].bgcolor = self.Phone.Settings.Personalization.CL_01_MainColour
-			ypos = ypos + 32
+			ypos = ypos + 32 + 5
 		elseif isstring(v) then
+			self:CreateNewLabel(8,ypos,0,0,k,"ARCPhone",self.Phone.Settings.Personalization.CL_03_MainText,self.Phone.Settings.Personalization.CL_01_MainColour)
+			ypos = ypos + 16
 			i = i + 1
 			self.Tiles[i] = ARCPhone.NewAppTextInputTile(self,v,false,122)
 			self.Tiles[i].y = ypos
@@ -63,15 +68,28 @@ function APP:SelectCategory(a)
 			self.Tiles[i].bgcolor = self.Phone.Settings.Personalization.CL_09_QuaternaryColour
 			self.Tiles[i].SingleLine = true
 			self.Tiles[i].Setting = k
-			ypos = ypos + 18
+			ypos = ypos + 18 + 5
 		end
+	end
+	if a == "System" then
+		self:CreateNewLabel(8,ypos,0,0,"Your phone number","ARCPhone",self.Phone.Settings.Personalization.CL_03_MainText,self.Phone.Settings.Personalization.CL_01_MainColour)
+		ypos = ypos + 16
+		i = i + 1
+		self.Tiles[i] = ARCPhone.NewAppTextInputTile(self,ARCPhone.GetPhoneNumber(LocalPlayer()),false,122)
+		self.Tiles[i].y = ypos
+		self.Tiles[i].w = 122
+		self.Tiles[i].x = 8
+		self.Tiles[i].color = self.Phone.Settings.Personalization.CL_11_QuaternaryText
+		self.Tiles[i].bgcolor = self.Phone.Settings.Personalization.CL_09_QuaternaryColour
+		self.Tiles[i].SingleLine = true
+		self.Tiles[i].Editable = false
+		ypos = ypos + 18 + 5
 	end
 end
 
 function APP:Init()
 	self.Section = ""
-	table.Empty(self.Tiles)
-	self:ResetCurPos()
+	self:ClearScreen()
 	local i = 0
 	for k in SortedPairs(self.Phone.Settings) do
 		i = i + 1
@@ -110,7 +128,9 @@ end
 function APP:OnBack()
 	if #self.Section > 0 then
 		for i=1,#self.Tiles-1 do
-			self.Phone.Settings[self.Section][self.Tiles[i].Setting] = self.Tiles[i]:GetValue()
+			if self.Tiles[i].Setting then
+				self.Phone.Settings[self.Section][self.Tiles[i].Setting] = self.Tiles[i]:GetValue()
+			end
 		end
 		self:Init()
 	else
