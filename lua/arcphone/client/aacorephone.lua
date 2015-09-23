@@ -546,7 +546,7 @@ end
 			message = string.Replace(message, matches[1], "{{IMGDATA:"..util.Base64Encode(file.Read(matches[2],"DATA"))..":"..util.Base64Encode(file.Read(matches[3],"DATA"))..":IMGDATA}}")
 			matches = {string.gmatch(message, "({{IMG:([^:]*):([^:]*):IMG}})")()}
 		end
-		local hash = ARCLib.JamesHash(message)
+		local hash = ARCLib.JamesHash(message..CurTime())
 		ARCPhone.PhoneSys.OutgoingTexts[hash] = {}
 		ARCPhone.PhoneSys.OutgoingTexts[hash].msg = ARCLib.SplitString(util.Compress(number..message),16384)
 		ARCPhone.PhoneSys.OutgoingTexts[hash].number = number

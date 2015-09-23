@@ -55,8 +55,7 @@ end
 APP.Photos = {}
 function APP:Init()
 	self.CurrentDir = ""
-	table.Empty(self.Tiles)
-	
+	self:ClearScreen()
 	self.Tiles[1] = ARCPhone.NewAppTile(self)
 	self.Tiles[1].x = 8
 	self.Tiles[1].y = 32
@@ -117,7 +116,7 @@ function APP:ListPhotos(dir)
 		self.Phone:AddMsgBox("Empty","There aren't any photos here!","warning")
 		return
 	end
-	table.Empty(self.Tiles)
+	self:ClearScreen()
 	for i=1,#files do
 		self.Tiles[i] = ARCPhone.NewAppTile(self)
 		self.Tiles[i].x = 4 + (43*((i-1)%3))

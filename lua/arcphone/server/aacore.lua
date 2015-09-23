@@ -319,7 +319,7 @@ end
 
 function ARCPhone.SendTextMsg(tonum,fromnum,msg)
 	MsgN("Sending text message from "..fromnum.." to "..tonum)
-	local hash = ARCLib.JamesHash(msg)
+	local hash = ARCLib.JamesHash(msg..CurTime())
 	if !ARCPhone.Disk.Texts[tonum] then
 		ARCPhone.Disk.Texts[tonum] = {}
 	end
