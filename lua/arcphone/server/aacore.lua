@@ -291,7 +291,7 @@ end
 function ARCPhone.AddToCall(caller,reciever)
 	if !ARCLib.RecursiveHasValue(ARCPhone.Calls,caller) then
 		ARCPhone.MakeCall(caller,reciever)
-	else
+	elseif !ARCLib.RecursiveHasValue(ARCPhone.Calls,reciever) then
 		local line = ARCPhone.GetLineFromCaller(caller)
 		if #reciever != 10 then -- Check if it's a 10 digit number
 			return 
@@ -314,6 +314,8 @@ function ARCPhone.AddToCall(caller,reciever)
 		
 		table.insert(ARCPhone.Calls[line].pending,reciever)
 		plyrec.ARCPhone_Status = ARCPHONE_ERROR_RINGING
+	else
+		ARCPhoneMsgCL(ply,"Note to self: Make some sort of error message pop up when a busy person was attempted to be added to a call")
 	end
 end
 

@@ -149,6 +149,7 @@ function APP:ListPhotos(dir)
 	end
 	self.Photos = files
 	self.CurrentDir = dir
+	self:SetCurPos(#files)
 end
 
 function APP:OnBack()
