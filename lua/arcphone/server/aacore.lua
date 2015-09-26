@@ -501,6 +501,11 @@ function ARCPhone.Load()
 			ARCPhoneMsg("LOADING FALIURE!")
 			return
 		end
+		if !file.IsDir( ARCBank.Dir.."/saved_atms","DATA" ) then
+			ARCBankMsg("Created Folder: "..ARCBank.Dir.."/saved_atms")
+			file.CreateDir(ARCBank.Dir.."/saved_atms")
+		end
+		
 		if file.Exists(ARCPhone.Dir.."/__data.txt","DATA") then
 			ARCPhone.Disk = util.JSONToTable(file.Read( ARCPhone.Dir.."/__data.txt","DATA" ))
 		end
