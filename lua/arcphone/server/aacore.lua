@@ -516,23 +516,8 @@ function ARCPhone.Load()
 			ARCPhone.Msg("WARNING! THE SYSTEM DIDN'T SHUT DOWN PROPERLY!")
 		end
 		
-		if file.Exists(ARCPhone.Dir.."/_saved_settings.txt","DATA") then
-			local disksettings = util.JSONToTable(file.Read(ARCPhone.Dir.."/_saved_settings.txt","DATA"))
-			if disksettings then
-				for k,v in pairs(ARCPhone.Settings) do
-					if disksettings[k] || isbool(disksettings[k]) then
-						ARCPhone.Settings[k] = disksettings[k]
-					else
-						ARCPhone.Msg(""..k.." not found in disk settings. Possibly out of date. Using default.")
-					end
-				end
-				ARCPhone.Msg("Settings succesfully set.")
-			else
-				ARCPhone.Msg("Settings file is corrupt or something! Using defaults.")
-			end
-		else
-			ARCPhone.Msg("No settings file found! Using defaults.")
-		end
+		
+		ARCLib.AddonLoadSettings("ARCPhone",backward)
 		--[[
 		if !file.IsDir( ARCPhone.Dir.."/languages","DATA" ) then
 			ARCPhone.Msg("Created Folder: "..ARCPhone.Dir.."/languages")
