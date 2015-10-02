@@ -6,24 +6,24 @@
 function ARCPhone.SpawnAntennas()
 	local shit = file.Read(ARCPhone.Dir.."/saved_atms/"..string.lower(game.GetMap())..".txt", "DATA" )
 	if !shit then
-		ARCPhoneMsg("Cannot spawn Antennas. No file associated with this map.")
+		ARCPhone.Msg("Cannot spawn Antennas. No file associated with this map.")
 		return false
 	end
 	local atmdata = util.JSONToTable(shit)
 	if !atmdata then
-		ARCPhoneMsg("Cannot spawn Antennas. Corrupt file associated with this map.")
+		ARCPhone.Msg("Cannot spawn Antennas. Corrupt file associated with this map.")
 		return false
 	end
 	for _, oldatms in pairs( ents.FindByClass("sent_arc_antenna") ) do
 		oldatms.ARCPhone_MapEntity = false
 		oldatms:Remove()
 	end
-	ARCPhoneMsg("Spawning Map Antennas...")
+	ARCPhone.Msg("Spawning Map Antennas...")
 	for i=1,atmdata.atmcount do
 			local shizniggle = ents.Create("sent_arc_antenna")
 			if !IsValid(shizniggle) then
 				atmdata.atmcount = 1
-				ARCPhoneMsg("Antennas failed to spawn.")
+				ARCPhone.Msg("Antennas failed to spawn.")
 			return false end
 			if atmdata.pos[i] && atmdata.angles[i] then
 				shizniggle:SetPos(atmdata.pos[i]+Vector(0,0,ARCLib.BoolToNumber(!atmdata.NewATMModel)*8.6))
@@ -37,7 +37,7 @@ function ARCPhone.SpawnAntennas()
 			else
 				shizniggle:Remove()
 				atmdata.atmcount = 1
-				ARCPhoneMsg("Corrupt File")
+				ARCPhone.Msg("Corrupt File")
 				return false 
 			end
 			local phys = shizniggle:GetPhysicsObject()
@@ -50,7 +50,7 @@ function ARCPhone.SpawnAntennas()
 	return true
 end
 function ARCPhone.SaveAntennas()
-	ARCPhoneMsg("Saving Antennas...")
+	ARCPhone.Msg("Saving Antennas...")
 	local atmdata = {}
 	atmdata.angles = {}
 	atmdata.pos = {}
@@ -59,7 +59,7 @@ function ARCPhone.SaveAntennas()
 	atmdata.atmcount = table.maxn(atms)
 	atmdata.NewATMModel = true
 	if atmdata.atmcount <= 0 then
-		ARCPhoneMsg("No Antennas to save!")
+		ARCPhone.Msg("No Antennas to save!")
 		return false
 	end
 	for i=1,atmdata.atmcount do
@@ -77,18 +77,18 @@ function ARCPhone.SaveAntennas()
 	local savepos = ARCPhone.Dir.."/saved_atms/"..string.lower(game.GetMap())..".txt"
 	file.Write(savepos,util.TableToJSON(atmdata))
 	if file.Exists(savepos,"DATA") then
-		ARCPhoneMsg("Antennas Saved in: "..savepos)
+		ARCPhone.Msg("Antennas Saved in: "..savepos)
 		return true
 	else
-		ARCPhoneMsg("Error while saving map.")
+		ARCPhone.Msg("Error while saving map.")
 		return false
 	end
 end
 function ARCPhone.UnSaveAntennas()
-	ARCPhoneMsg("UnSaving Antennas...")
+	ARCPhone.Msg("UnSaving Antennas...")
 	local atms = ents.FindByClass("sent_arc_antenna")
 	if table.maxn(atms) <= 0 then
-		ARCPhoneMsg("No Antennas to Unsave!")
+		ARCPhone.Msg("No Antennas to Unsave!")
 		return false
 	end
 	for i=1,table.maxn(atms) do
@@ -108,5 +108,5 @@ function ARCPhone.ClearAntennas() -- Make sure this doesn't crash (dump %%CONFIR
 		oldatms.ARCPhone_MapEntity = false
 		oldatms:Remove()
 	end
-	ARCPhoneMsg("All Antennas Removed.")
+	ARCPhone.Msg("All Antennas Removed.")
 end

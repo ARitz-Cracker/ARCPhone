@@ -65,7 +65,7 @@ net.Receive( "arcphone_comm_call", function(length,ply)
 			ARCPhone.MakeCall(ARCPhone.GetPhoneNumber(ply),number)
 			MsgN(ARCPhone.GetPhoneNumber(ply).." - "..number)
 		else
-			ARCPhoneMsgCL(ply,"No Phone number specified." )
+			ARCPhone.MsgCL(ply,"No Phone number specified." )
 		end
 	elseif operation == 2 then
 		ARCPhone.AnswerCall(ARCPhone.GetPhoneNumber(ply))
@@ -73,12 +73,12 @@ net.Receive( "arcphone_comm_call", function(length,ply)
 		ARCPhone.HangUp(ARCPhone.GetPhoneNumber(ply))
 	elseif operation == 4 then
 		if ply.ARCPhone_Status != ARCPHONE_ERROR_NONE then
-			ARCPhoneMsgCL(ply,"No call running or call has not been established.")
+			ARCPhone.MsgCL(ply,"No call running or call has not been established.")
 		else
 			ARCPhone.AddToCall(ARCPhone.GetPhoneNumber(ply),number)
 		end
 	else
-		ARCPhoneMsgCL(ply,"Invalid operation" )
+		ARCPhone.MsgCL(ply,"Invalid operation" )
 	end
 end)
 

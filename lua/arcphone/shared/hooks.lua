@@ -114,7 +114,7 @@ else
 		net.SendOmit(ply)
 	end)
 	
-	hook.Add( "ShutDown", "ARCBank Shutdown", function()
+	hook.Add( "ShutDown", "ARCPhone Shutdown", function()
 		for _, oldatms in pairs( ents.FindByClass("sent_arc_phone_antenna") ) do
 			oldatms.ARCPhone_MapEntity = false
 			--oldatms:Remove()
@@ -148,7 +148,7 @@ hook.Add( "ARCLoad_OnUpdate", "ARCPhone Remuv",function(loaded)
 	if loaded != "ARCPhone" then return end
 	if SERVER then
 		for k,v in pairs(player.GetAll()) do 
-			ARCPhoneMsgCL(v,"Updating...") 
+			ARCPhone.MsgCL(v,"Updating...") 
 		end
 		ARCPhone.SaveDisk()
 		ARCPhone.ClearAntennas()

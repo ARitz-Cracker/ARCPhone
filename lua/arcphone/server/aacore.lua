@@ -16,7 +16,7 @@ ARCPhone.Disk.Texts = ARCPhone.Disk.Texts or {}
 ARCPhone.Disk.ProperShutdown = false
 ARCPhone.Calls = ARCPhone.Calls or {}
 function ARCPhone.FuckIdiotPlayer(ply,reason)
-	ARCPhoneMsg("ARCPHONE ANTI-CHEAT WARNING: Some stupid shit by the name of "..ply:Nick().." ("..ply:SteamID()..") tried to use an exploit: ["..tostring(reason).."]")
+	ARCPhone.Msg("ARCPHONE ANTI-CHEAT WARNING: Some stupid shit by the name of "..ply:Nick().." ("..ply:SteamID()..") tried to use an exploit: ["..tostring(reason).."]")
 	if ply.ARCPhone_AFuckingIdiot then
 		--ply:Ban(ARCPhone.Settings["autoban_time"], ) 
 		ply:Ban(ARCBank.Settings["autoban_time"])
@@ -27,7 +27,7 @@ function ARCPhone.FuckIdiotPlayer(ply,reason)
 			end
 		end)
 	else
-		ARCPhoneMsgCL(ply,table.Random({"I fucking swear, you better not try that again.","It's people like you that make my life harder.","I'LL BAN YO' FUCKIN' ASS IF YOU TRY THAT MUTHAFUKIN SHIT AGAIN!","Seriously? Do you really think you can get away with that?"}))
+		ARCPhone.MsgCL(ply,table.Random({"I fucking swear, you better not try that again.","It's people like you that make my life harder.","I'LL BAN YO' FUCKIN' ASS IF YOU TRY THAT MUTHAFUKIN SHIT AGAIN!","Seriously? Do you really think you can get away with that?"}))
 		ply.ARCPhone_AFuckingIdiot = true
 	end
 end
@@ -315,7 +315,7 @@ function ARCPhone.AddToCall(caller,reciever)
 		table.insert(ARCPhone.Calls[line].pending,reciever)
 		plyrec.ARCPhone_Status = ARCPHONE_ERROR_RINGING
 	else
-		ARCPhoneMsgCL(ply,"Note to self: Make some sort of error message pop up when a busy person was attempted to be added to a call")
+		ARCPhone.MsgCL(ply,"Note to self: Make some sort of error message pop up when a busy person was attempted to be added to a call")
 	end
 end
 
@@ -472,37 +472,37 @@ function ARCPhone.UpdateLang(lang)
 				net.Send(v)
 			end
 		else
-			ARCPhoneMsg("WARNING! The language file '"..tostring(lang).."' is not a valid JSON file!")
+			ARCPhone.Msg("WARNING! The language file '"..tostring(lang).."' is not a valid JSON file!")
 		end
 	else
-		ARCPhoneMsg("WARNING! The language file '"..tostring(lang).."' wasn't found!")
+		ARCPhone.Msg("WARNING! The language file '"..tostring(lang).."' wasn't found!")
 	end
 	--]]
 end
 function ARCPhone.Load()
 	ARCPhone.Loaded = false
 		if #player.GetAll() == 0 then
-			ARCPhoneMsg("A player must be online before continuing...")
+			ARCPhone.Msg("A player must be online before continuing...")
 		end
 		timer.Simple(1,function()
 		
 		if game.SinglePlayer() then
-			ARCPhoneMsg("CRITICAL ERROR! THIS IS A SINGLE PLAYER GAME!")
-			ARCPhoneMsg("LOADING FALIURE!")
+			ARCPhone.Msg("CRITICAL ERROR! THIS IS A SINGLE PLAYER GAME!")
+			ARCPhone.Msg("LOADING FALIURE!")
 			return
 		end
 		if !file.IsDir( ARCPhone.Dir,"DATA" ) then
-			ARCPhoneMsg("Created Folder: "..ARCPhone.Dir)
+			ARCPhone.Msg("Created Folder: "..ARCPhone.Dir)
 			file.CreateDir(ARCPhone.Dir)
 		end
 		
 		if !file.IsDir( ARCPhone.Dir,"DATA" ) then
-			ARCPhoneMsg("CRITICAL ERROR! FAILED TO CREATE ROOT FOLDER!")
-			ARCPhoneMsg("LOADING FALIURE!")
+			ARCPhone.Msg("CRITICAL ERROR! FAILED TO CREATE ROOT FOLDER!")
+			ARCPhone.Msg("LOADING FALIURE!")
 			return
 		end
 		if !file.IsDir( ARCBank.Dir.."/saved_atms","DATA" ) then
-			ARCBankMsg("Created Folder: "..ARCBank.Dir.."/saved_atms")
+			ARCBank.Msg("Created Folder: "..ARCBank.Dir.."/saved_atms")
 			file.CreateDir(ARCBank.Dir.."/saved_atms")
 		end
 		
@@ -513,7 +513,7 @@ function ARCPhone.Load()
 		if ARCPhone.Disk.ProperShutdown then
 			ARCPhone.Disk.ProperShutdown = false
 		else
-			ARCPhoneMsg("WARNING! THE SYSTEM DIDN'T SHUT DOWN PROPERLY!")
+			ARCPhone.Msg("WARNING! THE SYSTEM DIDN'T SHUT DOWN PROPERLY!")
 		end
 		
 		if file.Exists(ARCPhone.Dir.."/_saved_settings.txt","DATA") then
@@ -523,19 +523,19 @@ function ARCPhone.Load()
 					if disksettings[k] || isbool(disksettings[k]) then
 						ARCPhone.Settings[k] = disksettings[k]
 					else
-						ARCPhoneMsg(""..k.." not found in disk settings. Possibly out of date. Using default.")
+						ARCPhone.Msg(""..k.." not found in disk settings. Possibly out of date. Using default.")
 					end
 				end
-				ARCPhoneMsg("Settings succesfully set.")
+				ARCPhone.Msg("Settings succesfully set.")
 			else
-				ARCPhoneMsg("Settings file is corrupt or something! Using defaults.")
+				ARCPhone.Msg("Settings file is corrupt or something! Using defaults.")
 			end
 		else
-			ARCPhoneMsg("No settings file found! Using defaults.")
+			ARCPhone.Msg("No settings file found! Using defaults.")
 		end
 		--[[
 		if !file.IsDir( ARCPhone.Dir.."/languages","DATA" ) then
-			ARCPhoneMsg("Created Folder: "..ARCPhone.Dir.."/languages")
+			ARCPhone.Msg("Created Folder: "..ARCPhone.Dir.."/languages")
 			file.CreateDir(ARCPhone.Dir.."/languages")
 		end	
 		file.Write(ARCPhone.Dir.."/languages/en.txt", file.Read( "arcphone/data/languages/en.lua", "LUA" ) )
@@ -549,14 +549,14 @@ function ARCPhone.Load()
 		ARCPhone.LogFile = os.date(ARCPhone.Dir.."/systemlog - %d %b %Y - "..tostring(os.date("%H")*60+os.date("%M"))..".log.txt")
 		file.Write(ARCPhone.LogFile,"***ARCPhone System Log***    \nIT IS RECCOMENDED TO USE NOTEPAD++ TO VIEW THIS FILE!    \nDates are in DD-MM-YYYY\n")
 		ARCPhone.LogFileWritten = true
-		ARCPhoneMsg("Log File Created at "..ARCPhone.LogFile)
+		ARCPhone.Msg("Log File Created at "..ARCPhone.LogFile)
 		
 		--[[
 		if timer.Exists( "ARCPHONE_TAKRCOST" ) then
-			ARCPhoneMsg("Stopping current cost timer...")
+			ARCPhone.Msg("Stopping current cost timer...")
 			timer.Destroy( "ARCPHONE_TAKRCOST" )
 		end
-		ARCPhoneMsg("Billing periods are every "..ARCLib.TimeString(ARCPhone.Settings["cost_time"]*3600))
+		ARCPhone.Msg("Billing periods are every "..ARCLib.TimeString(ARCPhone.Settings["cost_time"]*3600))
 		timer.Create( "ARCPHONE_TAKRCOST", ARCPhone.Settings["cost_time"]*3600, 0, ARCPhone.TakeCosts )
 		timer.Start( "ARCPHONE_TAKRCOST" ) 
 		]]
@@ -571,7 +571,7 @@ function ARCPhone.Load()
 			net.Send(v)
 		end
 		if timer.Exists( "ARCPHONE_SAVEDISK" ) then
-			ARCPhoneMsg("Stopping current savedisk timer...")
+			ARCPhone.Msg("Stopping current savedisk timer...")
 			timer.Destroy( "ARCPHONE_SAVEDISK" )
 		end
 		timer.Create( "ARCPHONE_SAVEDISK", 300, 0, function() 
@@ -584,21 +584,21 @@ function ARCPhone.Load()
 					if code == 200 then
 						ARCPhone.Outdated = !string.find(body,"--ARCPhone Version "..ARCPhone.Version.."--")
 						if ARCPhone.Outdated then
-							ARCPhoneMsg("ARCPhone is out of date!")
+							ARCPhone.Msg("ARCPhone is out of date!")
 						end
 					else
-						ARCPhoneMsg("FAILED TO CHECK FOR UPDATES! (HTTP Status "..code..") I'll check again later.")
+						ARCPhone.Msg("FAILED TO CHECK FOR UPDATES! (HTTP Status "..code..") I'll check again later.")
 					end
 				end,
 				function( err )
-					ARCPhoneMsg("FAILED TO CHECK FOR UPDATES! ("..err..") I'll check again later.")
+					ARCPhone.Msg("FAILED TO CHECK FOR UPDATES! ("..err..") I'll check again later.")
 				end
 			)
 			
 		end )
 		timer.Start( "ARCPHONE_SAVEDISK" ) 
 		if timer.Exists( "ARCPHONE_THINK" ) then
-			ARCPhoneMsg("Stopping current think timer...")
+			ARCPhone.Msg("Stopping current think timer...")
 			timer.Destroy( "ARCPHONE_THINK" )
 		end
 		timer.Create( "ARCPHONE_THINK", 1.337, 0, function()
@@ -614,14 +614,14 @@ function ARCPhone.Load()
 					net.Send(v)
 				end
 				ARCPhone.Calls = {}
-				ARCPhoneMsg("CRITICAL ERROR: Think function has errored!\r\n"..err)
+				ARCPhone.Msg("CRITICAL ERROR: Think function has errored!\r\n"..err)
 				ARCLib.NotifyBroadcast("ARCPhone experienced a critical error! You must type \"arcphone reset\" in console to re-start it!",NOTIFY_ERROR,30,true)
 				ARCLib.NotifyBroadcast("Please look in garrysmod/data/"..ARCPhone.LogFile.." on the SERVER to see why the error occured.",NOTIFY_ERROR,30,true)
 				timer.Destroy( "ARCPHONE_THINK" ) 
 			end
 		end)
 		timer.Start( "ARCPHONE_THINK" ) 
-		ARCPhoneMsg("ARCPhone is ready!")
+		ARCPhone.Msg("ARCPhone is ready!")
 		ARCPhone.Loaded = true
 		ARCPhone.Busy = false
 	end)
