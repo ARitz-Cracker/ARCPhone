@@ -144,6 +144,7 @@ else
 		if IsValid(ply) && ply:IsPlayer() then
 			ARCLib.SendAddonLanguage("ARCPhone",ply)
 			ARCLib.SendAddonSettings("ARCPhone",ply) 
+		end
 	end)
 end
 
