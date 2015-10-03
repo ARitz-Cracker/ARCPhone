@@ -95,10 +95,12 @@ net.Receive( "arcphone_comm_text", function(length,ply)
 	local hash = net.ReadString()
 	local str = ""
 	local strlen = net.ReadUInt(32)
+	if (length - strlen*8) != 192 then
+		ARCPhone.FuckIdiotPlayer(ply,"Text message buffer underflow")
+	end
 	if strlen > 0 then
 		str = net.ReadData(strlen)
 	end
-	MsgN("NET MSG NET LENGTH: "..(length - strlen*8))
 	local vnum = ARCPhone.GetPhoneNumber(ply)
 	
 	
