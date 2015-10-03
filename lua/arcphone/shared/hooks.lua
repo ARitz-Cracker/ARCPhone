@@ -140,7 +140,11 @@ else
 	hook.Add( "CanProperty", "ARCPhone BlockProperties", function( ply, property, ent )
 		if ent.ARCPhone_MapEntity then return false end 
 	end )
-	
+	hook.Add( "ARCLoad_OnPlayerLoaded", "ARCPhone PlyAuth", function( ply ) 
+		if IsValid(ply) && ply:IsPlayer() then
+			ARCLib.SendAddonLanguage("ARCPhone",ply)
+			ARCLib.SendAddonSettings("ARCPhone",ply) 
+	end)
 end
 
 

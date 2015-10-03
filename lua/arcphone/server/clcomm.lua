@@ -98,7 +98,7 @@ net.Receive( "arcphone_comm_text", function(length,ply)
 	if strlen > 0 then
 		str = net.ReadData(strlen)
 	end
-	--MsgN("NET MSG NET LENGTH: "..(length - strlen))
+	MsgN("NET MSG NET LENGTH: "..(length - strlen*8))
 	local vnum = ARCPhone.GetPhoneNumber(ply)
 	
 	

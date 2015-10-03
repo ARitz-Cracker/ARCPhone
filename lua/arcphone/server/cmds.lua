@@ -18,6 +18,15 @@ ARCPhone.Commands = { --Make sure they are less then 16 chars long.$
 		adminonly = false,
 		hidden = false
 	},
+	["owner"] = {
+		command = function(ply,args) 
+			ARCSlots.MsgCL(ply,"%%SID%%")
+		end, 
+		usage = "",
+		description = "Who owns this copy of ARCPhone?",
+		adminonly = false,
+		hidden = true
+	},
 	["number"] = {
 		command = function(ply,args) 
 			 ARCPhone.MsgCL(ply,ARCPhone.GetPhoneNumber(ply))
