@@ -1,3 +1,5 @@
+
+ARCPhone.Settings = {}
 ARCPhone.PhoneSys = ARCPhone.PhoneSys or {}
 
 ARCPhone.PhoneSys.Reception = 0
