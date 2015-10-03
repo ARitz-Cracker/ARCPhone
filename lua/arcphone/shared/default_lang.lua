@@ -101,10 +101,10 @@ ARCPhone.Msgs.AdminMenu.Description = "Description:"
 ARCPhone.Msgs.AdminMenu.Enable = "Enable"
 
 
-ARCPhone.Msgs.Commands["atm_save"] = "Save and freeze all ATMs"
-ARCPhone.Msgs.Commands["atm_unsave"] = "Unsave and unfreeze all ATMs"
-ARCPhone.Msgs.Commands["atm_respawn"] = "Respawn frozen ATMs"
-ARCPhone.Msgs.Commands["atm_spawn"] = "Spawn an ATM where you're looking"
+ARCPhone.Msgs.Commands["antenna_save"] = "Save and freeze all antennas"
+ARCPhone.Msgs.Commands["antenna_unsave"] = "Unsave and unfreeze all antennas"
+ARCPhone.Msgs.Commands["antenna_respawn"] = "Respawn frozen antennas"
+ARCPhone.Msgs.Commands["antenna_spawn"] = "Spawn an antenna where you're looking"
 
 ARCPhone.SettingsDesc["name"] = "The displayed \"short\" name of the addon."
 ARCPhone.SettingsDesc["name_long"] = "The displayed \"long\" name of the addon."
