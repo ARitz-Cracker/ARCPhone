@@ -88,7 +88,7 @@ ARCPhone.Commands = { --Make sure they are less then 16 chars long.$
 						cmdlist = cmdlist.."\n"..desc
 					end
 				end
-				for _,v in pairs(string.Explode( "\n", cmdlist ))do
+				for _,v in ipairs(string.Explode( "\n", cmdlist ))do
 					ARCPhone.MsgCL(ply,v)
 				end
 			end
@@ -119,7 +119,7 @@ ARCPhone.Commands = { --Make sure they are less then 16 chars long.$
 			if ARCPhone.SaveAntennas() then
 				ARCPhone.MsgCL(ply,"Antennas saved onto map!")
 			else
-				ARCPhone.MsgCL(ply,"An error occured while saving the Antennas onto the map.")
+				ARCPhone.MsgCL(ply,"An error occurred while saving the Antennas onto the map.")
 			end
 		end, 
 		usage = "",
@@ -134,7 +134,7 @@ ARCPhone.Commands = { --Make sure they are less then 16 chars long.$
 			if ARCPhone.UnSaveAntennas() then
 				ARCPhone.MsgCL(ply,"Antennas Detached from map!")
 			else
-				ARCPhone.MsgCL(ply,"An error occured while detatching Antennas from map.")
+				ARCPhone.MsgCL(ply,"An error occurred while detaching Antennas from map.")
 			end
 		end, 
 		usage = "",
