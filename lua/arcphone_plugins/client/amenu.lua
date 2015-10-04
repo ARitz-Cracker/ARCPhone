@@ -97,7 +97,7 @@ if ARCPhone then
 			CommandButton:SetPos( 10, 120 )
 			CommandButton:SetSize( 180, 20 )
 			CommandButton.DoClick = function()		
-				local cmdlist = {"antenna_save","antenna_unsave","antenna_respawn","antenna_spawn"}
+				local cmdlist = {"antenna_save","antenna_unsave","antenna_respawn"}
 				local CommandFrame = vgui.Create( "DFrame" )
 				CommandFrame:SetSize( 200*math.ceil(#cmdlist/8), 30+(30*math.Clamp(#cmdlist,0,8)) )
 				CommandFrame:Center()

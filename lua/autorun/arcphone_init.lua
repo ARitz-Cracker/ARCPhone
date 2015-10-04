@@ -16,8 +16,8 @@ ARCPhone.Msg(table.Random({"RIIING RIIIING!!!","ARitz Cracker's NEXT BIG PROJECT
 ARCPhone.Msg("© Copyright 2014 Aritz Beobide-Cardinal (ARitz Cracker) All rights reserved.")
 
 
-ARCPhone.Update = "September 21st 2015"
-ARCPhone.Version = "0.8.0"
+ARCPhone.Update = "Right Now"
+ARCPhone.Version = "Developer Version"
 
 NULLFUNC = function(...) end
 
@@ -155,5 +155,19 @@ else
 	end
 	
 	ARCPhone.Msg("####  Clientside Lua Loading Complete.  ####")
+	
 end
-
+local arcload_exists
+if SERVER then
+	arcload_exists = file.Exists("autorun/server/arcload_1_1.lua","LUA")
+else
+	arcload_exists = file.Exists("autorun/client/arcload_1_1.lua","LUA")
+end
+if !arcload_exists then
+	hook.Add("ARCLib_OnPlayerFullyLoaded","ARCPhone DevLoad",function(ply)
+		hook.Call( "ARCLoad_OnPlayerLoaded",GM,ply)
+	end)
+end
+hook.Add("InitPostEntity","ARCPhone DevLoad",function(ply)
+	hook.Call( "ARCLoad_OnLoaded",GM,"ARCPhone")
+end)
