@@ -41,6 +41,8 @@ arcphone settings (setting) (value)
 ^ SETS THE SETTING YOU WANT TO THE SPECIFIED VALUE.
 ]]
 function ARCPhone.SettingsReset() --DO NOT EDIT THIS!!!!
+	ARCPhone.Settings["name"] = "ARCPhone" --DO NOT EDIT THIS!!!!
+	ARCPhone.Settings["name_long"] = "ARitz Cracker Phone" --DO NOT EDIT THIS!!!!
 	ARCPhone.Settings["antenna_range"] = 5000 --DO NOT EDIT THIS!!!!
 	ARCPhone.Settings["antenna_strength"] = 1435 --DO NOT EDIT THIS!!!!
 	ARCPhone.Settings["jammer_range"] = 50 --DO NOT EDIT THIS!!!!
