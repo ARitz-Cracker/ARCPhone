@@ -100,6 +100,8 @@ ARCPhone.Msgs.AdminMenu.Add = "Add"
 ARCPhone.Msgs.AdminMenu.Description = "Description:"
 ARCPhone.Msgs.AdminMenu.Enable = "Enable"
 ARCPhone.Msgs.AdminMenu.Settings = "Settings"
+ARCPhone.Msgs.AdminMenu.ChooseSetting = "Choose setting"
+ARCPhone.Msgs.AdminMenu.SaveSettings = "Save settings"
 
 ARCPhone.Msgs.Commands["antenna_save"] = "Save and freeze all antennas"
 ARCPhone.Msgs.Commands["antenna_unsave"] = "Unsave and unfreeze all antennas"
