@@ -443,7 +443,7 @@ self.OptionAnimEndTime = 1]]
 		self:AddMsgBox("CRITICAL ERROR","Failed to create root folder. All apps that require data to be saved (including the home screen) won't work.")
 		return
 	end
-	ARCPhone.ROOTDIR = "_arcphone_client/"..string.lower(string.gsub(ARCLib.GetUserID(LocalPlayer()), "[^_%w]", "_"))
+	ARCPhone.ROOTDIR = "_arcphone_client/"..ARCPhone.GetPhoneNumber(LocalPlayer())
 	if !file.IsDir( ARCPhone.ROOTDIR,"DATA" ) then
 		file.CreateDir( ARCPhone.ROOTDIR)
 	end

@@ -9,9 +9,7 @@ ARCPhone.Commands = { --Make sure they are less then 16 chars long.$
 		command = function(ply,args) 
 			if !ARCPhone.Loaded then ARCPhone.MsgCL(ply,"System reset required!") return end
 			ARCPhone.MsgCL(ply,"ARitz Cracker Phone v"..ARCPhone.Version.." Last updated on "..ARCPhone.Update )
-			ARCPhone.MsgCL(ply,"© Copyright 2015 Aritz Beobide-Cardinal (ARitz Cracker) All rights reserved.")
-			ARCPhone.MsgCL(ply,"If you have any questions, please go to this webpage: ")
-			ARCPhone.MsgCL(ply,"www.aritzcracker.ca")
+			ARCPhone.MsgCL(ply,"© Copyright 2015-2016 Aritz Beobide-Cardinal (ARitz Cracker) All rights reserved.")
 		end, 
 		usage = "",
 		description = "About ARitz Cracker Phone.",

@@ -184,41 +184,6 @@ net.Receive( "arcphone_comm_text", function(length,ply)
 		MsgN("ARCPhone: Client sent error on text "..hash)
 	end
 end)
---[[
-net.Receive( "arcphone_comm_text", function(length,ply)
-	local number = net.ReadString()
-	local message = net.ReadString()
-	if number == "confirming" then
-		local plynum = ARCPhone.Disk.Texts[ARCPhone.GetPhoneNumber(ply)]
-		if plynum then
-			MsgN(table.RemoveByValue(plynum,message))
-		end
-	else
-		if ply.ARCPhone_Reception > 15 then
-			number = tonumber(number)
-			if isnumber(number) && math.floor(math.log10(number)) == 9 && number >= 7960265729 then -- That phone number translates to STEAM_0:1:0. But I doubt rich (The first user ever on steam) will ever play DarkRP any time soon.
-				if ARCPhone.Disk.Texts[number] then
-					table.insert(ARCPhone.Disk.Texts[number],ARCPhone.GetPhoneNumber(ply)..message.."\nSent: "..os.date("%d-%m-%Y %H:%M:%S"))
-				else
-					ARCPhone.Disk.Texts[number] = {ARCPhone.GetPhoneNumber(ply)..message.."\nSent: "..os.date("%d-%m-%Y %H:%M:%S")}
-				end
-			else
-				if ARCPhone.Disk.Texts[ARCPhone.GetPhoneNumber(ply)] then
-					table.insert(ARCPhone.Disk.Texts[ARCPhone.GetPhoneNumber(ply)],"*002728398Text to "..tostring(number).." failed because the number is invalid.")
-				else
-					ARCPhone.Disk.Texts[ARCPhone.GetPhoneNumber(ply)] = {"*002728398Text to "..tostring(number).." failed because the number is invalid."}
-				end
-			end
-		else
-			if ARCPhone.Disk.Texts[ARCPhone.GetPhoneNumber(ply)] then
-				table.insert(ARCPhone.Disk.Texts[ARCPhone.GetPhoneNumber(ply)],"*002728398Text to "..tostring(number).." failed because you didn't have enough bars.")
-			else
-				ARCPhone.Disk.Texts[ARCPhone.GetPhoneNumber(ply)] = {"*002728398Text to "..tostring(number).." failed because you didn't have enough bars."}
-			end
-		end
-	end
-end)
-]]
 
 util.AddNetworkString( "arcphone_ringer" )
 net.Receive( "arcphone_ringer", function(length,ply)

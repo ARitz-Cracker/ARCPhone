@@ -1,6 +1,6 @@
 -- This shit is under copyright, and is bound to the agreement stated in the ELUA.
 -- Any 3rd party content has been used as either public domain or with permission.
--- © Copyright 2015-2016 Aritz Beobide-Cardinal All rights reserved.
+-- © Copyright 2014-2016 Aritz Beobide-Cardinal All rights reserved.
 
 --ENUMS FOR ARC BANKING SYSTEM!
 --137164355
@@ -13,8 +13,8 @@ function ARCPhone.Msg(msg)
 	end
 end
 ARCPhone.Msg("Running...\n ____ ____ _ ___ ___     ____ ____ ____ ____ _  _ ____ ____    ___  _  _ ____ _  _ ____ \n |__| |__/ |  |    /     |    |__/ |__| |    |_/  |___ |__/    |__] |__| |  | |\\ | |___ \n |  | |  \\ |  |   /__    |___ |  \\ |  | |___ | \\_ |___ |  \\    |    |  | |__| | \\| |___ \n")
-ARCPhone.Msg(table.Random({"ARitz Cracker is finally working on this!","RIIING RIIIING!!!","ARitz Cracker's NEXT BIG PROJECT!","fone","Call your friends!","Super fukin' Sexy edition!","3rd party app support!"}))
-ARCPhone.Msg("© Copyright 2015-2016 Aritz Beobide-Cardinal (ARitz Cracker) All rights reserved.")
+ARCPhone.Msg(table.Random({"HOLY SHIT HE'S FINALLY WORKING ON IT??","RIIING RIIIING!!!","ARitz Cracker's NEXT BIG PROJECT!","fone","Call your friends!","Super fukin' Sexy edition!","3rd party app support!"}))
+ARCPhone.Msg("© Copyright 2014-2016 Aritz Beobide-Cardinal (ARitz Cracker) All rights reserved.")
 
 
 ARCPhone.Update = "October 14th 2016"
@@ -79,3 +79,5 @@ if SERVER then
 	end
 end
 
+
+return "ARCPhone","ARCPhone",{"arclib"}

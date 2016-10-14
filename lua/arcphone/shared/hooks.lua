@@ -123,12 +123,6 @@ else
 	end)
 	
 	
-	hook.Add( "ARCLoad_OnLoaded", "ARCPhone SpawnAntennas", function(loaded)
-		if loaded != true && loaded != "ARCPhone" then return end
-			ARCPhone.Load()
-			ARCPhone.SpawnAntennas()
-	end )
-	
 	hook.Add( "CanTool", "ARCPhone Tool", function( ply, tr, tool )
 		if IsValid(tr.Entity) then -- Overrides shitty FPP
 			if tr.Entity.ARCPhone_MapEntity then return false end 
@@ -140,24 +134,4 @@ else
 	hook.Add( "CanProperty", "ARCPhone BlockProperties", function( ply, property, ent )
 		if ent.ARCPhone_MapEntity then return false end 
 	end )
-	hook.Add( "ARCLoad_OnPlayerLoaded", "ARCPhone PlyAuth", function( ply ) 
-		if IsValid(ply) && ply:IsPlayer() then
-			ARCLib.SendAddonLanguage("ARCPhone",ply)
-			ARCLib.SendAddonSettings("ARCPhone",ply) 
-		end
-	end)
 end
-
-
-hook.Add( "ARCLoad_OnUpdate", "ARCPhone Remuv",function(loaded)
-	if loaded != "ARCPhone" then return end
-	if SERVER then
-		for k,v in pairs(player.GetAll()) do 
-			ARCPhone.MsgCL(v,"Updating...") 
-		end
-		ARCPhone.SaveDisk()
-		ARCPhone.ClearAntennas()
-	else
-		ARCPhone.PhoneSys:AddMsgBox("Update","This phone will re-start for an update in 5 seconds and there's nothing you can do about it.","warning")
-	end
-end)

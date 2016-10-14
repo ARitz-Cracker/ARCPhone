@@ -446,39 +446,6 @@ function ARCPhone.Think()
 			trefr = trefr + 1
 		end
 end
-function ARCPhone.UpdateLang(lang)
---[[
-	local lanstr = file.Read(ARCPhone.Dir.."/languages/"..lang..".txt","DATA")
-	if lanstr && lanstr != "" then
-		local tab = util.JSONToTable(lanstr)
-		if tab then
-			ARCPHONE_ERRORSTRINGS = tab.errmsgs
-			ARCPhone.Msgs = tab.msgs
-			ARCPhone.SettingsDesc = tab.settingsdesc
-			--[[
-			local translations = {}
-			translations.errmsgs = ARCPHONE_ERRORSTRINGS
-			translations.msgs = ARCPhone.Msgs
-			translations.settingsdesc = ARCPhone.SettingsDesc
-			--]
-			ARCPhone.JSON_Lang = ARCLib.SplitString(lanstr,16384) -- Splitting the string every 16 kb just in case
-			for k,v in pairs(player.GetHumans()) do
-				net.Start("arcphone_comm_lang")
-				net.WriteInt(0,ARCPHONE_ERRORBITRATE)
-				v._ARCPhone_Lang_Place = 0
-				net.WriteUInt(0,32)
-				net.WriteUInt(#ARCPhone.JSON_Lang,32)
-				net.WriteString("")
-				net.Send(v)
-			end
-		else
-			ARCPhone.Msg("WARNING! The language file '"..tostring(lang).."' is not a valid JSON file!")
-		end
-	else
-		ARCPhone.Msg("WARNING! The language file '"..tostring(lang).."' wasn't found!")
-	end
-	--]]
-end
 function ARCPhone.Load()
 	ARCPhone.Loaded = false
 		if #player.GetAll() == 0 then
@@ -518,17 +485,7 @@ function ARCPhone.Load()
 		
 		
 		ARCLib.AddonLoadSettings("ARCPhone",backward)
-		--[[
-		if !file.IsDir( ARCPhone.Dir.."/languages","DATA" ) then
-			ARCPhone.Msg("Created Folder: "..ARCPhone.Dir.."/languages")
-			file.CreateDir(ARCPhone.Dir.."/languages")
-		end	
-		file.Write(ARCPhone.Dir.."/languages/en.txt", file.Read( "arcphone/data/languages/en.lua", "LUA" ) )
-		--end
-		ARCPhone.UpdateLang(ARCPhone.Settings["language"])
-		]]
-		
-		--MORE FOLDER CREATIONS HERE
+		--TODO: Language support
 		
 		
 		ARCPhone.LogFile = os.date(ARCPhone.Dir.."/systemlog - %d %b %Y - "..tostring(os.date("%H")*60+os.date("%M"))..".log.txt")
