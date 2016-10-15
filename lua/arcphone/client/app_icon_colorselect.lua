@@ -14,7 +14,7 @@ polytab2[2] = {}
 polytab2[3] = {}
 function coltile:drawfunc(xpos,ypos)
 	local x,y,w,h
-	draw.SimpleText( self.title, "ARCPhoneSmall", xpos+1, ypos+ 1, self.txtcol,TEXT_ALIGN_LEFT , TEXT_ALIGN_BOTTOM )
+	draw.SimpleText( self.title, "ARCPhoneSmall", xpos+1, ypos+ 1, self.txtcol,TEXT_ALIGN_LEFT , TEXT_ALIGN_TOP )
 	for i=1,4 do
 		h = self.h - 14
 		w = self.w/4

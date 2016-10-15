@@ -17,7 +17,7 @@ APP.CameraOn = false
 APP.CameraStage = 0
 function APP:PhoneStart()
 	self.CameraStage = 0
-	self.Mat = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/camera/phone_0.dat","png")
+	self.Mat = Material("../data/" .. ARCPhone.ROOTDIR .. "/camera/phone_0.png") 
 	self.Tiles[1] = ARCPhone.NewAppTile(self)
 	self.Tiles[1].x = 8
 	self.Tiles[1].y = 32
@@ -80,7 +80,7 @@ function APP:ForegroundThink()
 		self.CameraStage = 0 -- TODO: Replace with transition animation
 	
 	elseif self.CameraStage == 2 then
-		file.Write(ARCPhone.ROOTDIR.."/photos/camera/"..self.PicFileName..".thumb.dat", render.Capture {
+		file.Write(ARCPhone.ROOTDIR.."/photos/camera/"..self.PicFileName..".thumb.jpg", render.Capture {
 			x = self.FoneXPos - 129,
 			y = self.ScreenYPos+1,
 			h = 128,
@@ -91,7 +91,7 @@ function APP:ForegroundThink()
 		self.CameraStage = 0
 		self.ThumbMat = nil
 	elseif self.CameraStage == 1 then
-		file.Write(ARCPhone.ROOTDIR.."/photos/camera/"..self.PicFileName..".photo.dat", render.Capture {
+		file.Write(ARCPhone.ROOTDIR.."/photos/camera/"..self.PicFileName..".photo.jpg", render.Capture {
 			x = self.ScreenXPos+1,
 			y = self.ScreenYPos+1,
 			h = self.ScreenHight-2,
@@ -100,7 +100,7 @@ function APP:ForegroundThink()
 			format = "jpeg"
 			
 		})
-		self.ThumbMat = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/photos/camera/"..self.PicFileName..".photo.dat","jpg")
+		self.ThumbMat = Material("../data/"..ARCPhone.ROOTDIR.."/photos/camera/"..self.PicFileName..".photo.jpg")
 		self.CameraStage = self.CameraStage + 1
 	end
 end
@@ -143,9 +143,9 @@ function APP:DrawHUD()
 		
 		surface.SetMaterial(self.Mat)
 		surface.DrawTexturedRect(self.FoneXPos,self.FoneYPos,self.FoneWidth,self.FoneHight)
-		draw.SimpleText("ENTER = Take Photo" , "ARCPhoneHudText", self.ScreenXPos + self.FoneWidth,self.ScreenYPos, color_white, TEXT_ALIGN_LEFT  , TEXT_ALIGN_TOP)
-		draw.SimpleText("BACKSPACE = Exit" , "ARCPhoneHudText", self.ScreenXPos + self.FoneWidth,self.ScreenYPos + 32, color_white, TEXT_ALIGN_LEFT  , TEXT_ALIGN_TOP)
-		draw.SimpleText("UP/DOWN = Zoom" , "ARCPhoneHudText", self.ScreenXPos + self.FoneWidth,self.ScreenYPos + 64, color_white, TEXT_ALIGN_LEFT  , TEXT_ALIGN_TOP)
+		draw.SimpleText("ENTER = Take Photo" , "ARCPhoneHudText", self.ScreenXPos + self.FoneWidth,self.ScreenYPos, color_white, TEXT_ALIGN_LEFT  , TEXT_ALIGN_BOTTOM)
+		draw.SimpleText("BACKSPACE = Exit" , "ARCPhoneHudText", self.ScreenXPos + self.FoneWidth,self.ScreenYPos + 32, color_white, TEXT_ALIGN_LEFT  , TEXT_ALIGN_BOTTOM)
+		draw.SimpleText("UP/DOWN = Zoom" , "ARCPhoneHudText", self.ScreenXPos + self.FoneWidth,self.ScreenYPos + 64, color_white, TEXT_ALIGN_LEFT  , TEXT_ALIGN_BOTTOM)
 		
 		
 		if self.ThumbMat then

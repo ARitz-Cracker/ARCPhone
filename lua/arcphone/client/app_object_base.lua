@@ -196,7 +196,7 @@ function ARCPHONE_APP:DrawTiles(mvx,mvy)
 				end
 				if v.text && string.len(v.text) > 0 then
 					if v.mat || v.tex then
-						draw.SimpleText( ARCLib.CutOutText(v.text,"ARCPhoneSmall",v.w-1), "ARCPhoneSmall", v.x + mvx +1, v.y + mvy + v.h -1, FuckingHell,TEXT_ALIGN_LEFT , TEXT_ALIGN_TOP ) 
+						draw.SimpleText( ARCLib.CutOutText(v.text,"ARCPhoneSmall",v.w-1), "ARCPhoneSmall", v.x + mvx +1, v.y + mvy + v.h -1, FuckingHell,TEXT_ALIGN_LEFT , TEXT_ALIGN_BOTTOM ) 
 					else
 						--MsgN("TXT:"..ARCLib.CutOutText(v.text,"ARCPhone",v.w-1))
 						draw.SimpleText(ARCLib.CutOutText(v.text,"ARCPhone",v.w-1), "ARCPhone", v.x + mvx+v.w*0.5, v.y + mvy+v.h*0.5, FuckingHell, TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 

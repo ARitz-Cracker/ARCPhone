@@ -7,7 +7,7 @@ function texttile:drawfunc(xpos,ypos)
 		txtcol = self.color
 	end
 	if self.SingleLine then
-		draw.SimpleText(ARCLib.CutOutTextReverse(self.TextInput,"ARCPhoneSmall",self.w - 2)  , "ARCPhoneSmall", xpos+1, ypos+1, txtcol,TEXT_ALIGN_LEFT , TEXT_ALIGN_BOTTOM )
+		draw.SimpleText(ARCLib.CutOutTextReverse(self.TextInput,"ARCPhoneSmall",self.w - 2)  , "ARCPhoneSmall", xpos+1, ypos+1, txtcol,TEXT_ALIGN_LEFT , TEXT_ALIGN_TOP )
 	else
 		self._imagedisplay = 0
 		self._nextimagedisplay = 1
@@ -20,7 +20,7 @@ function texttile:drawfunc(xpos,ypos)
 					self._imagedisplay = self._imagedisplay + 1
 					self._nextimagedisplay = self._nextimagedisplay + 1
 				else
-					draw.SimpleText( self._InputTable[i], "ARCPhoneSmall", xpos+1, ypos-11 + (i-self._imagedisplay)*12 + self._imagedisplay*(self.w - 2), txtcol,TEXT_ALIGN_LEFT , TEXT_ALIGN_BOTTOM )
+					draw.SimpleText( self._InputTable[i], "ARCPhoneSmall", xpos+1, ypos-11 + (i-self._imagedisplay)*12 + self._imagedisplay*(self.w - 2), txtcol,TEXT_ALIGN_LEFT , TEXT_ALIGN_TOP )
 				end
 			end
 		end
@@ -36,7 +36,7 @@ function texttile:UpdateText()
 		local imgnum = 0
 		while #matches > 0 do
 			imgnum = imgnum + 1;
-			self._images[imgnum] = ARCLib.MaterialFromTxt(matches[2],"jpg")
+			self._images[imgnum] = Material("../data/" .. matches[2])
 			displaytext = string.Replace(displaytext, matches[1], "\nIMG_"..imgnum.."\n")
 			matches = {string.gmatch(displaytext, "({{IMG:([^:]*):([^:]*):IMG}})")()}
 		end

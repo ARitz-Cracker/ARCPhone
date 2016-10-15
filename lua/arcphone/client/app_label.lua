@@ -13,7 +13,7 @@ function ARCPhone.NewAppLabel(app,x,y,w,h,tex,font,color,bgcolor,xAlign,yAlign)
 	bgcolor = ARCLib.ValidVariable(bgcolor,ARCLib.IsColor(bgcolor),color_white)
 	font = ARCLib.ValidVariable(font,isstring(font),"ARCPhone")
 	xAlign = ARCLib.ValidVariable(xAlign,isnumber(xAlign),TEXT_ALIGN_LEFT)
-	yAlign = ARCLib.ValidVariable(yAlign,isnumber(yAlign),TEXT_ALIGN_TOP)
+	yAlign = ARCLib.ValidVariable(yAlign,isnumber(yAlign),TEXT_ALIGN_BOTTOM)
 	assert(isstring(tex),"ARCPhone.NewAppTile: Bad argument #6 string expected, got "..type(tex))
 	assert(isnumber(h),"ARCPhone.NewAppTile: Bad argument #5 number expected, got "..type(h))
 	assert(isnumber(w),"ARCPhone.NewAppTile: Bad argument #4 number expected, got "..type(w))
@@ -39,9 +39,9 @@ function ARCPhone.NewAppLabel(app,x,y,w,h,tex,font,color,bgcolor,xAlign,yAlign)
 		end
 		for i=1,len do
 			tab.Texts[i] = {tex,font,x,0,tab.color,xAlign,yAlign}
-			if yAlign == TEXT_ALIGN_TOP then
+			if yAlign == TEXT_ALIGN_BOTTOM then
 				tab.Texts[i][4] = (i-1)*th
-			elseif yAlign == TEXT_ALIGN_BOTTOM then
+			elseif yAlign == TEXT_ALIGN_TOP then
 				tab.Texts[i][4] = y - (i-1)*th
 			elseif yAlign == TEXT_ALIGN_CENTER then
 				tab.Texts[i][4] = y - th/2 + (i-1)*th
@@ -56,9 +56,9 @@ function ARCPhone.NewAppLabel(app,x,y,w,h,tex,font,color,bgcolor,xAlign,yAlign)
 	elseif xAlign == TEXT_ALIGN_CENTER then
 		tab.x = x - tab.w/2
 	end
-	if yAlign == TEXT_ALIGN_TOP then
+	if yAlign == TEXT_ALIGN_BOTTOM then
 		tab.y = y
-	elseif yAlign == TEXT_ALIGN_BOTTOM then
+	elseif yAlign == TEXT_ALIGN_TOP then
 		tab.y = y - tab.h
 	elseif yAlign == TEXT_ALIGN_CENTER then
 		tab.y = y - tab.h/2

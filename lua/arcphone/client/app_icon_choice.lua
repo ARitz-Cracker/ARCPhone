@@ -40,14 +40,14 @@ function choicetile:drawfunc2(xpos,ypos)
 
 		for i = 1,#self.ChoiceKeys do
 			if self.SelectedChoice != i then
-				draw.SimpleText( ARCLib.CutOutText(self.ChoiceKeys[i],"ARCPhone",self.w-4), "ARCPhone", xpos + 2, textypos[i], Color(255,255,255,255), TEXT_ALIGN_LEFT , TEXT_ALIGN_BOTTOM  )
+				draw.SimpleText( ARCLib.CutOutText(self.ChoiceKeys[i],"ARCPhone",self.w-4), "ARCPhone", xpos + 2, textypos[i], Color(255,255,255,255), TEXT_ALIGN_LEFT , TEXT_ALIGN_TOP  )
 			end
 			
 		end
 		--local textypos = ( ystartpos + ((self.SelectedChoice-1)*14) ) * multiplier + (ypos+(self.h/2 - 6))*multiplierrev
 		surface.SetDrawColor(ARCLib.ConvertColor(self.App.Phone.Settings.Personalization.CL_15_ContextMenuSelect))
 		surface.DrawRect( xpos, ( ystartpos + ((self.SelectedChoice-1)*16) ) * self.multiplier + (ypos)*multiplierrev, self.w, 16*self.multiplier + self.h*multiplierrev)
-		draw.SimpleText( ARCLib.CutOutText(self.ChoiceKeys[self.SelectedChoice],"ARCPhone",self.w-2), "ARCPhone", xpos + 2, textypos[self.SelectedChoice], Color(255,255,255,255), TEXT_ALIGN_LEFT , TEXT_ALIGN_BOTTOM  )
+		draw.SimpleText( ARCLib.CutOutText(self.ChoiceKeys[self.SelectedChoice],"ARCPhone",self.w-2), "ARCPhone", xpos + 2, textypos[self.SelectedChoice], Color(255,255,255,255), TEXT_ALIGN_LEFT , TEXT_ALIGN_TOP  )
 		
 		surface.SetDrawColor(ARCLib.ConvertColor(self.App.Phone.Settings.Personalization.CL_16_ContextMenuBorder))
 		surface.DrawOutlinedRect( xpos, textypos[1], self.w, textypos[#textypos] - textypos[1] + 16  )

@@ -255,7 +255,7 @@ self.OptionAnimEndTime = 1]]
 						surface.SetDrawColor(ARCLib.ConvertColor(self.Settings.Personalization.CL_15_ContextMenuSelect))
 						surface.DrawRect( 0, self.ScreenResY - ((i)*14)*multiplier, self.ScreenResX, 14 )
 					end
-					draw.SimpleText(self.Options[i].text, "ARCPhoneSmall", 2, self.ScreenResY - (i*14)*multiplier, Color(255,255,255,255), TEXT_ALIGN_LEFT , TEXT_ALIGN_BOTTOM  )
+					draw.SimpleText(self.Options[i].text, "ARCPhoneSmall", 2, self.ScreenResY - (i*14)*multiplier, Color(255,255,255,255), TEXT_ALIGN_LEFT , TEXT_ALIGN_TOP  )
 				end
 				surface.SetDrawColor(ARCLib.ConvertColor(self.Settings.Personalization.CL_16_ContextMenuBorder))
 				surface.DrawOutlinedRect( 0, self.ScreenResY - size*multiplier, self.ScreenResX, size )
@@ -294,27 +294,27 @@ self.OptionAnimEndTime = 1]]
 				end
 				surface.DrawTexturedRect( 4, 26, 16, 16 )
 
-				draw.SimpleText(ARCLib.CutOutText(self.MsgBoxs[maxmsgbox].Title,"ARCPhone",buttonwidth),"ARCPhone", 24, 27, self.Settings.Personalization.CL_21_PopupBoxText, TEXT_ALIGN_LEFT , TEXT_ALIGN_BOTTOM  )
+				draw.SimpleText(ARCLib.CutOutText(self.MsgBoxs[maxmsgbox].Title,"ARCPhone",buttonwidth),"ARCPhone", 24, 27, self.Settings.Personalization.CL_21_PopupBoxText, TEXT_ALIGN_LEFT , TEXT_ALIGN_TOP  )
 				for i = 1,#txttab do
-					draw.SimpleText(txttab[i],"ARCPhoneSmall", 4, 34+(i*12), self.Settings.Personalization.CL_21_PopupBoxText, TEXT_ALIGN_LEFT , TEXT_ALIGN_BOTTOM  )
+					draw.SimpleText(txttab[i],"ARCPhoneSmall", 4, 34+(i*12), self.Settings.Personalization.CL_21_PopupBoxText, TEXT_ALIGN_LEFT , TEXT_ALIGN_TOP  )
 				end
 				surface.SetDrawColor( self.Settings.Personalization.CL_22_PopupAccept )
 				surface.DrawRect( 4, 46 + 4 + 12*#txttab, buttonwidth, 20)
 
 				if typ == 1 || typ == 3 then -- Case statements would work really nice here :/
-					draw.SimpleText("OK","ARCPhone", self.HalfScreenResX, 46 + 6 + 12*#txttab, self.Settings.Personalization.CL_23_PopupAcceptText, TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+					draw.SimpleText("OK","ARCPhone", self.HalfScreenResX, 46 + 6 + 12*#txttab, self.Settings.Personalization.CL_23_PopupAcceptText, TEXT_ALIGN_CENTER , TEXT_ALIGN_TOP  )
 				end
 				if typ == 2 || typ == 6 then
-					draw.SimpleText("Yes","ARCPhone", self.HalfScreenResX, 46 + 6 + 12*#txttab, self.Settings.Personalization.CL_23_PopupAcceptText, TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+					draw.SimpleText("Yes","ARCPhone", self.HalfScreenResX, 46 + 6 + 12*#txttab, self.Settings.Personalization.CL_23_PopupAcceptText, TEXT_ALIGN_CENTER , TEXT_ALIGN_TOP  )
 				end
 				if typ == 4 || typ == 7 then
-					draw.SimpleText("Retry","ARCPhone", self.HalfScreenResX, 46 + 6 + 12*#txttab, self.Settings.Personalization.CL_23_PopupAcceptText, TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+					draw.SimpleText("Retry","ARCPhone", self.HalfScreenResX, 46 + 6 + 12*#txttab, self.Settings.Personalization.CL_23_PopupAcceptText, TEXT_ALIGN_CENTER , TEXT_ALIGN_TOP  )
 				end
 				if typ == 5 then
-					draw.SimpleText("Reply","ARCPhone", self.HalfScreenResX, 46 + 6 + 12*#txttab, self.Settings.Personalization.CL_23_PopupAcceptText, TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+					draw.SimpleText("Reply","ARCPhone", self.HalfScreenResX, 46 + 6 + 12*#txttab, self.Settings.Personalization.CL_23_PopupAcceptText, TEXT_ALIGN_CENTER , TEXT_ALIGN_TOP  )
 				end
 				if typ == 8 then
-					draw.SimpleText("Answer","ARCPhone", self.HalfScreenResX, 46 + 6 + 12*#txttab, self.Settings.Personalization.CL_23_PopupAcceptText, TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+					draw.SimpleText("Answer","ARCPhone", self.HalfScreenResX, 46 + 6 + 12*#txttab, self.Settings.Personalization.CL_23_PopupAcceptText, TEXT_ALIGN_CENTER , TEXT_ALIGN_TOP  )
 				end
 				if self.MsgBoxOption == 1 then
 					surface.SetDrawColor(ARCPhone.PhoneSys.Settings.Personalization.CL_00_CursorColour)
@@ -325,19 +325,19 @@ self.OptionAnimEndTime = 1]]
 					surface.SetDrawColor(self.Settings.Personalization.CL_24_PopupDeny)
 					surface.DrawRect( 4, 46 + 24 + 12*#txttab, buttonwidth, 20)
 					if typ == 2 || typ == 6 then -- Case statements would work really nice here :/
-						draw.SimpleText("No","ARCPhone",self.HalfScreenResX,46 + 26 + 12*#txttab, self.Settings.Personalization.CL_25_PopupDenyText, TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+						draw.SimpleText("No","ARCPhone",self.HalfScreenResX,46 + 26 + 12*#txttab, self.Settings.Personalization.CL_25_PopupDenyText, TEXT_ALIGN_CENTER , TEXT_ALIGN_TOP  )
 					end
 					if typ == 3 then
-						draw.SimpleText("Cancel","ARCPhone",self.HalfScreenResX,46 + 26 + 12*#txttab, self.Settings.Personalization.CL_25_PopupDenyText, TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+						draw.SimpleText("Cancel","ARCPhone",self.HalfScreenResX,46 + 26 + 12*#txttab, self.Settings.Personalization.CL_25_PopupDenyText, TEXT_ALIGN_CENTER , TEXT_ALIGN_TOP  )
 					end
 					if typ == 4 || typ == 7 then
-						draw.SimpleText("Abort","ARCPhone",self.HalfScreenResX,46 + 26 + 12*#txttab, self.Settings.Personalization.CL_25_PopupDenyText, TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+						draw.SimpleText("Abort","ARCPhone",self.HalfScreenResX,46 + 26 + 12*#txttab, self.Settings.Personalization.CL_25_PopupDenyText, TEXT_ALIGN_CENTER , TEXT_ALIGN_TOP  )
 					end
 					if typ == 5 then
-						draw.SimpleText("Close","ARCPhone",self.HalfScreenResX,46 + 26 + 12*#txttab, self.Settings.Personalization.CL_25_PopupDenyText, TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+						draw.SimpleText("Close","ARCPhone",self.HalfScreenResX,46 + 26 + 12*#txttab, self.Settings.Personalization.CL_25_PopupDenyText, TEXT_ALIGN_CENTER , TEXT_ALIGN_TOP  )
 					end
 					if typ == 8 then
-						draw.SimpleText("Ignore","ARCPhone",self.HalfScreenResX,46 + 26 + 12*#txttab, self.Settings.Personalization.CL_25_PopupDenyText, TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+						draw.SimpleText("Ignore","ARCPhone",self.HalfScreenResX,46 + 26 + 12*#txttab, self.Settings.Personalization.CL_25_PopupDenyText, TEXT_ALIGN_CENTER , TEXT_ALIGN_TOP  )
 					end
 					if self.MsgBoxOption == 2 then
 						surface.SetDrawColor(ARCPhone.PhoneSys.Settings.Personalization.CL_00_CursorColour)
@@ -348,13 +348,13 @@ self.OptionAnimEndTime = 1]]
 					surface.SetDrawColor(self.Settings.Personalization.CL_26_PopupDefer)
 					surface.DrawRect( 4, 46 + 44 + 12*#txttab, buttonwidth, 20)
 					if typ == 6 then -- Case statements would work really nice here :/
-						draw.SimpleText("Cancel","ARCPhone", self.HalfScreenResX,  46 + 46 + 12*#txttab, self.Settings.Personalization.CL_27_PopupDeferText, TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+						draw.SimpleText("Cancel","ARCPhone", self.HalfScreenResX,  46 + 46 + 12*#txttab, self.Settings.Personalization.CL_27_PopupDeferText, TEXT_ALIGN_CENTER , TEXT_ALIGN_TOP  )
 					end
 					if typ == 7 then
-						draw.SimpleText("Ignore","ARCPhone", self.HalfScreenResX,  46 + 46 + 12*#txttab, self.Settings.Personalization.CL_27_PopupDeferText, TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+						draw.SimpleText("Ignore","ARCPhone", self.HalfScreenResX,  46 + 46 + 12*#txttab, self.Settings.Personalization.CL_27_PopupDeferText, TEXT_ALIGN_CENTER , TEXT_ALIGN_TOP  )
 					end
 					if typ == 8 then
-						draw.SimpleText("Text Excuse","ARCPhone", self.HalfScreenResX,  46 + 46 + 12*#txttab, self.Settings.Personalization.CL_27_PopupDeferText, TEXT_ALIGN_CENTER , TEXT_ALIGN_BOTTOM  )
+						draw.SimpleText("Text Excuse","ARCPhone", self.HalfScreenResX,  46 + 46 + 12*#txttab, self.Settings.Personalization.CL_27_PopupDeferText, TEXT_ALIGN_CENTER , TEXT_ALIGN_TOP  )
 					end
 					if self.MsgBoxOption == 3 then
 						surface.SetDrawColor(ARCPhone.PhoneSys.Settings.Personalization.CL_00_CursorColour)
@@ -559,12 +559,12 @@ end
 		local matches = {string.gmatch(message, "({{IMGDATA:([^:]*):([^:]*):IMGDATA}})")()} --WHY DOES string.gmatch RETURN A FUNCTION INSTEAD OF A TABLE? WHY DO I HAVE TO CALL THAT FUNCTION TO MAKE A TABLE MYSELF?!
 		local i = 1
 		while #matches > 0 do
-			local imgname = ARCPhone.ROOTDIR.."/photos/texts/"..number.."_"..i..".photo.dat"
+			local imgname = ARCPhone.ROOTDIR.."/photos/texts/"..number.."_"..i..".photo.jpg"
 			while file.Exists(imgname,"DATA") do
 				i = i + 1
-				imgname = ARCPhone.ROOTDIR.."/photos/texts/"..number.."_"..i..".photo.dat"
+				imgname = ARCPhone.ROOTDIR.."/photos/texts/"..number.."_"..i..".photo.jpg"
 			end
-			local thumbname = ARCPhone.ROOTDIR.."/photos/texts/"..number.."_"..i..".thumb.dat"
+			local thumbname = ARCPhone.ROOTDIR.."/photos/texts/"..number.."_"..i..".thumb.jpg"
 			file.Write(thumbname,util.Base64Decode(matches[2]))
 			file.Write(imgname,util.Base64Decode(matches[3]))
 			message = string.Replace(message, matches[1], "{{IMG:"..thumbname..":"..imgname..":IMG}}")

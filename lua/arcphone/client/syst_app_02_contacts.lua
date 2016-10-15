@@ -47,7 +47,7 @@ function APP:SelectContact(tileid)
 	self.Tiles[1].color = self.Phone.Settings.Personalization.CL_01_MainColour
 	self.Tiles[1].ContactEditable = true
 	if file.Exists(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[tileid][ARCPHONE_CONTACT_NUMBER]..".dat","DATA") then
-		self.ProfilePics[1] = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[tileid][ARCPHONE_CONTACT_NUMBER]..".dat","jpg");
+		self.ProfilePics[1] = Material("../data/" .. ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[tileid][ARCPHONE_CONTACT_NUMBER]..".jpg")
 	end
 	self.Tiles[1].drawfunc = function(tile,x,y)
 		surface.SetDrawColor(ARCLib.ConvertColor(self.Phone.Settings.Personalization.CL_03_MainText))
@@ -57,8 +57,8 @@ function APP:SelectContact(tileid)
 			surface.SetMaterial(tile.App.ProfilePics[0])
 		end
 		surface.DrawTexturedRect( x + 2, y + 2, 24, 24 )
-		draw.SimpleText(tile.App.Disk[tileid][ARCPHONE_CONTACT_NAME], "ARCPhone", x + 28, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_03_MainText, TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
-		draw.SimpleText(tile.App.Disk[tileid][ARCPHONE_CONTACT_NUMBER], "ARCPhone", x + 28, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_03_MainText, TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
+		draw.SimpleText(tile.App.Disk[tileid][ARCPHONE_CONTACT_NAME], "ARCPhone", x + 28, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_03_MainText, TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
+		draw.SimpleText(tile.App.Disk[tileid][ARCPHONE_CONTACT_NUMBER], "ARCPhone", x + 28, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_03_MainText, TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
 	end
 	
 	local len = #self.ContactOptionNames + 1
@@ -140,7 +140,7 @@ function APP:PhoneStart()
 	end
 	self.Options[2].args = {self}
 	self.ProfilePics = {}
-	self.ProfilePics[0] = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/contactphotos/0000000000.dat","jpg")
+	self.ProfilePics[0] = Material("../data/" .. ARCPhone.ROOTDIR .. "/contactphotos/0000000000.jpg")
 	local len = #self.Disk
 	for i=1,len do
 		if file.Exists(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[i][ARCPHONE_CONTACT_NUMBER]..".dat","DATA") then
@@ -154,7 +154,7 @@ function APP:Init()
 	
 	self.Tiles = {}
 	table.Empty(self.ProfilePics)
-	self.ProfilePics[0] = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/contactphotos/0000000000.dat","jpg")
+	self.ProfilePics[0] = Material("../data/" .. ARCPhone.ROOTDIR .. "/contactphotos/0000000000.jpg")
 	
 	
 
@@ -168,7 +168,7 @@ function APP:Init()
 		self.Tiles[i].color = self.Phone.Settings.Personalization.CL_01_MainColour
 		self.Tiles[i].ContactEditable = true
 		if file.Exists(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[i][ARCPHONE_CONTACT_NUMBER]..".dat","DATA") then
-			self.ProfilePics[i] = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[i][ARCPHONE_CONTACT_NUMBER]..".dat","jpg");
+			self.ProfilePics[i] = Material("../data/" .. ARCPhone.ROOTDIR .. "/contactphotos/"..self.Disk[i][ARCPHONE_CONTACT_NUMBER]..".jpg")
 		end
 		self.Tiles[i].drawfunc = function(tile,x,y)
 			surface.SetDrawColor(ARCLib.ConvertColor(self.Phone.Settings.Personalization.CL_03_MainText))
@@ -178,8 +178,8 @@ function APP:Init()
 				surface.SetMaterial(tile.App.ProfilePics[0])
 			end
 			surface.DrawTexturedRect( x + 2, y + 2, 24, 24 )
-			draw.SimpleText(tile.App.Disk[i][ARCPHONE_CONTACT_NAME], "ARCPhone", x + 28, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_03_MainText, TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
-			draw.SimpleText(tile.App.Disk[i][ARCPHONE_CONTACT_NUMBER], "ARCPhone", x + 28, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_03_MainText, TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
+			draw.SimpleText(tile.App.Disk[i][ARCPHONE_CONTACT_NAME], "ARCPhone", x + 28, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_03_MainText, TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
+			draw.SimpleText(tile.App.Disk[i][ARCPHONE_CONTACT_NUMBER], "ARCPhone", x + 28, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_03_MainText, TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
 		end
 		self.Tiles[i].OnPressed = function(tile)
 			tile.color = self.Phone.Settings.Personalization.CL_02_MainPressed

@@ -164,8 +164,8 @@ function APP:UpdateCallList()
 				surface.SetMaterial(ARCPhone.Apps["contacts"].ProfilePics[0])
 			end
 			surface.DrawTexturedRect( x + 2, y + 2, 24, 24 )
-			draw.SimpleText(ARCPhone.Apps["contacts"]:GetNameFromNumber(ARCPhone.PhoneSys.CurrentCall.on[i-1]), "ARCPhone", x + 28, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_03_MainText, TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
-			draw.SimpleText(ARCPhone.PhoneSys.CurrentCall.on[i-1], "ARCPhone", x + 28, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_03_MainText, TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
+			draw.SimpleText(ARCPhone.Apps["contacts"]:GetNameFromNumber(ARCPhone.PhoneSys.CurrentCall.on[i-1]), "ARCPhone", x + 28, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_03_MainText, TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
+			draw.SimpleText(ARCPhone.PhoneSys.CurrentCall.on[i-1], "ARCPhone", x + 28, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_03_MainText, TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
 		end
 		--[[
 		self.Tiles[i].OnPressed = function(app)
@@ -197,8 +197,8 @@ function APP:UpdateCallList()
 				surface.SetMaterial(ARCPhone.Apps["contacts"].ProfilePics[0])
 			end
 			surface.DrawTexturedRect( x + 2, y + 2, 24, 24 )
-			draw.SimpleText(ARCPhone.Apps["contacts"]:GetNameFromNumber(self.Phone.CurrentCall.pending[i-1-len]), "ARCPhone", x + 28, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_05_SecondaryText, TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
-			draw.SimpleText(self.Phone.CurrentCall.pending[i-1-len], "ARCPhone", x + 28, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_05_SecondaryText, TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
+			draw.SimpleText(ARCPhone.Apps["contacts"]:GetNameFromNumber(self.Phone.CurrentCall.pending[i-1-len]), "ARCPhone", x + 28, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_05_SecondaryText, TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
+			draw.SimpleText(self.Phone.CurrentCall.pending[i-1-len], "ARCPhone", x + 28, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_05_SecondaryText, TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
 		end
 		--[[
 		self.Tiles[i].OnPressed = function(app)

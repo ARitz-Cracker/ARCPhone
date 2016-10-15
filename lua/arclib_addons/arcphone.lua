@@ -67,6 +67,7 @@ ARCPHONE_MSGBOX_CALL = 8
 ARCPhone.Msg("Version: "..ARCPhone.Version)
 ARCPhone.Msg("Updated on: "..ARCPhone.Update)
 if SERVER then
+	resource.AddWorkshop( "404863548" )
 	function ARCPhone.MsgCL(ply,msg)
 		--net.Start( "ARCPhone_Msg" )
 		--net.WriteString( msg )

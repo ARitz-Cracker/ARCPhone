@@ -111,7 +111,7 @@ end
 
 function APP:ListPhotos(dir)
 	
-	local files, directories = file.Find( ARCPhone.ROOTDIR.."/photos/"..dir.."/*.photo.dat", "DATA" )
+	local files, directories = file.Find( ARCPhone.ROOTDIR.."/photos/"..dir.."/*.photo.jpg", "DATA" )
 	if #files == 0 then
 		self.Phone:AddMsgBox("Empty","There aren't any photos here!","warning")
 		return
@@ -139,12 +139,12 @@ function APP:ListPhotos(dir)
 			tile.color = Color(255,255,255,255)
 			tile.App:SelectPhoto(i)
 		end
-		local thumbimg = ARCPhone.ROOTDIR.."/photos/"..dir.."/"..string.sub( files[i], 1, #files[i]-10 )..".thumb.dat"
+		local thumbimg = "../data/" .. ARCPhone.ROOTDIR.."/photos/"..dir.."/"..string.sub( files[i], 1, #files[i]-10 )..".thumb.jpg"
 		if file.Exists(thumbimg,"DATA") then
-			self.Tiles[i].mat = ARCLib.MaterialFromTxt(thumbimg,"jpg")
+			self.Tiles[i].mat = Material(thumbimg)
 		else
 			MsgN("ARCPhone: Warning! "..thumbimg.." doesn't exist! This may cause FPS drop because reasons.")
-			self.Tiles[i].mat = ARCLib.MaterialFromTxt(ARCPhone.ROOTDIR.."/photos/"..dir.."/"..files[i],"jpg")
+			self.Tiles[i].mat = Material("../data/" .. ARCPhone.ROOTDIR .. "/photos/"..dir.."/"..files[i])
 		end
 	end
 	self.Photos = files
@@ -184,7 +184,7 @@ function APP:SelectPhoto(i)
 	assert(isnumber(i),"Bad photo selected! Wanted number got nil!")
 	assert(self.Photos[i],"Photos[i] is nil!")
 	if self.AttachFunc then
-		local thumbimg = ARCPhone.ROOTDIR.."/photos/"..self.CurrentDir.."/"..string.sub( self.Photos[i], 1, #self.Photos[i]-10 )..".thumb.dat"
+		local thumbimg = ARCPhone.ROOTDIR.."/photos/"..self.CurrentDir.."/"..string.sub( self.Photos[i], 1, #self.Photos[i]-10 )..".thumb.jpg"
 		if file.Exists(thumbimg,"DATA") then
 			self.AttachFunc(unpack(self.AttachFuncArgs),thumbimg,ARCPhone.ROOTDIR.."/photos/"..self.CurrentDir.."/"..self.Photos[i])
 		else
