@@ -139,9 +139,9 @@ function APP:ListPhotos(dir)
 			tile.color = Color(255,255,255,255)
 			tile.App:SelectPhoto(i)
 		end
-		local thumbimg = "../data/" .. ARCPhone.ROOTDIR.."/photos/"..dir.."/"..string.sub( files[i], 1, #files[i]-10 )..".thumb.jpg"
+		local thumbimg = ARCPhone.ROOTDIR.."/photos/"..dir.."/"..string.sub( files[i], 1, #files[i]-10 )..".thumb.jpg"
 		if file.Exists(thumbimg,"DATA") then
-			self.Tiles[i].mat = Material(thumbimg)
+			self.Tiles[i].mat = Material("../data/" .. thumbimg)
 		else
 			MsgN("ARCPhone: Warning! "..thumbimg.." doesn't exist! This may cause FPS drop because reasons.")
 			self.Tiles[i].mat = Material("../data/" .. ARCPhone.ROOTDIR .. "/photos/"..dir.."/"..files[i])

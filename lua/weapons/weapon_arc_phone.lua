@@ -70,7 +70,7 @@ function SWEP:Reload()
 		self:SendWeaponAnim(ACT_VM_THROW)
 		timer.Simple(0.9,function()
 			if self.Owner:GetActiveWeapon() == self then
-				self:SendWeaponAnim( ACT_VM_IDLE )
+				self:SendWeaponAnimTime( ACT_VM_IDLE , 0.2 )
 			end
 		end)
 		IsFull = false
@@ -97,7 +97,7 @@ end
 function SWEP:Deploy()
 	timer.Simple(1.5,function()
 		if self.Owner:GetActiveWeapon() == self then
-			self:SendWeaponAnimTime( ACT_VM_IDLE , 0.3 )
+			self:SendWeaponAnimTime( ACT_VM_IDLE , 0.2 )
 		end
 	end)
 	self:SendWeaponAnimTime( ACT_VM_DRAW )
