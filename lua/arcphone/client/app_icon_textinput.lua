@@ -3,11 +3,15 @@ local texttile = table.Copy(ARCPhone.TileBase)
 
 function texttile:drawfunc(xpos,ypos)
 	local txtcol = color_white
+	local displaytext = self.TextPlaceholder or ""
+	if self.TextInput != "" then
+		displaytext = self.TextInput
+	end
 	if (self.bgcolor) then
 		txtcol = self.color
 	end
 	if self.SingleLine then
-		draw.SimpleText(ARCLib.CutOutTextReverse(self.TextInput,"ARCPhoneSmall",self.w - 2)  , "ARCPhoneSmall", xpos+1, ypos+1, txtcol,TEXT_ALIGN_LEFT , TEXT_ALIGN_TOP )
+		draw.SimpleText(ARCLib.CutOutTextReverse(displaytext,"ARCPhoneSmall",self.w - 2)  , "ARCPhoneSmall", xpos+1, ypos+1, txtcol,TEXT_ALIGN_LEFT , TEXT_ALIGN_TOP )
 	else
 		self._imagedisplay = 0
 		self._nextimagedisplay = 1
@@ -27,11 +31,19 @@ function texttile:drawfunc(xpos,ypos)
 	end
 end
 texttile._images = {}
+function texttile:SetPlaceholder(text)
+	self.TextPlaceholder = text
+	self:UpdateText()
+end
 function texttile:UpdateText()
 	if self.SingleLine then return end
 	if self.CanResize then
 		table.Empty(self._images)
-		local displaytext = self.TextInput
+		local displaytext = self.TextPlaceholder
+		if self.TextInput != "" then
+			displaytext = self.TextInput
+		end
+		
 		local matches = {string.gmatch(displaytext, "({{IMG:([^:]*):([^:]*):IMG}})")()} --WHY DOES string.gmatch RETURN A FUNCTION INSTEAD OF A TABLE? WHY DO I HAVE TO CALL THAT FUNCTION TO MAKE A TABLE MYSELF?!
 		local imgnum = 0
 		while #matches > 0 do
@@ -70,6 +82,7 @@ function ARCPhone.NewAppTextInputTile(app,txt,resize,w)
 	tab.App = app
 	tab.w = w or 100
 	tab.CanResize = resize
+	tab.TextPlaceholder = ""
 	tab:SetText(txt or "")
 	return tab
 end

@@ -36,6 +36,11 @@ function ENT:OnTakeDamage(dmg)
 	end
 end
 ]]
+
+--function ENT:PhysicsUpdate( phys )
+--	MsgN(tostring(self).." is moving!")
+--end
+
 function ENT:Think()
 
 --[[

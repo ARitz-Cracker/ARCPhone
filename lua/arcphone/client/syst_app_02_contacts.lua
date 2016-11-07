@@ -4,6 +4,7 @@ APP.Name = "Contacts"
 APP.Author = "ARitz Cracker"
 APP.Purpose = "Contacts app for ARCPhone"
 APP.FlatIconName = "people"
+APP.Number = "0000000001"
 
 APP.ContactOptionNames = {}
 APP.ContactOptionFuncs = {}
@@ -167,16 +168,17 @@ function APP:Init()
 		self.Tiles[i].h = 28
 		self.Tiles[i].color = self.Phone.Settings.Personalization.CL_01_MainColour
 		self.Tiles[i].ContactEditable = true
-		if file.Exists(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[i][ARCPHONE_CONTACT_NUMBER]..".dat","DATA") then
+		if file.Exists(ARCPhone.ROOTDIR.."/contactphotos/"..self.Disk[i][ARCPHONE_CONTACT_NUMBER]..".jpg","DATA") then
 			self.ProfilePics[i] = Material("../data/" .. ARCPhone.ROOTDIR .. "/contactphotos/"..self.Disk[i][ARCPHONE_CONTACT_NUMBER]..".jpg")
 		end
 		self.Tiles[i].drawfunc = function(tile,x,y)
-			surface.SetDrawColor(ARCLib.ConvertColor(self.Phone.Settings.Personalization.CL_03_MainText))
+			surface.SetDrawColor(255,255,255,255)
 			if (tile.App.ProfilePics[i]) then
 				surface.SetMaterial(tile.App.ProfilePics[i])
 			else
 				surface.SetMaterial(tile.App.ProfilePics[0])
 			end
+			surface.SetDrawColor(ARCLib.ConvertColor(self.Phone.Settings.Personalization.CL_03_MainText))
 			surface.DrawTexturedRect( x + 2, y + 2, 24, 24 )
 			draw.SimpleText(tile.App.Disk[i][ARCPHONE_CONTACT_NAME], "ARCPhone", x + 28, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_03_MainText, TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
 			draw.SimpleText(tile.App.Disk[i][ARCPHONE_CONTACT_NUMBER], "ARCPhone", x + 28, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_03_MainText, TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
@@ -223,11 +225,50 @@ function APP:Init()
 	end
 	self.Tiles[len].OnUnPressed = function(tile)
 		tile.color = self.Phone.Settings.Personalization.CL_03_SecondaryColour
-		tile.App.Phone:AddMsgBox("Coming soon!","This feature has not been implemented yet, it will be available in a later version of ARCPhone","info")
+		self.Phone:SetLoading(-1)
+		self:SendText("f")
+		--tile.App.Phone:AddMsgBox("Coming soon!","This feature has not been implemented yet, it will be available in a later version of ARCPhone","info")
 	end
 	
 end
 --APP:Init()
+function APP:OnText(timestamp,data)
+	self.Phone:SetLoading(-2)
+	local numbers = string.Explode(" ",data)
+	local len = #numbers
+	for i=1,len do
+		local number = numbers[i]
+		local name = ARCPhone.GetPlayerFromPhoneNumber(number):Nick()
+		
+	
+		self.Tiles[i] = ARCPhone.NewAppTile(self)
+		self.Tiles[i].x = 8
+		self.Tiles[i].y = 10 + i*32
+		self.Tiles[i].w = 122
+		self.Tiles[i].h = 28
+		self.Tiles[i].color = self.Phone.Settings.Personalization.CL_01_MainColour
+		self.Tiles[i].ContactEditable = true
+		self.Tiles[i].drawfunc = function(tile,x,y)
+			surface.SetDrawColor(255,255,255,255)
+			surface.SetMaterial(tile.App.ProfilePics[0])
+			surface.DrawTexturedRect( x + 2, y + 2, 24, 24 )
+			surface.SetDrawColor(ARCLib.ConvertColor(self.Phone.Settings.Personalization.CL_03_MainText))
+			draw.SimpleText(name, "ARCPhone", x + 28, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_03_MainText, TEXT_ALIGN_LEFT,TEXT_ALIGN_BOTTOM) 
+			draw.SimpleText(number, "ARCPhone", x + 28, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_03_MainText, TEXT_ALIGN_LEFT,TEXT_ALIGN_TOP) 
+		end
+		self.Tiles[i].OnPressed = function(tile)
+			tile.color = self.Phone.Settings.Personalization.CL_02_MainPressed
+		end
+		self.Tiles[i].OnUnPressed = function(tile)
+			tile.color = self.Phone.Settings.Personalization.CL_01_MainColour
+			local len = #tile.App.Disk + 1
+			tile.App.Disk[len] = {}
+			tile.App.Disk[len][ARCPHONE_CONTACT_NAME] = name
+			tile.App.Disk[len][ARCPHONE_CONTACT_NUMBER] = number
+			tile.App:SelectContact(len)
+		end
+	end
+end
 
 function APP:EditContact(tileid)
 	self:ResetCurPos()

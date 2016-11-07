@@ -17,7 +17,7 @@ function ENT:Initialize()
 	--self:SetCollisionGroup( COLLISION_GROUP_DEBRIS )
 	self.NoiseDelay = CurTime() + 1
 	self.OnSound = CreateSound(self,"ambient/machines/combine_terminal_loop1.wav")
-	self.OnSound:PlayEx(0.02,100)
+	self.OnSound:PlayEx(0.05,100)
 end
 function ENT:SpawnFunction( ply, tr )
  	if ( !tr.Hit ) then return end
@@ -50,9 +50,9 @@ function ENT:Think()
 	end
 	--]]
 	if self.NoiseDelay < CurTime() then
-		self:EmitSound("ambient/levels/prison/radio_random"..math.random(1,15)..".wav",40,math.random(50,125))
+		self:EmitSound("ambient/levels/prison/radio_random"..math.random(1,15)..".wav",60,math.random(50,125))
 		self.NoiseDelay = CurTime() + math.Rand(0,6.5)
-		self.OnSound:PlayEx(0.02,100)
+		self.OnSound:PlayEx(0.05,100)
 	end
 end
 

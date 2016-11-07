@@ -40,7 +40,7 @@ function ARCPhone.NewAppLabel(app,x,y,w,h,tex,font,color,bgcolor,xAlign,yAlign)
 		for i=1,len do
 			tab.Texts[i] = {tex,font,x,0,tab.color,xAlign,yAlign}
 			if yAlign == TEXT_ALIGN_BOTTOM then
-				tab.Texts[i][4] = (i-1)*th
+				tab.Texts[i][4] = y
 			elseif yAlign == TEXT_ALIGN_TOP then
 				tab.Texts[i][4] = y - (i-1)*th
 			elseif yAlign == TEXT_ALIGN_CENTER then

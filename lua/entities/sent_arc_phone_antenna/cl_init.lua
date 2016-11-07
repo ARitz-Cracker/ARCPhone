@@ -12,6 +12,17 @@ end
 function ENT:OnRestore()
 end
 
+hook.Add( "PostDrawTranslucentRenderables", "ARCPhone VisualizeReception", function(wut,skybox)
+	if skybox then return end
+	local ent = ents.FindByClass("sent_arc_phone_test")[1]
+	if IsValid(ent) then
+		for k,v in pairs(ents.FindByClass("sent_arc_phone_antenna")) do
+			render.DrawWireframeSphere( v:GetPos(), ARCPhone.Settings["antenna_range"], 32,32, Color(0,0,255,255), true ) 
+		
+		end
+	end
+end)
+
 --[[
 local curtab = {}
 net.Receive( "ARCDEVTESTPHONE", function(length)

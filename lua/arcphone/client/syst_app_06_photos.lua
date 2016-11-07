@@ -183,16 +183,18 @@ function APP:SelectPhoto(i)
 	assert(self.CurrentDir && #self.CurrentDir > 0,"Attempted to select photo when CurrentDir isn't set!")
 	assert(isnumber(i),"Bad photo selected! Wanted number got nil!")
 	assert(self.Photos[i],"Photos[i] is nil!")
+	local imgpath = ARCPhone.ROOTDIR.."/photos/"..self.CurrentDir.."/"..self.Photos[i]
 	if self.AttachFunc then
 		local thumbimg = ARCPhone.ROOTDIR.."/photos/"..self.CurrentDir.."/"..string.sub( self.Photos[i], 1, #self.Photos[i]-10 )..".thumb.jpg"
 		if file.Exists(thumbimg,"DATA") then
-			self.AttachFunc(unpack(self.AttachFuncArgs),thumbimg,ARCPhone.ROOTDIR.."/photos/"..self.CurrentDir.."/"..self.Photos[i])
+			self.AttachFunc(unpack(self.AttachFuncArgs),thumbimg,imgpath)
 		else
 			MsgN("ARCPhone: Warning! "..thumbimg.." doesn't exist! This may cause FPS drop because reasons.")
-			thumbimg = ARCPhone.ROOTDIR.."/photos/"..self.CurrentDir.."/"..self.Photos[i]
-			self.AttachFunc(unpack(self.AttachFuncArgs),thumbimg,thumbimg)
+			self.AttachFunc(unpack(self.AttachFuncArgs),imgpath,imgpath)
 		end
 		self.Phone:OpenApp(self.AttachFuncApp,true,false)
+	else
+	
 	end
 end
 

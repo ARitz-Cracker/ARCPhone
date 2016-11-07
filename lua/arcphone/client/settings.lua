@@ -4,10 +4,10 @@ ARCPhone.PhoneSys.SettingChoices = {}
 ARCPhone.PhoneSys.Settings.Ringtones = {}
 ARCPhone.PhoneSys.SettingChoices.Ringtones = {}
 ARCPhone.PhoneSys.Settings.Ringtones.PhoneCall = "http://www.aritzcracker.ca/arcphone/ringtones/generic1.mp3"
-ARCPhone.PhoneSys.SettingChoices.Ringtones.PhoneCall = {{"Default","http://www.aritzcracker.ca/arcphone/ringtones/generic1.mp3"},{"BANANA PHONE","http://www.lee.org/blog/wp-content/uploads/2008/03/raffi-bananaphone.mp3"}}
+ARCPhone.PhoneSys.SettingChoices.Ringtones.PhoneCall = {{"Default","http://www.aritzcracker.ca/arcphone/ringtones/generic1.mp3"},{"BANANA PHONE","http://www.lee.org/blog/wp-content/uploads/2008/03/raffi-bananaphone.mp3"},{"Swiggity Swag","http://www.aritzcracker.ca/texttospeech/3cacecb98e895f27b41e324c745b72a9.mp3"},{"POMF =3","http://www.aritzcracker.ca/texttospeech/63118d6268cbf68ef21cd4625db785b5.mp3"},{"LeaksRbad","https://austinhh.info/leaksrbad.mp3"},{"Dragonborn Comes","http://ndlee.com/thedragonborncomes.mp3"},{"BlueLeaks","http://www.underdone.org/leak/underdone/blue.mp3"}}
 ARCPhone.PhoneSys.Settings.Ringtones.TextMsg = "http://www.aritzcracker.ca/arcphone/notifications/162464__kastenfrosch__message.mp3"
 ARCPhone.PhoneSys.Settings.Ringtones.Popup = "http://www.aritzcracker.ca/arcphone/notifications/162464__kastenfrosch__message.mp3"
-ARCPhone.PhoneSys.Settings.Ringtones.Test = 1
+ARCPhone.PhoneSys.Settings.Ringtones.TestNumber = 1
 
 ARCPhone.PhoneSys.Settings.Personalization = {}
 ARCPhone.PhoneSys.SettingChoices.Personalization = {}

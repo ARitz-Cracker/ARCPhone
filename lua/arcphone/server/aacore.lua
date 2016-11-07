@@ -1,8 +1,8 @@
--- _core.lua - Base Resources and Virtual Netowrking
+-- aacore.lua - Base Resources and Virtual Netowrking
 
 -- This shit is under copyright, and is bound to the agreement stated in the ELUA.
 -- Any 3rd party content has been used as either public domain or with permission.
--- © Copyright 2014 Aritz Beobide-Cardinal All rights reserved.
+-- © Copyright 2014-2016 Aritz Beobide-Cardinal All rights reserved.
 
 ARCPhone.LogFileWritten = false
 ARCPhone.LogFile = ""
@@ -79,7 +79,7 @@ function ARCPhone.MakeCall(caller,reciever)
 	
 	
 	local phonecall = plycall:GetWeapon("weapon_arc_phone") 
-	if ARCPhone.EntGetReception(phonecall) < 13 then
+	if ARCPhone.GetReception(plycall) < 13 then
 		plycall.ARCPhone_Status = ARCPHONE_ERROR_NO_RECEPTION
 		return
 	end
@@ -123,7 +123,7 @@ function ARCPhone.MakeCall(caller,reciever)
 	local phonerec = plyrec:GetWeapon("weapon_arc_phone") 
 	-- 15
 
-	if ARCPhone.EntGetReception(phonerec) < 7 then
+	if ARCPhone.GetReception(plyrec) < 7 then
 		plycall.ARCPhone_Status = ARCPHONE_ERROR_UNREACHABLE
 		return 
 	end
@@ -160,90 +160,146 @@ function ARCPhone.TakeCosts()
 
 
 end
-function ARCPhone.GetReception(ply)
+function ARCPhone.GetReception(ply,routine)
 	if !ARCPhone.Loaded then return 0 end
 	if !IsValid(ply) || !ply:IsPlayer() then return 0 end
 	local phone = ply:GetWeapon("weapon_arc_phone")
-	if IsValid(phone) then
-		return ARCPhone.EntGetReception(phone)
+	if IsValid(phone) && phone.IsDahAwesomePhone then
+		if !ARCPhone.Settings["realistic_reception"] then return 100 end
+		return math.Round(ARCPhone.GetReceptionFromPos(phone:GetPos(),routine))
 	else
 		return 0
 	end
 end
-function ARCPhone.EntGetReception(phone)
+local receptionFilterFunc = function( ent ) if ( ent:GetClass() == "sent_arc_radio_blocker" ) then failsafe = 200 return true end end
+function ARCPhone.GetReceptionFromPos(beginpos,routine,debugtab)
 	if !ARCPhone.Loaded then return 0 end
-	if !IsValid(phone) || !phone.IsDahAwesomePhone then return 0 end
-	if !ARCPhone.Settings["realistic_reception"] then return 100 end
+	if debugtab then
+		debugtab.startLines = {}
+		debugtab.endLines = {}
+		debugtab.colour = {}
+		debugtab.len = 0
+		
+		debugtab.anttotal = {}
+		debugtab.antrange = {}
+		debugtab.antblock = {}
+		debugtab.antpos = {}
+		debugtab.antlen = 0
+	end
+	
 	local per = 0
 	for _,antenna in pairs(ents.FindByClass("sent_arc_phone_antenna")) do
 		
-		local beginpos = phone:GetPos()
 		local dis = beginpos:Distance(antenna:GetPos())
-		-- Target - Source
-		local ang = (beginpos - antenna:GetPos()):Angle()
-		local totaldistace = 0
-		local totalblock = 0
-		local failsafe = 0
-		while math.ceil(totaldistace) < math.floor(dis) && failsafe < 200 do
-			failsafe = failsafe + 1
-			local trace = util.TraceLine( {
-				start = antenna:GetPos() + ang:Forward()*(totaldistace+5),
-				endpos = antenna:GetPos() + ang:Forward()*(dis),
-				filter = function( ent ) if ( ent:GetClass() == "sent_arc_radio_blocker" ) then failsafe = 200 return true end end
-			} )
-			--trace.FractionLeftSolid = trace.FractionLeftSolid^2
-			if !util.IsInWorld(trace.HitPos) then
-				totalblock = totalblock + (dis-totaldistace)*trace.Fraction+1
-			else
-				totalblock = totalblock + (dis-totaldistace)*trace.FractionLeftSolid+1
-			end
-			totaldistace = totaldistace + (dis-totaldistace)*trace.Fraction+1
-		end
-		if failsafe == 200 then
-			totalblock = dis
-			totaldistace = dis
-		end
-
-		local mul = math.Clamp(((totalblock/ARCPhone.Settings["antenna_strength"]) - 1)*-1,0,1)^2
-		per = per + math.Clamp((-1*(3^((totaldistace-ARCPhone.Settings["antenna_range"])/500)) + 100)*mul,0,100)
-
-	end
-
-	
-	for _,jammer in pairs(ents.FindByClass("sent_arc_phone_jammer")) do
-		if jammer.Jamming then
-			local beginpos = phone:GetPos()
-			local dis = beginpos:Distance(jammer:GetPos())
+		
+		if dis < ARCPhone.Settings["antenna_range"] then
 			-- Target - Source
-			local ang = (beginpos - jammer:GetPos()):Angle()
+			local ang = (beginpos - antenna:GetPos()):Angle()
 			local totaldistace = 0
 			local totalblock = 0
 			local failsafe = 0
+			
+			local endpos = antenna:GetPos() + ang:Forward()*(dis)
 			while math.ceil(totaldistace) < math.floor(dis) && failsafe < 200 do
 				failsafe = failsafe + 1
+				local startpos = antenna:GetPos() + ang:Forward()*(totaldistace+5)
+				
 				local trace = util.TraceLine( {
-					start = jammer:GetPos() + ang:Forward()*(totaldistace+5),
-					endpos = jammer:GetPos() + ang:Forward()*(dis),
-					filter = function( ent ) if ( ent:GetClass() == "sent_arc_radio_blocker" ) then failsafe = 200 return true end end
+					start = startpos,
+					endpos = endpos,
+					filter = receptionFilterFunc
 				} )
 				--trace.FractionLeftSolid = trace.FractionLeftSolid^2
-				if !util.IsInWorld(trace.HitPos) then
-					totalblock = totalblock + (dis-totaldistace)*trace.Fraction+1
-				else
+
+				
+				if debugtab then
+					debugtab.len = debugtab.len + 1
+					debugtab.startLines[debugtab.len] = startpos
+					if util.IsInWorld(trace.HitPos) then
+						debugtab.colour[debugtab.len] = Color(255,0,0,255)
+						debugtab.endLines[debugtab.len] = startpos + ang:Forward()*(dis-totaldistace)*(trace.FractionLeftSolid)
+
+						debugtab.len = debugtab.len + 1
+						debugtab.startLines[debugtab.len] = debugtab.endLines[debugtab.len-1]
+						debugtab.endLines[debugtab.len] = trace.HitPos
+						debugtab.colour[debugtab.len] = Color(0,255,0,255)
+					else
+						debugtab.endLines[debugtab.len] = trace.HitPos
+						debugtab.colour[debugtab.len] = Color(255,255,0,255)
+					end
+				end
+				
+				if util.IsInWorld(trace.HitPos) then
 					totalblock = totalblock + (dis-totaldistace)*trace.FractionLeftSolid+1
+				else
+					totalblock = totalblock + (dis-totaldistace)*trace.Fraction+1
 				end
 				totaldistace = totaldistace + (dis-totaldistace)*trace.Fraction+1
+				
+				if routine then
+					coroutine.yield()
+				end
 			end
 			if failsafe == 200 then
 				totalblock = dis
 				totaldistace = dis
 			end
-
-			local mul = math.Clamp(((totalblock/ARCPhone.Settings["jammer_strength"]) - 1)*-1,0,1)^2
-			per = per - math.Clamp((-1*(3^((totaldistace-ARCPhone.Settings["jammer_range"])/500)) + 100)*mul,0,100)
+			local mul = math.Clamp(((totalblock/ARCPhone.Settings["antenna_strength"]) - 1)*-1,0,1)^2
+			local thisper = math.Clamp((ARCLib.BetweenNumberScaleReverse(0,totaldistace,ARCPhone.Settings["antenna_range"])^0.25)*100,0,100)
+			if debugtab then
+				debugtab.antlen = debugtab.antlen + 1
+				debugtab.antrange[debugtab.antlen] = thisper
+				debugtab.antblock[debugtab.antlen] = -mul*100+100
+				debugtab.anttotal[debugtab.antlen] = thisper*mul
+				debugtab.antpos[debugtab.antlen] = antenna:GetPos()
+				
+			end
+			per = per + thisper*mul
 		end
 	end
-	return math.Clamp(math.Round(per),0,100)
+
+	
+	for _,jammer in pairs(ents.FindByClass("sent_arc_phone_jammer")) do
+		if jammer.Jamming then
+			local dis = beginpos:Distance(jammer:GetPos())
+			if dis < ARCPhone.Settings["jammer_range"] then
+				-- Target - Source
+				local ang = (beginpos - jammer:GetPos()):Angle()
+				local totaldistace = 0
+				local totalblock = 0
+				local failsafe = 0
+				
+				local endpos = jammer:GetPos() + ang:Forward()*(dis)
+				while math.ceil(totaldistace) < math.floor(dis) && failsafe < 200 do
+					failsafe = failsafe + 1
+					local trace = util.TraceLine( {
+						start = jammer:GetPos() + ang:Forward()*(totaldistace+5),
+						endpos = endpos,
+						filter = function( ent ) if ( ent:GetClass() == "sent_arc_radio_blocker" ) then failsafe = 200 return true end end
+					} )
+					--trace.FractionLeftSolid = trace.FractionLeftSolid^2
+					if util.IsInWorld(trace.HitPos) then
+						totalblock = totalblock + (dis-totaldistace)*trace.FractionLeftSolid+1
+					else
+						totalblock = totalblock + (dis-totaldistace)*trace.Fraction+1
+					end
+					totaldistace = totaldistace + (dis-totaldistace)*trace.Fraction+1
+					if routine then
+						coroutine.yield()
+					end
+				end
+				if failsafe == 200 then
+					totalblock = dis
+					totaldistace = dis
+				end
+
+				local mul = math.Clamp(((totalblock/ARCPhone.Settings["jammer_strength"]) - 1)*-1,0,1)^2
+				per = per - math.Clamp((ARCLib.BetweenNumberScaleReverse(10,totaldistace,ARCPhone.Settings["jammer_range"])^0.25)*mul*100,0,100)
+			end
+		end
+	end
+	
+	return math.Clamp(per,0,100)
 end
 
 function ARCPhone.GetLineFromCaller(number)
@@ -306,7 +362,7 @@ function ARCPhone.AddToCall(caller,reciever)
 		local phonerec = plyrec:GetWeapon("weapon_arc_phone") 
 		-- 15
 
-		if ARCPhone.EntGetReception(phonerec) < 7 then
+		if ARCPhone.GetReception(plyrec) < 7 then
 			return 
 		end
 		if line == -1 then return end
@@ -321,130 +377,178 @@ end
 
 function ARCPhone.SendTextMsg(tonum,fromnum,msg)
 	MsgN("Sending text message from "..fromnum.." to "..tonum)
-	local hash = ARCLib.JamesHash(msg..CurTime())
-	if !ARCPhone.Disk.Texts[tonum] then
-		ARCPhone.Disk.Texts[tonum] = {}
-	end
-	ARCPhone.Disk.Texts[tonum][hash] = {}
-	ARCPhone.Disk.Texts[tonum][hash].msg = ARCLib.SplitString(util.Compress(fromnum.."\v"..os.time().."\v"..msg),16384)
-	ARCPhone.Disk.Texts[tonum][hash].number = fromnum
-	local ply = ARCPhone.GetPlayerFromPhoneNumber(tonum)
-	if ply.ARCPhone_Reception > 10 then
-		ARCPhone.Disk.Texts[tonum][hash].place = 0
-		net.Start("arcphone_comm_text")
-		net.WriteInt(0,8)
-		net.WriteUInt(0,32)
-		net.WriteUInt(#ARCPhone.Disk.Texts[tonum][hash].msg,32)
-		net.WriteString(hash) --Hash
-		net.WriteUInt(0,32)
-		net.Send(ply)
+	if string.sub( tonum, 1, 3 ) == "000" or string.sub( tonum, 1, 3 ) == "001" then
+		if istable(ARCPhone.TextApps[tonum]) then
+			ARCPhone.TextApps[tonum]:OnText(fromnum,msg)
+		else
+			ARCPhone.Msg("The number "..tonum.." isn't associated with any app.")
+		end
 	else
-		ARCPhone.Disk.Texts[tonum][hash].place = -1
+		local hash = ARCLib.JamesHash(msg..CurTime())
+		if !ARCPhone.Disk.Texts[tonum] then
+			ARCPhone.Disk.Texts[tonum] = {}
+		end
+		ARCPhone.Disk.Texts[tonum][hash] = {}
+		ARCPhone.Disk.Texts[tonum][hash].msg = ARCLib.SplitString(util.Compress(fromnum.."\v"..os.time().."\v"..msg),16384)
+		ARCPhone.Disk.Texts[tonum][hash].number = fromnum
+		local ply = ARCPhone.GetPlayerFromPhoneNumber(tonum)
+		if ply.ARCPhone_Reception > 10 then
+			ARCPhone.Disk.Texts[tonum][hash].place = 0
+			net.Start("arcphone_comm_text")
+			net.WriteInt(0,8)
+			net.WriteUInt(0,32)
+			net.WriteUInt(#ARCPhone.Disk.Texts[tonum][hash].msg,32)
+			net.WriteString(hash) --Hash
+			net.WriteUInt(0,32)
+			net.Send(ply)
+		else
+			ARCPhone.Disk.Texts[tonum][hash].place = -1
+		end
 	end
 end
 
-local refr = -15
-local trefr = -2
+local thinkThread
+
+hook.Add( "Think", "ARCPhone Think", function()
+	if ARCPhone.Loaded then
+		local done = false
+		if thinkThread == nil then
+			thinkThread = coroutine.create(ARCPhone.Think) 
+		else
+			local stime = SysTime()
+			local i = 0
+			while SysTime() - stime < 0.001 do
+				i = i + 1
+				if (coroutine.status(thinkThread) == "dead") then
+					thinkThread = nil -- NEXT TICK!
+					break
+				else
+					local succ,err = coroutine.resume(thinkThread)
+					if !succ then
+						for k,v in pairs(player.GetAll()) do
+							v.ARCPhone_Reception = 0
+							v.ARCPhone_Status = ARCPHONE_ERROR_NOT_LOADED
+							net.Start("arcphone_comm_status")
+							net.WriteInt(v.ARCPhone_Reception,8)
+							net.WriteInt(v.ARCPhone_Status,ARCPHONE_ERRORBITRATE)
+							net.WriteTable({on = {},pending = {}})
+							net.Send(v)
+						end
+						ARCPhone.Calls = {}
+						ARCPhone.Msg("CRITICAL ERROR: Think function has errored!\r\n"..err)
+						ARCLib.NotifyBroadcast("ARCPhone experienced a critical error! You must type \"arcphone reset\" in console to re-start it!",NOTIFY_ERROR,30,true)
+						ARCLib.NotifyBroadcast("Please look in garrysmod/data/"..ARCPhone.LogFile.." on the SERVER to see why the error occured.",NOTIFY_ERROR,30,false)
+						ARCPhone.Loaded = false
+						break
+					end
+				end
+			end
+		end
+	end
+end)
+
+local refreshReception = -1
+local refreshTexts = -1
+local calcReception = 0
 function ARCPhone.Think()
-	--MsgN("Update Status")
-	for k,v in pairs(player.GetAll()) do
-		--MsgN("Status of "..v:Nick())
-		if !v.ARCPhone_Status then
-			v.ARCPhone_Status = ARCPHONE_ERROR_CALL_ENDED
-		end
-		if !v.ARCPhone_Reception then
-			v.ARCPhone_Reception = 0
-		end
-		if refr > 3 then
-			v.ARCPhone_Reception = ARCPhone.GetReception(v)
-		end
-		local vnum = ARCPhone.GetPhoneNumber(v)
-		if trefr > 1 then
-			if v.ARCPhone_Reception > 10 then
-				if !ARCPhone.Disk.Texts[vnum] then
-					ARCPhone.Disk.Texts[vnum] = {}
+	if calcReception < SysTime() then
+		for k,v in pairs(player.GetAll()) do
+			--MsgN("Status of "..v:Nick())
+			if !v.ARCPhone_Status then
+				v.ARCPhone_Status = ARCPHONE_ERROR_CALL_ENDED
+			end
+			if !v.ARCPhone_Reception then
+				v.ARCPhone_Reception = 0
+			end
+			if refreshReception > 2 then
+				coroutine.yield()
+				v.ARCPhone_Reception = ARCPhone.GetReception(v,true)
+			end
+			local vnum = ARCPhone.GetPhoneNumber(v)
+			if refreshTexts > 1 then
+				if v.ARCPhone_Reception > 10 then
+					if !ARCPhone.Disk.Texts[vnum] then
+						ARCPhone.Disk.Texts[vnum] = {}
+					end
+					--PrintTable(ARCPhone.Disk.Texts[vnum])
+					for kk,vv in pairs(ARCPhone.Disk.Texts[vnum]) do
+						if vv.place == -1 then
+							vv.place = 0
+							-- Send dummy message
+							net.Start("arcphone_comm_text")
+							net.WriteInt(0,8)
+							net.WriteUInt(0,32)
+							net.WriteUInt(#vv.msg,32)
+							net.WriteString(kk) --Hash
+							net.WriteUInt(0,32)
+							net.Send(v)
+						end
+					end
 				end
-				--PrintTable(ARCPhone.Disk.Texts[vnum])
-				for kk,vv in pairs(ARCPhone.Disk.Texts[vnum]) do
-					if vv.place == -1 then
-						vv.place = 0
-						-- Send dummy message
-						net.Start("arcphone_comm_text")
-						net.WriteInt(0,8)
-						net.WriteUInt(0,32)
-						net.WriteUInt(#vv.msg,32)
-						net.WriteString(kk) --Hash
-						net.WriteUInt(0,32)
-						net.Send(v)
+			end
+			--MsgN("Texting Refresh done - "..v:Nick())
+			net.Start("arcphone_comm_status")
+			net.WriteInt(v.ARCPhone_Reception,8)
+			net.WriteInt(v.ARCPhone_Status,ARCPHONE_ERRORBITRATE)
+			local line = ARCPhone.GetLineFromCaller(vnum)
+			--MsgN("Got line - "..v:Nick())
+			if ARCPhone.Calls[line] then
+				--MsgN("Line IsValid - "..v:Nick())
+				local tab = {on = {},pending = {}}
+				for k,v in pairs(ARCPhone.Calls[line].on) do
+					table.insert(tab.on,v)
+				end
+				for k,v in pairs(ARCPhone.Calls[line].pending) do
+					table.insert(tab.pending,v)
+				end
+				net.WriteTable(tab)
+			else
+				net.WriteTable({on = {},pending = {}})
+			end
+			net.Send(v)
+			if v.ARCPhone_Status > 0 then
+				v.ARCPhone_Status = ARCPHONE_ERROR_CALL_ENDED
+			end
+		end
+		
+		--MsgN("Update calls")
+		for k,v in pairs(ARCPhone.Calls) do	
+			--MsgN("Line "..tostring(v))
+			for kk,vv in pairs(v.on) do
+				--MsgN("      ON: "..tostring(vv))
+				local ply = ARCPhone.GetPlayerFromPhoneNumber(vv)
+				coroutine.yield()
+				local rep = ARCPhone.GetReception(ply,true)
+				if rep < 40 then
+					local chance = math.random(0,rep)
+					if chance < 5 then
+						for kkk,vvv in pairs(v.on) do
+							ARCPhone.GetPlayerFromPhoneNumber(vvv):ConCommand("play ambient/levels/prison/radio_random"..math.random(1,15)..".wav")
+						end
+					end
+					if chance == 0 then
+						ply.ARCPhone_Status = ARCPHONE_ERROR_CALL_DROPPED
+						table.remove(v.on,kk)
+					end
+					if #v.on < 2 then
+						ARCPhone.DropAllFromCall(k) 
 					end
 				end
 			end
 		end
-		--MsgN("Texting Refresh done - "..v:Nick())
-		net.Start("arcphone_comm_status")
-		net.WriteInt(v.ARCPhone_Reception,8)
-		net.WriteInt(v.ARCPhone_Status,ARCPHONE_ERRORBITRATE)
-		local line = ARCPhone.GetLineFromCaller(vnum)
-		--MsgN("Got line - "..v:Nick())
-		if ARCPhone.Calls[line] then
-			--MsgN("Line IsValid - "..v:Nick())
-			local tab = {on = {},pending = {}}
-			for k,v in pairs(ARCPhone.Calls[line].on) do
-				table.insert(tab.on,v)
-			end
-			for k,v in pairs(ARCPhone.Calls[line].pending) do
-				table.insert(tab.pending,v)
-			end
-			net.WriteTable(tab)
+		if refreshReception > 2 then
+			refreshReception = 1
 		else
-			net.WriteTable({on = {},pending = {}})
+			refreshReception = refreshReception + 1
 		end
-		net.Send(v)
-		if v.ARCPhone_Status > 0 then
-			v.ARCPhone_Status = ARCPHONE_ERROR_CALL_ENDED
+		if refreshTexts > 1 then
+			refreshTexts = 1
+		else
+			refreshTexts = refreshTexts + 1
 		end
+		calcReception = calcReception + 1.337
 	end
-	
-	--MsgN("Update calls")
-	for k,v in pairs(ARCPhone.Calls) do	
-		--MsgN("Line "..tostring(v))
-		for kk,vv in pairs(v.on) do
-			--MsgN("      ON: "..tostring(vv))
-			local ply = ARCPhone.GetPlayerFromPhoneNumber(vv)
-			local rep = ARCPhone.GetReception(ply)
-			if rep < 40 then
-				local chance = math.random(0,rep)
-				if chance < 5 then
-					for kkk,vvv in pairs(v.on) do
-						ARCPhone.GetPlayerFromPhoneNumber(vvv):ConCommand("play ambient/levels/prison/radio_random"..math.random(1,15)..".wav")
-					end
-				end
-				if chance == 0 then
-					ply.ARCPhone_Status = ARCPHONE_ERROR_CALL_DROPPED
-					table.remove(v.on,kk)
-				end
-				if #v.on < 2 then
-					ARCPhone.DropAllFromCall(k) 
-				end
-			end
-		end
-		--[[
-		for kk,vv in pairs(v.pending) do
-			
-		end
-		]]
-	end
-	
-		if refr > 3 then
-			refr = 1
-		else
-			refr = refr + 1
-		end
-		if trefr > 1 then
-			trefr = 1
-		else
-			trefr = trefr + 1
-		end
+	--ARCPhone.VisualizeRepThink()
 end
 function ARCPhone.Load()
 	ARCPhone.Loaded = false
@@ -520,6 +624,7 @@ function ARCPhone.Load()
 			file.Write(ARCPhone.Dir.."/__data.txt", util.TableToJSON(ARCPhone.Disk) )
 			--ARCPhone.UpdateLang(ARCPhone.Settings["atm_language"])
 
+			--[[
 			if !ARCPhone.Settings["notify_update"] then return end
 			http.Fetch( "http://www.aritzcracker.ca/arcphoneversion.txt",
 				function( body, len, headers, code )
@@ -536,35 +641,11 @@ function ARCPhone.Load()
 					ARCPhone.Msg("FAILED TO CHECK FOR UPDATES! ("..err..") I'll check again later.")
 				end
 			)
-			
+			]]
 		end )
-		timer.Start( "ARCPHONE_SAVEDISK" ) 
-		if timer.Exists( "ARCPHONE_THINK" ) then
-			ARCPhone.Msg("Stopping current think timer...")
-			timer.Destroy( "ARCPHONE_THINK" )
-		end
-		timer.Create( "ARCPHONE_THINK", 1.337, 0, function()
-			succ, err = pcall(ARCPhone.Think)
-			if !succ then
-				for k,v in pairs(player.GetAll()) do
-					v.ARCPhone_Reception = 0
-					v.ARCPhone_Status = ARCPHONE_ERROR_NOT_LOADED
-					net.Start("arcphone_comm_status")
-					net.WriteInt(v.ARCPhone_Reception,8)
-					net.WriteInt(v.ARCPhone_Status,ARCPHONE_ERRORBITRATE)
-					net.WriteTable({on = {},pending = {}})
-					net.Send(v)
-				end
-				ARCPhone.Calls = {}
-				ARCPhone.Msg("CRITICAL ERROR: Think function has errored!\r\n"..err)
-				ARCLib.NotifyBroadcast("ARCPhone experienced a critical error! You must type \"arcphone reset\" in console to re-start it!",NOTIFY_ERROR,30,true)
-				ARCLib.NotifyBroadcast("Please look in garrysmod/data/"..ARCPhone.LogFile.." on the SERVER to see why the error occured.",NOTIFY_ERROR,30,true)
-				timer.Destroy( "ARCPHONE_THINK" ) 
-			end
-		end)
-		timer.Start( "ARCPHONE_THINK" ) 
 		ARCPhone.Msg("ARCPhone is ready!")
 		ARCPhone.Loaded = true
+		calcReception = SysTime()
 		ARCPhone.Busy = false
 	end)
 end

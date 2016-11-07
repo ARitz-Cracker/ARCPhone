@@ -60,7 +60,8 @@ function APP:OpenConvo(num)
 	end
 	len = len + 1
 	self.TextInputIcon = len
-	self.Tiles[len] = ARCPhone.NewAppTextInputTile(self,"Enter your message",true,118)
+	self.Tiles[len] = ARCPhone.NewAppTextInputTile(self,"",true,118)
+	self.Tiles[len]:SetPlaceholder("Enter your message")
 	if len > 1 then
 		self.Tiles[len].y = self.Tiles[len-1].y + self.Tiles[len-1].h + 4
 	else

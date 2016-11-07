@@ -5,7 +5,13 @@ AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 include('shared.lua')
 ENT.ARitzDDProtected = true
+util.AddNetworkString("arcphone_see_reception_line")
 function ENT:Initialize()
+	if #ents.FindByClass("sent_arc_phone_test") > 1 then
+		ARCLib.NotifyBroadcast("There can only be 1 phone tester because I am a lazy programmer",NOTIFY_ERROR,5,true)
+		self:Remove()
+		return
+	end
 	self:SetModel( "models/ap/phone/phone_model.mdl" )
 	self:PhysicsInit( SOLID_VPHYSICS )
 	self:SetMoveType( MOVETYPE_VPHYSICS )
@@ -22,6 +28,7 @@ function ENT:SpawnFunction( ply, tr )
 	local blarg = ents.Create ("sent_arc_phone_test")
 	blarg:SetPos(tr.HitPos + tr.HitNormal * 40)
 	blarg:Spawn()
+	blarg.SpawnerGuy = ply
 	blarg:Activate()
 	return blarg
 end
@@ -36,7 +43,17 @@ function ENT:OnTakeDamage(dmg)
 end
 ]]
 function ENT:Think()
-
+	if !IsValid(self.SpawnerGuy) then 
+		self:Remove()
+		return
+	end
+	local debugTab = {}
+	local rep = ARCPhone.GetReceptionFromPos(self:GetPos(),false,debugTab)
+	
+	net.Start("arcphone_see_reception_line")
+	net.WriteUInt(rep,8)
+	net.WriteTable(debugTab)
+	net.Send(self.SpawnerGuy)
 end
 
 function ENT:OnRemove()

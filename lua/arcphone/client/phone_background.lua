@@ -16,7 +16,7 @@ function ARCPhone.OnStatusChanged()
 	if newstatus == ARCPHONE_ERROR_DIALING then
 		if !CallingSound then
 			CallingSound = CreateSound( LocalPlayer(), "arcphone/ringback.wav" )
-			CallingSound:Play()
+			CallingSound:PlayEx(0.35,100)
 		end
 	else
 		
@@ -34,6 +34,7 @@ function ARCPhone.OnStatusChanged()
 			RingingSound = nil
 		end
 		--MsgN("NEW STATUS:"..newstatus)
+		
 		if newstatus > 0 then
 			LocalPlayer():EmitSound("arcphone/errors/"..newstatus..".wav")
 			ARCPhone.PhoneSys:AddMsgBox("ARCPhone",ARCPHONE_ERRORSTRINGS[newstatus],"warning")
@@ -41,8 +42,21 @@ function ARCPhone.OnStatusChanged()
 				ARCPhone.PhoneSys:OpenApp("dialer")
 			end
 		elseif newstatus != ARCPHONE_ERROR_RINGING && newstatus != ARCPHONE_NO_ERROR then
-			if ARCPhone.PhoneSys.OldStatus <= 0 then
+			if ARCPhone.PhoneSys.OldStatus <= 0 && ARCPhone.PhoneSys.OldStatus != ARCPHONE_ERROR_RINGING then
 				ARCPhone.PhoneSys:AddMsgBox("ARCPhone",ARCPHONE_ERRORSTRINGS[newstatus],"info")
+			end
+			if newstatus == ARCPHONE_ERROR_CALL_ENDED && istable(ARCPhone.PhoneSys.MsgBoxs) then
+				for i=1,#ARCPhone.PhoneSys.MsgBoxs do
+					if ARCPhone.PhoneSys.MsgBoxs[i].Title == "Incoming call" then
+						ARCPhone.PhoneSys.MsgBoxs[i].Title = "Missed call!"
+						ARCPhone.PhoneSys.MsgBoxs[i].Text = "You missed a call!"
+						ARCPhone.PhoneSys.MsgBoxs[i].Type = 1
+						ARCPhone.PhoneSys.MsgBoxs[i].GreenFunc = NULLFUNC
+						ARCPhone.PhoneSys.MsgBoxs[i].RedFunc = NULLFUNC
+						ARCPhone.PhoneSys.MsgBoxs[i].YellowFunc = NULLFUNC
+						break
+					end
+				end
 			end
 		end
 		
@@ -89,7 +103,7 @@ function ARCPhone.PhoneSys.PlayNotification(snd)
 				NotifSound = station
 				NotifSound:SetPos(LocalPlayer():GetPos() )
 				NotifSound:Play()
-				NotifSound:SetVolume(0.5)
+				NotifSound:SetVolume(0.25)
 			else
 				notification.AddLegacy("ARCPhone.PhoneSys.Ringtones."..snd.." failed. ("..tostring(errid)..") "..tostring(errstr),NOTIFY_ERROR,5) 
 				LocalPlayer():EmitSound("buttons/button8.wav" )

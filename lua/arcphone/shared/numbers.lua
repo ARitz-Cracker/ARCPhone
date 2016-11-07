@@ -16,8 +16,14 @@ function ARCPhone.GetPhoneNumber(ply)
 	return string.sub( steamid, #steamid-9)
 end
 function ARCPhone.GetPlayerFromPhoneNumber(number)
-	local ply = player.GetBySteamID64( "7656119"..number ) or NULL
+	local ply = {}
+	for _, v in pairs( player.GetHumans() ) do
+		if ARCPhone.GetPhoneNumber(v) == number then
+			ply = v
+		end
+	end
 	if !IsValid(ply) then
+		ply.ARCPhone_Reception = 0
 		function ply:SteamID() return "STEAM_ID_PENDING" end
 		function ply:Nick() return "[Player Offline]" end
 		function ply:IsPlayer() return false end

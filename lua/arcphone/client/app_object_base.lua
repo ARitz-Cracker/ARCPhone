@@ -262,10 +262,21 @@ function ARCPHONE_APP:SetCurPos(pos)
 	self.Tiles[pos]:OnSelected()
 end
 
+function ARCPHONE_APP:RegisterTextNumber()
+	assert(ARCPhone.IsValidPhoneNumber(self.Number),"ARCPHONE_APP.RegisterTextNumber: Bad argument #1: Invalid phone number")
+	assert(string.sub( self.Number, 1, 3 ) == "000","ARCPHONE_APP.RegisterTextNumber: Bad argument #1: Phone number must start with 000")
+	self.Phone.TextApps[self.Number] = self
+end
+function ARCPHONE_APP:SendText(data)
+	assert(ARCPhone.IsValidPhoneNumber(self.Number),"ARCPHONE_APP.SendText: This app isn't registered to text!")
+	ARCPhone.PhoneSys:SendText(self.Number,data)
+end
+
 ARCPHONE_APP.ShowTaskbar = true
 ARCPHONE_APP.ForegroundThink = NULLFUNC
 ARCPHONE_APP.BackgroundThink = NULLFUNC
 ARCPHONE_APP.Think = NULLFUNC
+ARCPHONE_APP.OnText = NULLFUNC -- (TIME,DATA)
 ARCPHONE_APP.OnBack = NULLFUNC
 ARCPHONE_APP.OnEnter = NULLFUNC
 ARCPHONE_APP.OnUp = NULLFUNC
@@ -476,6 +487,9 @@ function ARCPhone.RegisterApp(app,name)
 	assert( isstring(name), "ARCPhone.RegisterApp: Bad argument #2; All I wanted was a string, but I got some sort of "..type(name).." thing..." )
 	name = string.lower(string.gsub(name, "[^_%w]", "_"))
 	app.sysname = name
+	if isstring(app.Number) then
+		app:RegisterTextNumber()
+	end
 	ARCPhone.Apps[name] = app
 	MsgN(name.." registered!")
 end

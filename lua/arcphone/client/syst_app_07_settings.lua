@@ -30,8 +30,12 @@ function APP:SelectCategory(a)
 			self.Tiles[i].h = 20
 			self.Tiles[i].color = self.Phone.Settings.Personalization.CL_03_MainText
 			self.Tiles[i].bgcolor = self.Phone.Settings.Personalization.CL_01_MainColour
-			for i=1,#self.Phone.SettingChoices[a][k] do
-				self.Tiles[i]:AddChoice(self.Phone.SettingChoices[a][k][i][1],self.Phone.SettingChoices[a][k][i][2])
+			PrintTable(self.Phone.SettingChoices[a][k])
+			for ii=1,#self.Phone.SettingChoices[a][k] do
+				self.Tiles[i]:AddChoice(self.Phone.SettingChoices[a][k][ii][1],self.Phone.SettingChoices[a][k][ii][2])
+				if (v==self.Phone.SettingChoices[a][k][ii][2]) then
+					self.Tiles[i].SelectedChoice = ii
+				end
 			end
 			ypos = ypos + 22 + 5
 			self.Tiles[i].Setting = k

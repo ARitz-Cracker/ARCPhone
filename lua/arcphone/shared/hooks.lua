@@ -51,12 +51,24 @@ if CLIENT then
 			end
 		end
 	end)
-
+	
 	hook.Add( "StartChat", "ARCPhone OpenChat", function(t) 
 		ARCPhone.PhoneSys.PauseInput = true
+		timer.Simple(0.1,function()
+			ARCPhone.PhoneSys.PauseInput = true
+		end)
+		timer.Simple(0.2,function()
+			ARCPhone.PhoneSys.PauseInput = true
+		end)
+		timer.Simple(0.3,function()
+			ARCPhone.PhoneSys.PauseInput = true
+		end)
+		timer.Simple(0.4,function()
+			ARCPhone.PhoneSys.PauseInput = true
+		end)
 	end)
 	hook.Add( "FinishChat", "ARCPhone CloseChat", function(t) 
-		timer.Simple(0.1,function()
+		timer.Simple(0.5,function()
 			ARCPhone.PhoneSys.PauseInput = false
 		end)
 	end)
@@ -72,7 +84,7 @@ else
 		if butt == KEY_UP && !ply:GetActiveWeapon().IsDahAwesomePhone && IsValid(ply:GetWeapon( "weapon_arc_phone" )) then
 			local lastwep = ply:GetActiveWeapon():GetClass()
 			ply:GetActiveWeapon():SendWeaponAnim(ACT_VM_HOLSTER)
-			timer.Simple(0.25,function()
+			timer.Simple(0.1,function()
 				if !IsValid(ply) then return end
 				ply:SelectWeapon( "weapon_arc_phone" )
 					timer.Simple(0.1,function()
@@ -121,6 +133,7 @@ else
 		end
 		ARCPhone.SaveDisk()
 	end)
+	
 	
 	
 	hook.Add( "CanTool", "ARCPhone Tool", function( ply, tr, tool )

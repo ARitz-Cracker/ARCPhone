@@ -48,6 +48,7 @@ function ARCPhone.PhoneSys:SetLoading(percent)
 	self.Loading = tobool(percent > -2)
 
 end
+local pressedKeys = {}
 function ARCPhone.PhoneSys:Think(wep)
 	if !gui.IsGameUIVisible() && !self.PauseInput then
 		if self.TextInputTile then
@@ -55,20 +56,22 @@ function ARCPhone.PhoneSys:Think(wep)
 		end
 		if !self.Loading && !self.ShowConsole then
 			for k,v in pairs(self.ValidKeys) do
-				if (input.IsKeyDown(v) || input.WasKeyPressed(v)) && self.KeyDelay[v] <= CurTime() then -- The only reason why I merge IsKeyDown and WasKeyPressed is because of people with shitty computers
-					if self.KeyDelay[v] < CurTime() - 1 then
-						self:OnButtonDown(v)
-						self:OnButton(v)
-						self.KeyDelay[v] = CurTime() + 1
-					elseif self.KeyDelay[v] <= CurTime() then
-						self.KeyDelay[v] = CurTime() + 0.1
-						self:OnButton(v)
+				if (input.IsKeyDown(v) || input.WasKeyPressed(v)) then -- The only reason why I merge IsKeyDown and WasKeyPressed is because of people with shitty computers
+					if self.KeyDelay[v] <= CurTime() then
+						if self.KeyDelay[v] < CurTime() - 1 then
+							self:OnButtonDown(v)
+							self:OnButton(v)
+							self.KeyDelay[v] = CurTime() + 1
+						elseif self.KeyDelay[v] <= CurTime() then
+							self.KeyDelay[v] = CurTime() + 0.1
+							self:OnButton(v)
+						end
+						pressedKeys[v] = true
 					end
-
-				end
-				if input.WasKeyReleased(v) then
+				elseif pressedKeys[v] then
 					if self.KeyDelay[v] >= CurTime() - 1 then
 						self:OnButtonUp(v)
+						pressedKeys[v] = false
 						self.KeyDelay[v] = CurTime() - 2
 					end
 				end
@@ -140,7 +143,7 @@ function ARCPhone.PhoneSys:Init(wep)
 
 	self.MsgBoxs = {}
 	self.MsgBoxOption = 1
-
+	self.TextApps = {}
 	self.OptionAnimStartTime = 0
 	self.OptionAnimEndTime = 1
 
@@ -536,6 +539,7 @@ end
 	end
 
 	function ARCPhone.PhoneSys:SendText(number,message)
+		if message == "" then message = " " end
 		local fil = ARCPhone.ROOTDIR.."/messaging/"..number..".txt"
 		if file.Exists(fil,"DATA") then
 			file.Append(fil,"\fs\v"..os.time().."\v"..message)
@@ -570,29 +574,36 @@ end
 			message = string.Replace(message, matches[1], "{{IMG:"..thumbname..":"..imgname..":IMG}}")
 			matches = {string.gmatch(message, "({{IMGDATA:([^:]*):([^:]*):IMGDATA}})")()}
 		end
-		local fil = ARCPhone.ROOTDIR.."/messaging/"..number..".txt"
-		if file.Exists(fil,"DATA") then
-			file.Append(fil,"\fr\v"..timestamp.."\v"..message)
-		else
-			file.Write(fil,"r\v"..timestamp.."\v"..message)
-		end
-		
-		local app = self:GetActiveApp()
-		if app.sysname == "messaging" && app.OpenNumber == number then
-			app:OpenConvo(number)
-		else
-			local name = number
-			local contactapp = self:GetApp("contacts")
-			if contactapp then
-				name = contactapp:GetNameFromNumber(number)
+		if string.sub( number, 1, 3 ) == "000" then
+			if istable(self.Phone.TextApps[number]) then
+				self.Phone.TextApps[number]:OnText(timestamp,message)
+			else
+				self:AddMsgBox("ERROR","This phone recieved a text from "..number.." but there is no app associated with that number.")
 			end
-			self:AddMsgBox("New Message","New Message from "..name.." ("..number..")","comments",ARCPHONE_MSGBOX_REPLY,function()
-				app = self:OpenApp("messaging")
+		else
+			local fil = ARCPhone.ROOTDIR.."/messaging/"..number..".txt"
+			if file.Exists(fil,"DATA") then
+				file.Append(fil,"\fr\v"..timestamp.."\v"..message)
+			else
+				file.Write(fil,"r\v"..timestamp.."\v"..message)
+			end
+			
+			local app = self:GetActiveApp()
+			if app.sysname == "messaging" && app.OpenNumber == number then
 				app:OpenConvo(number)
-			end)
+			else
+				local name = number
+				local contactapp = self:GetApp("contacts")
+				if contactapp then
+					name = contactapp:GetNameFromNumber(number)
+				end
+				self:AddMsgBox("New Message","New Message from "..name.." ("..number..")","comments",ARCPHONE_MSGBOX_REPLY,function()
+					app = self:OpenApp("messaging")
+					app:OpenConvo(number)
+				end)
+			end
+			ARCPhone.PhoneSys.PlayNotification("TextMsg")
 		end
-		ARCPhone.PhoneSys.PlayNotification("TextMsg")
-		//file.Write(ARCPhone.ROOTDIR.."/messaging/"..number..".txt",util.TableToJSON(texts))
 	end
 	function ARCPhone.PhoneSys:Call(number)
 		if !ARCPhone.IsValidPhoneNumber(number) then
@@ -785,7 +796,7 @@ end
 				if (CurTime() < lastback) then
 					self:Lock()
 				end
-				lastback = CurTime() + 0.1
+				lastback = CurTime() + 0.25
 				app:OnBack()
 			elseif button == KEY_ENTER then
 				app:OnEnter()

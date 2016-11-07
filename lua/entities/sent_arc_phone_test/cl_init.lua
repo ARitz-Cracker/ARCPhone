@@ -11,7 +11,7 @@ end
 
 function ENT:OnRestore()
 end
-
+--[[
 hook.Add( "CalcView", "ARCPhone testview",function( ply, pos, angles, fov ) --Good
 	local ent = ents.FindByClass("sent_arc_phone_test")[1]
 	if IsValid(ent) then
@@ -24,27 +24,36 @@ hook.Add( "CalcView", "ARCPhone testview",function( ply, pos, angles, fov ) --Go
 		return view
 	end
 end)
+]]
 
---[[
 local curtab = {}
-net.Receive( "ARCDEVTESTPHONE", function(length)
+local rep = 0
+net.Receive( "arcphone_see_reception_line", function(length)
+	rep = net.ReadUInt(8)
 	curtab = net.ReadTable()
 end)
-hook.Add("HUDPaint", "ARCVisionHUD", function()
-	for k,v in pairs(curtab) do
-		local spos = v.StartPos:ToScreen()
-		local epos = v.HitPos:ToScreen()
-		draw.SimpleText("S", "default", spos.x,spos.y, Color(0,255,0,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_CENTER)
-		draw.SimpleText("E", "default", epos.x,epos.y, Color(255,0,0,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_CENTER)
-		if !v.IsInWorld then
-			surface.SetDrawColor(255,0,0,255)
-		elseif v.HitNoDraw then
-			surface.SetDrawColor(255,255,0,255)
-		else
-			surface.SetDrawColor(0,0,255,255)
+hook.Add("HUDPaint", "ARCPhone ReceptionLine", function()
+	local ent = ents.FindByClass("sent_arc_phone_test")[1]
+	if IsValid(ent) && curtab.len then
+		local reppos = ent:GetPos():ToScreen()
+		
+		for i=1,curtab.len do
+			local spos = curtab.startLines[i]:ToScreen()
+			local epos = curtab.endLines[i]:ToScreen()
+			--draw.SimpleText("S", "default", spos.x,spos.y, Color(0,255,0,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_CENTER)
+			--draw.SimpleText("E", "default", epos.x,epos.y, Color(255,0,0,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_CENTER)
+			surface.SetDrawColor(curtab.colour[i])
+			surface.DrawLine(spos.x,spos.y,epos.x,epos.y)
 		end
-		surface.DrawLine(spos.x,spos.y,epos.x,epos.y)
+		draw.SimpleText("Total reception: "..rep, "default", reppos.x,reppos.y, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_CENTER)
+		
+		
+		for i=1,curtab.antlen do
+			local apos = curtab.antpos[i]:ToScreen()
+			draw.SimpleText("Reception without walls: "..math.Round(curtab.antrange[i]), "default", apos.x,apos.y-12, color_white, TEXT_ALIGN_CENTER , TEXT_ALIGN_CENTER)
+			draw.SimpleText("Wall percentage: "..math.Round(curtab.antblock[i]), "default", apos.x,apos.y, color_white, TEXT_ALIGN_CENTER , TEXT_ALIGN_CENTER)
+			draw.SimpleText("Reception with walls: "..math.Round(curtab.anttotal[i]), "default", apos.x,apos.y+12, color_white, TEXT_ALIGN_CENTER , TEXT_ALIGN_CENTER)
+		end
 	end
 end)
-]]
 

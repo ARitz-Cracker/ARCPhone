@@ -6,20 +6,20 @@
 --Check if the thing is running
 
 util.AddNetworkString( "arcphone_switchwep" )
-	ARCPhone.Loaded = false
-	net.Receive( "arcphone_switchwep", function(length,ply)
-		local wep = net.ReadString()
-		if !wep then return end
-		if ply:GetActiveWeapon().IsDahAwesomePhone then
-			ply:GetActiveWeapon():SendWeaponAnim(ACT_VM_HOLSTER)
-			timer.Simple(1,function()
-				ply:SelectWeapon(wep)
-				--timer.Simple(0.001,function()
-					ply:GetActiveWeapon():SendWeaponAnim(ACT_VM_DRAW)
-				--end)
-			end)
-		end
-	end)
+ARCPhone.Loaded = false
+net.Receive( "arcphone_switchwep", function(length,ply)
+	local wep = net.ReadString()
+	if !wep then return end
+	if ply:GetActiveWeapon().IsDahAwesomePhone then
+		ply:GetActiveWeapon():SendWeaponAnim(ACT_VM_HOLSTER)
+		timer.Simple(1,function()
+			ply:SelectWeapon(wep)
+			--timer.Simple(0.001,function()
+				ply:GetActiveWeapon():SendWeaponAnim(ACT_VM_DRAW)
+			--end)
+		end)
+	end
+end)
 	
 util.AddNetworkString( "arcphone_comm_check" )
 
