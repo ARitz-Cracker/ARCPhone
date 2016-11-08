@@ -487,9 +487,6 @@ function ARCPhone.RegisterApp(app,name)
 	assert( isstring(name), "ARCPhone.RegisterApp: Bad argument #2; All I wanted was a string, but I got some sort of "..type(name).." thing..." )
 	name = string.lower(string.gsub(name, "[^_%w]", "_"))
 	app.sysname = name
-	if isstring(app.Number) then
-		app:RegisterTextNumber()
-	end
 	ARCPhone.Apps[name] = app
 	MsgN(name.." registered!")
 end

@@ -3,7 +3,8 @@ APP.Number = "0000000001" -- Boring, I know. I gues 0000000 to 0000099 is reserv
 
 
 
-function ARCPHONE_SERVERAPP:OnText(num,data)
+function APP:OnText(num,data)
+	MsgN("CONTACTS APP GOT TEXT FROM "..num)
 	if data == "f" then
 		local ply = ARCPhone.GetPlayerFromPhoneNumber(num)
 		if IsValid(ply) then
@@ -21,3 +22,4 @@ function ARCPHONE_SERVERAPP:OnText(num,data)
 		end
 	end
 end
+ARCPhone.RegisterServerApp(APP)

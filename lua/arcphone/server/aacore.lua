@@ -15,6 +15,7 @@ ARCPhone.Disk = {}
 ARCPhone.Disk.Texts = ARCPhone.Disk.Texts or {}
 ARCPhone.Disk.ProperShutdown = false
 ARCPhone.Calls = ARCPhone.Calls or {}
+ARCPhone.TextApps = ARCPhone.TextApps or {}
 function ARCPhone.FuckIdiotPlayer(ply,reason)
 	ARCPhone.Msg("ARCPHONE ANTI-CHEAT WARNING: Some stupid shit by the name of "..ply:Nick().." ("..ply:SteamID()..") tried to use an exploit: ["..tostring(reason).."]")
 	if ply.ARCPhone_AFuckingIdiot then
@@ -416,9 +417,7 @@ hook.Add( "Think", "ARCPhone Think", function()
 			thinkThread = coroutine.create(ARCPhone.Think) 
 		else
 			local stime = SysTime()
-			local i = 0
 			while SysTime() - stime < 0.001 do
-				i = i + 1
 				if (coroutine.status(thinkThread) == "dead") then
 					thinkThread = nil -- NEXT TICK!
 					break

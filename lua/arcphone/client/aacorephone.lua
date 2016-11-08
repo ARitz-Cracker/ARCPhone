@@ -11,7 +11,7 @@ ARCPhone.PhoneSys.HideWhatsOffTheScreen = true
 ARCPhone.PhoneSys.ValidKeys = {KEY_UP,KEY_DOWN,KEY_LEFT,KEY_RIGHT,KEY_ENTER,KEY_BACKSPACE,KEY_LCONTROL,KEY_RCONTROL}
 ARCPhone.PhoneSys.KeyDelay = {}
 ARCPhone.PhoneSys.OutgoingTexts = ARCPhone.PhoneSys.OutgoingTexts or {}
-
+ARCPhone.PhoneSys.TextApps = {}
 ARCPhone.PhoneSys.Booted = false
 
 ARCPhone.PhoneSys.Ent = NULL
@@ -143,7 +143,6 @@ function ARCPhone.PhoneSys:Init(wep)
 
 	self.MsgBoxs = {}
 	self.MsgBoxOption = 1
-	self.TextApps = {}
 	self.OptionAnimStartTime = 0
 	self.OptionAnimEndTime = 1
 
@@ -486,25 +485,27 @@ self.OptionAnimEndTime = 1]]
 end
 
 
-	function ARCPhone.PhoneSys:Init_Final()
-		for k,v in pairs(ARCPhone.Apps) do
-			if file.Exists(ARCPhone.ROOTDIR.."/appdata/"..k..".txt","DATA") then
-				local tab = util.JSONToTable(file.Read(ARCPhone.ROOTDIR.."/appdata/"..k..".txt","DATA"))
-				if tab then
-					v.Disk = tab
-				end
+function ARCPhone.PhoneSys:Init_Final()
+	for k,v in pairs(ARCPhone.Apps) do
+		if file.Exists(ARCPhone.ROOTDIR.."/appdata/"..k..".txt","DATA") then
+			local tab = util.JSONToTable(file.Read(ARCPhone.ROOTDIR.."/appdata/"..k..".txt","DATA"))
+			if tab then
+				v.Disk = tab
 			end
 		end
-		for k,v in pairs(ARCPhone.Apps) do
-			v:PhoneStart()
-		end
-		self:SetLoading(-2)
-		self:OpenApp("home")
-		self.Booted = true
-		self:AddMsgBox("PROTOTYPE VERSION","Because this is not a public release, BE PREPARED TO LOOSE ALL DATA WITH EVERY UPDATE.","warning")
-		self:AddMsgBox("My excuse for a tutorial","Use the Arrow keys to move the cursor. Press BACKSPACE to go back, press CTRL to access the context menu, and press ENTER to select.","info")
-		self:AddMsgBox("PROTOTYPE VERSION","This is the prototype version of ARCPhone (pre-alpha), and does not represent the final product. Everything is subject to change. (Press ENTER to close this window)","info")
 	end
+	for k,v in pairs(ARCPhone.Apps) do
+		if isstring(v.Number) then
+			v:RegisterTextNumber()
+		end
+		v:PhoneStart()
+	end
+	self:SetLoading(-2)
+	self:OpenApp("home")
+	self.Booted = true
+	self:AddMsgBox("ALPHA VERSION","This is an Alpha version of ARCPhone, and does not represent the final product. Everything is subject to change. (Press ENTER to close this window)","info")
+	self:AddMsgBox("My excuse for a tutorial","Use the Arrow keys to move the cursor. Press BACKSPACE to go back, press CTRL to access the context menu (It's kinda like right-clicking), and press ENTER to select.","info")
+end
 
 	function ARCPhone.PhoneSys:Init_DLFiles(num,retries)
 		if (ARCPhone.ClientFilesDL && ARCPhone.ClientFilesDL[num]) then
@@ -575,10 +576,10 @@ end
 			matches = {string.gmatch(message, "({{IMGDATA:([^:]*):([^:]*):IMGDATA}})")()}
 		end
 		if string.sub( number, 1, 3 ) == "000" then
-			if istable(self.Phone.TextApps[number]) then
-				self.Phone.TextApps[number]:OnText(timestamp,message)
+			if istable(self.TextApps[number]) then
+				self.TextApps[number]:OnText(timestamp,message)
 			else
-				self:AddMsgBox("ERROR","This phone recieved a text from "..number.." but there is no app associated with that number.")
+				self:AddMsgBox("ERROR","This phone recieved a text from "..number.." but there is no app associated with that number.","cross")
 			end
 		else
 			local fil = ARCPhone.ROOTDIR.."/messaging/"..number..".txt"
