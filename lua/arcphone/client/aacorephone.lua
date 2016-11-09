@@ -31,7 +31,9 @@ function ARCPhone.PhoneSys:ChoosePhoto(func,...)
 		newapp:AttachPhoto(curapp.sysname,func,...)
 	end
 end
-
+function ARCPhone.PhoneSys:IsValid()
+	return true
+end
 function ARCPhone.PhoneSys:GetActiveApp()
 	return ARCPhone.Apps[self.ActiveApp]
 end
@@ -548,10 +550,10 @@ end
 			file.Write(fil,"s\v"..os.time().."\v"..message)
 		end
 
-		local matches = {string.gmatch(message, "({{IMG:([^:]*):([^:]*):IMG}})")()} --WHY DOES string.gmatch RETURN A FUNCTION INSTEAD OF A TABLE? WHY DO I HAVE TO CALL THAT FUNCTION TO MAKE A TABLE MYSELF?!
+		local matches = {string.gmatch(message, "({{IMG:([^:]*):IMG}})")()} --WHY DOES string.gmatch RETURN A FUNCTION INSTEAD OF A TABLE? WHY DO I HAVE TO CALL THAT FUNCTION TO MAKE A TABLE MYSELF?!
 		while #matches > 0 do
-			message = string.Replace(message, matches[1], "{{IMGDATA:"..util.Base64Encode(file.Read(matches[2],"DATA"))..":"..util.Base64Encode(file.Read(matches[3],"DATA"))..":IMGDATA}}")
-			matches = {string.gmatch(message, "({{IMG:([^:]*):([^:]*):IMG}})")()}
+			message = string.Replace(message, matches[1], "{{IMGDATA:"..util.Base64Encode(file.Read(ARCPhone.ROOTDIR.."/photos/"..matches[2],"DATA"))..":IMGDATA}}")
+			matches = {string.gmatch(message, "({{IMG:([^:]*):IMG}})")()}
 		end
 		local hash = ARCLib.JamesHash(message..CurTime())
 		ARCPhone.PhoneSys.OutgoingTexts[hash] = {}
@@ -561,19 +563,17 @@ end
 	end
 	function ARCPhone.PhoneSys:RecieveText(number,timestamp,message)
 
-		local matches = {string.gmatch(message, "({{IMGDATA:([^:]*):([^:]*):IMGDATA}})")()} --WHY DOES string.gmatch RETURN A FUNCTION INSTEAD OF A TABLE? WHY DO I HAVE TO CALL THAT FUNCTION TO MAKE A TABLE MYSELF?!
+		local matches = {string.gmatch(message, "({{IMGDATA:([^:]*):IMGDATA}})")()} --WHY DOES string.gmatch RETURN A FUNCTION INSTEAD OF A TABLE? WHY DO I HAVE TO CALL THAT FUNCTION TO MAKE A TABLE MYSELF?!
 		local i = 1
 		while #matches > 0 do
-			local imgname = ARCPhone.ROOTDIR.."/photos/texts/"..number.."_"..i..".photo.jpg"
+			local imgname = "texts/"..number.."_"..i..".photo.jpg"
 			while file.Exists(imgname,"DATA") do
 				i = i + 1
-				imgname = ARCPhone.ROOTDIR.."/photos/texts/"..number.."_"..i..".photo.jpg"
+				imgname = "texts/"..number.."_"..i..".photo.jpg"
 			end
-			local thumbname = ARCPhone.ROOTDIR.."/photos/texts/"..number.."_"..i..".thumb.jpg"
-			file.Write(thumbname,util.Base64Decode(matches[2]))
-			file.Write(imgname,util.Base64Decode(matches[3]))
-			message = string.Replace(message, matches[1], "{{IMG:"..thumbname..":"..imgname..":IMG}}")
-			matches = {string.gmatch(message, "({{IMGDATA:([^:]*):([^:]*):IMGDATA}})")()}
+			file.Write(ARCPhone.ROOTDIR.."/photos/"..imgname,util.Base64Decode(matches[2]))
+			message = string.Replace(message, matches[1], "{{IMG:"..imgname..":IMG}}")
+			matches = {string.gmatch(message, "({{IMGDATA:([^:]*):IMGDATA}})")()}
 		end
 		if string.sub( number, 1, 3 ) == "000" then
 			if istable(self.TextApps[number]) then
@@ -890,5 +890,100 @@ end
 			app:OnRightDown()
 		end
 	end
-
+	function ARCPhone.PhoneSys:GenerateImagePreviewStart()
+		if self.GeneratingThumbs then return end
+		self.GeneratingThumbs = true
+		self.ThumbMats = self.ThumbMats or {}
+		self:GenerateImagePreview()
+	end
+	function ARCPhone.PhoneSys:GenerateImagePreview()
+		local path = self.ThumbMats[self.ThumbMati]
+		if path then
+			self.PreviewRT:Capture("jpeg",100,function(data)
+				if !IsValid(self) then return end
+				local thumbfullpath = ARCPhone.ROOTDIR .. "/photos/"..string.sub( path, 1, #path-10 )..".thumb.jpg"
+				file.Write(thumbfullpath,data)
+				self.ThumbMaterials[path] = Material("../data/" .. thumbfullpath)
+				
+				self.ThumbMati = self.ThumbMati + 1
+				self:GenerateImagePreview()
+			end)
+		else
+			self.ThumbMati = 1
+			self.GeneratingThumbs = false
+			self.PreviewRT:Destroy()
+		end
+	end
+	function ARCPhone.PhoneSys:ClearImageMaterials()
+		self.PhotoMaterials = {}
+		self.ThumbMaterials = {}
+		self.GeneratingThumbs = false
+		self.PreviewRT:Destroy()
+		self.PreviewRT = nil
+		self.ThumbMati = 1
+		self.ThumbMats = {}
+	end
+	--[[
+	hook.Add( "HUDPaint", "ARCPhone TestCamera", function()
+		if IsValid(ARCPhone.PhoneSys.PreviewRT) then
+			surface.SetDrawColor(255,255,255,255)
+			surface.SetMaterial( ARCPhone.PhoneSys.PreviewRT:GetMaterial() ) 
+			surface.DrawTexturedRect( 16,16,64,64 ) 
+		end
+	end)
+]]
+	function ARCPhone.PhoneSys:GetImageMaterials(path)
+		self.PhotoMaterials = self.PhotoMaterials or {}
+		self.ThumbMaterials = self.ThumbMaterials or {}
+		self.ThumbMats = self.ThumbMats or {}
+		self.ThumbMati = self.ThumbMati or 1
+		if !self.PhotoMaterials[path] or !self.ThumbMaterials[path] then
+			local fullpath = ARCPhone.ROOTDIR .. "/photos/"..path
+			if file.Exists(fullpath,"DATA") then
+				self.PhotoMaterials[path] = Material("../data/" .. fullpath)
+				local thumbfullpath = string.sub( fullpath, 1, #fullpath-10 )..".thumb.jpg"
+				if file.Exists(thumbfullpath,"DATA") then
+					self.ThumbMaterials[path] = Material("../data/" .. thumbfullpath)
+				else
+					self.ThumbMaterials[path] = ARCLib.GetWebIcon32("photo")
+					self.ThumbMats[#self.ThumbMats + 1] = path
+					
+					if !IsValid(self.PreviewRT) then
+						self.PreviewRT = ARCLib.CreateRenderTarget("arcphone_imgthumb",128,128)
+						self.PreviewRT:Enable()
+						self.PreviewRT:SetFunc(function()
+							if !IsValid(self) then return end
+							if self.ThumbMats[self.ThumbMati] then
+								cam.Start2D()
+									--MsgN("RENDERING "..self.ThumbMats[self.ThumbMati])
+									local mat = self.PhotoMaterials[self.ThumbMats[self.ThumbMati]]
+									local w = mat:Width()
+									local h = mat:Height()
+									if w > h then
+										h = 128*(h/w)
+										w = 128
+									else
+										w = 128*(w/h)
+										h = 128
+									end
+									
+									local x = 64 - w/2
+									local y = 64 - h/2
+									
+									surface.SetDrawColor(255,255,255,255)
+									surface.SetMaterial(mat)
+									surface.DrawTexturedRect(x,y,w,h)
+								cam.End2D()
+							end
+						end)
+					end
+					self:GenerateImagePreviewStart()
+				end
+			else
+				self.PhotoMaterials[path] = ARCLib.GetWebIcon32("document_torn")
+				self.ThumbMaterials[path] = ARCLib.GetWebIcon32("document_torn")
+			end
+		end
+		return self.PhotoMaterials[path],self.ThumbMaterials[path]
+	end
 	--ARCPhone.PhoneSys.Init()

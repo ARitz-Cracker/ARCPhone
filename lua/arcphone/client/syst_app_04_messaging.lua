@@ -14,8 +14,8 @@ function APP:PhoneStart()
 end
 
 
-function APP:AttachPhoto(thumb,photo)
-	local imagetag = "{{IMG:"..thumb..":"..photo..":IMG}}"
+function APP:AttachPhoto(photo)
+	local imagetag = "{{IMG:"..photo..":IMG}}"
 	if string.find( self.Tiles[self.TextInputIcon]:GetText(), imagetag ,1 ,false) then
 		ARCPhone.PhoneSys:AddMsgBox("Duplicate image","You cannot attach 2 of the same image","warning")
 	else

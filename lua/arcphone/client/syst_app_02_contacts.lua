@@ -225,14 +225,20 @@ function APP:Init()
 	end
 	self.Tiles[len].OnUnPressed = function(tile)
 		tile.color = self.Phone.Settings.Personalization.CL_03_SecondaryColour
-		self.Phone:SetLoading(-1)
-		self:SendText("f")
-		--tile.App.Phone:AddMsgBox("Coming soon!","This feature has not been implemented yet, it will be available in a later version of ARCPhone","info")
+		if tile.App.Phone.Reception < 15 then
+			tile.App.Phone:AddMsgBox("No signal","You do not have enough reception to perform this operation","warning")
+		else
+			tile.App.Phone:SetLoading(-1)
+			tile.App:SendText("f")
+		end
+		--
 	end
 	
 end
 --APP:Init()
 function APP:OnText(timestamp,data)
+	self:ResetCurPos()
+	self.Tiles = {}
 	self.Phone:SetLoading(-2)
 	local numbers = string.Explode(" ",data)
 	local len = #numbers
@@ -298,9 +304,12 @@ function APP:EditContact(tileid)
 		self.Tiles[2] = ARCPhone.NewAppTextInputTile(self,self.Disk[tileid][ARCPHONE_CONTACT_NAME],false,118)
 		self.Tiles[3] = ARCPhone.NewAppTextInputTile(self,self.Disk[tileid][ARCPHONE_CONTACT_NUMBER],false,118)
 	else
-		self.Tiles[2] = ARCPhone.NewAppTextInputTile(self,"Contact Name",false,118)
-		self.Tiles[3] = ARCPhone.NewAppTextInputTile(self,"Insert Number",false,118)
+		self.Tiles[2] = ARCPhone.NewAppTextInputTile(self,"",false,118)
+		self.Tiles[3] = ARCPhone.NewAppTextInputTile(self,"",false,118)
 	end
+	self.Tiles[2]:SetPlaceholder("Contact Name")
+	self.Tiles[3]:SetPlaceholder("Insert Number")
+	
 	self.Tiles[2].SingleLine = true
 	self.Tiles[3].SingleLine = true
 	self.Tiles[2].y = 24

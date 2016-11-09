@@ -19,7 +19,7 @@ function texttile:drawfunc(xpos,ypos)
 			if self._InputTable[i] then
 				if (self._InputTable[i] == "IMG_"..self._nextimagedisplay) && self._images[self._nextimagedisplay] then
 					surface.SetDrawColor(255,255,255,255)
-					surface.SetMaterial(self._images[self._nextimagedisplay])
+					surface.SetMaterial(select(2,self.App.Phone:GetImageMaterials(self._images[self._nextimagedisplay])))
 					surface.DrawTexturedRect(xpos+1,ypos-11 + i*12 + self._imagedisplay*(self.w - 2),self.w - 2,self.w - 2)
 					self._imagedisplay = self._imagedisplay + 1
 					self._nextimagedisplay = self._nextimagedisplay + 1
@@ -44,13 +44,13 @@ function texttile:UpdateText()
 			displaytext = self.TextInput
 		end
 		
-		local matches = {string.gmatch(displaytext, "({{IMG:([^:]*):([^:]*):IMG}})")()} --WHY DOES string.gmatch RETURN A FUNCTION INSTEAD OF A TABLE? WHY DO I HAVE TO CALL THAT FUNCTION TO MAKE A TABLE MYSELF?!
+		local matches = {string.gmatch(displaytext, "({{IMG:([^:]*):IMG}})")()} --WHY DOES string.gmatch RETURN A FUNCTION INSTEAD OF A TABLE? WHY DO I HAVE TO CALL THAT FUNCTION TO MAKE A TABLE MYSELF?!
 		local imgnum = 0
 		while #matches > 0 do
 			imgnum = imgnum + 1;
-			self._images[imgnum] = Material("../data/" .. matches[2])
+			self._images[imgnum] = matches[2]--Material("../data/" .. )
 			displaytext = string.Replace(displaytext, matches[1], "\nIMG_"..imgnum.."\n")
-			matches = {string.gmatch(displaytext, "({{IMG:([^:]*):([^:]*):IMG}})")()}
+			matches = {string.gmatch(displaytext, "({{IMG:([^:]*):IMG}})")()}
 		end
 		self._InputTable = ARCLib.FitText(displaytext,"ARCPhoneSmall",self.w - 2)
 
