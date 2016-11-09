@@ -31,6 +31,13 @@ function ARCPhone.PhoneSys:ChoosePhoto(func,...)
 		newapp:AttachPhoto(curapp.sysname,func,...)
 	end
 end
+function ARCPhone.PhoneSys:ChooseContact(func,...)
+	local curapp = ARCPhone.Apps[self.ActiveApp]
+	local newapp = ARCPhone.PhoneSys:OpenApp("contacts",false,true)
+	if (newapp) then
+		newapp:ChooseContact(curapp.sysname,func,...)
+	end
+end
 function ARCPhone.PhoneSys:IsValid()
 	return true
 end

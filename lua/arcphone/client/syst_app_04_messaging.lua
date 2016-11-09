@@ -161,7 +161,8 @@ function APP:Init()
 	end
 	self.Tiles[len].OnUnPressed = function(tile)
 		tile.color = self.Phone.Settings.Personalization.CL_06_TertiaryColour
-		tile.App:NewConvo()
+		--tile.App:NewConvo()
+		ARCPhone.PhoneSys:AddMsgBox("COMING SOON!","Please select a person to from your contact list (This button will have you choose between a contact and a new number in a future update)")
 	end
 	--[[
 	self.Tiles[1] = ARCPhone.NewAppTextInputTile("This is a text input tile, but it isn't editable because the Editable variable has been set to false")

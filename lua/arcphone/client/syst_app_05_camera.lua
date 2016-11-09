@@ -39,10 +39,10 @@ function APP:ForegroundThink()
 		if self.Selfie then
 			local ang = ply:EyeAngles()
 			ang:RotateAroundAxis( ang:Up(), 180 ) 
-			self.RT:SetPos(ply:EyePos()+ply:GetAimVector() * 25)
+			self.RT:SetPos(ply:EyePos()+ply:GetAimVector() * 25 + ply:GetVelocity()*0.09)
 			self.RT:SetAngles(ang)
 		else
-			self.RT:SetPos(ply:EyePos()+ply:GetAimVector() * 15)
+			self.RT:SetPos(ply:EyePos()+ply:GetAimVector() * 15 + ply:GetVelocity()*0.09)
 			self.RT:SetAngles(ply:EyeAngles())
 		end
 	end

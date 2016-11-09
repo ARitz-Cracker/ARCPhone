@@ -153,7 +153,10 @@ function APP:ListPhotos(dir)
 end
 
 function APP:OnBack()
-	if #self.CurrentDir > 0 then
+	if self.ViewImage then
+		self.ViewImage = nil
+		self.DisableTileSwitching = false
+	elseif #self.CurrentDir > 0 then
 		self:Init()
 	else
 		if self.AttachFunc then
@@ -179,6 +182,31 @@ function APP:OnClose()
 	self.AttachFuncApp = nil
 end
 
+function APP:ForegroundDraw(movex,movey)
+	if self.ViewImage then
+		surface.SetDrawColor(0,0,0,255)
+		surface.DrawRect(0,0,self.Phone.ScreenResX,self.Phone.ScreenResY)
+	
+		local mat = self.ViewImage
+		local w = mat:Width()
+		local h = mat:Height()
+		if w > h then
+			h = self.Phone.ScreenResX*(h/w)
+			w = self.Phone.ScreenResX
+		else
+			w = self.Phone.ScreenResY*(w/h)
+			h = self.Phone.ScreenResY
+		end
+		
+		local x = self.Phone.HalfScreenResX - w/2
+		local y = self.Phone.HalfScreenResY - h/2
+		
+		surface.SetDrawColor(255,255,255,255)
+		surface.SetMaterial(mat)
+		surface.DrawTexturedRect(x,y,w,h)
+	end
+end
+
 function APP:SelectPhoto(i)
 	assert(self.CurrentDir && #self.CurrentDir > 0,"Attempted to select photo when CurrentDir isn't set!")
 	assert(isnumber(i),"Bad photo selected! Wanted number got nil!")
@@ -188,7 +216,8 @@ function APP:SelectPhoto(i)
 		self.AttachFunc(unpack(self.AttachFuncArgs),imgpath)
 		self.Phone:OpenApp(self.AttachFuncApp,true,false)
 	else
-	
+		self.ViewImage = self.Phone:GetImageMaterials(imgpath)
+		self.DisableTileSwitching = true
 	end
 end
 
