@@ -1,6 +1,6 @@
--- This shit is under copyright.
+-- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
--- © Copyright 2014 Aritz Beobide-Cardinal All rights reserved.
+-- © Copyright 2016 Aritz Beobide-Cardinal All rights reserved.
 include('shared.lua')
 function ENT:Initialize()
 
@@ -74,6 +74,7 @@ end
 function ENT:Draw()
 	self:DrawModel()
 	self:DrawShadow( true )
+	--[[
 	--local DisplayPos = self:GetPos() + ((self:GetAngles():Up() * -0.41) + (self:GetAngles():Forward() * 5.7) + (self:GetAngles():Right() * 2.7 ))
 	self.displayangle1 = self:GetAngles()
 	self.displayangle1:RotateAroundAxis( self.displayangle1:Up(), 97.8 )
@@ -85,6 +86,7 @@ function ENT:Draw()
 	cam.Start3D2D(self:LocalToWorld(Vector(12.62,-4.73,52.55)), self.displayangle1, 0.23)
 		FakeConsole2(10)
 	cam.End3D2D()
+	]]
 	--[[
 	cam.Start3D2D(self:LocalToWorld(Vector(40,-5,53)), Angle(0,0,0), 1)
 		surface.SetDrawColor(255,255,255,255)

@@ -1,4 +1,4 @@
--- This shit is under copyright, and is bound to the agreement stated in the ELUA.
+-- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
 -- © Copyright 2014-2016 Aritz Beobide-Cardinal All rights reserved.
 
@@ -18,7 +18,7 @@ ARCPhone.Msg("© Copyright 2014-2016 Aritz Beobide-Cardinal (ARitz Cracker) All 
 
 
 ARCPhone.Update = "October 14th 2016"
-ARCPhone.Version = "0.8.2"
+ARCPhone.Version = "0.8.3"
 
 NULLFUNC = function(...) end
 

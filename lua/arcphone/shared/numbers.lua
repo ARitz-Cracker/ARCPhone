@@ -1,8 +1,8 @@
 -- numbers.lua - Phone number stuff
 
--- This file is under copyright, and is bound to the agreement stated in the ELUA.
+-- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
--- © Copyright 2014 Aritz Beobide-Cardinal All rights reserved.
+-- © Copyright 2016 Aritz Beobide-Cardinal All rights reserved.
 
 function ARCPhone.SteamIDToPhoneNumber(steamid)
 	return string.sub( util.SteamIDTo64(steamid), #steamid-9)

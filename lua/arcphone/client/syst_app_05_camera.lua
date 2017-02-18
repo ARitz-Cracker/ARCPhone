@@ -39,10 +39,10 @@ function APP:ForegroundThink()
 		if self.Selfie then
 			local ang = ply:EyeAngles()
 			ang:RotateAroundAxis( ang:Up(), 180 ) 
-			self.RT:SetPos(ply:EyePos()+ply:GetAimVector() * 25 + ply:GetVelocity()*0.09)
+			self.RT:SetPos(ply:EyePos()+ply:GetAimVector() * 25)
 			self.RT:SetAngles(ang)
 		else
-			self.RT:SetPos(ply:EyePos()+ply:GetAimVector() * 15 + ply:GetVelocity()*0.09)
+			self.RT:SetPos(ply:EyePos()+ply:GetAimVector() * 15)
 			self.RT:SetAngles(ply:EyeAngles())
 		end
 	end
@@ -53,7 +53,7 @@ function APP:SwitchCamera()
 end
 --tile.App
 function APP:Init()
-	self:AddMenuOption("Swich Camera",self.SwitchCamera,self)
+	self:AddMenuOption("Switch Camera",self.SwitchCamera,self)
 	if !IsValid(self.RT) then
 		self.RT = ARCLib.CreateRenderTarget("arcphone_camera",ScrH()*(self.Phone.ScreenResX/self.Phone.ScreenResY),ScrH(),EyePos(),EyeAngles(),64)
 	end
@@ -61,6 +61,9 @@ function APP:Init()
 	self.RT:SetFunc2D(function()
 		--hook.Call("HUDPaint",GM)
 	end)
+	--net.Start("arcphone_switchholdtype")
+	--net.WriteString("pistol")
+	--net.SendToServer()
 	self.Zoom = 64
 end
 
@@ -69,6 +72,9 @@ function APP:OnClose()
 		self.RT:Destroy()
 		self.RT = nil
 	end
+	--net.Start("arcphone_switchholdtype")
+	--net.WriteString("normal")
+	--net.SendToServer()
 end
 function APP:OnBack()
 	self.Phone:OpenApp("home")

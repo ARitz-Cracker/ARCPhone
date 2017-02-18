@@ -1,7 +1,8 @@
 -- svcomm.lua - Client/Server communications for ARCPhone
--- This file is under copyright.
+
+-- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
--- © Copyright 2014 Aritz Beobide-Cardinal All rights reserved.
+-- © Copyright 2016 Aritz Beobide-Cardinal All rights reserved.
 
 local ARCPhone_PingBusy = false
 local ARCPhone_PingCallBack = {}
@@ -62,8 +63,19 @@ net.Receive( "arcphone_comm_status", function(length)
 end)
 
 
-local msgchunks = {}
+--ARCLib.SendBigMessage("arcphone_comm_text","",ply,NULLFUNC)
+ARCLib.ReceiveBigMessage("arcphone_comm_text",function(err,per,data,ply)
+	if err == ARCLib.NET_DOWNLOADING then
+		MsgN("TODO: ARCPhone text receive progress icon")
+	elseif err == ARCLib.NET_COMPLETE then
+		ARCPhone.PhoneSys:RecieveText(unpack(string.Explode( "\v", data)))
+	else
+		ARCPhone.Msg("Incomming arcphone_comm_text message errored! "..err)
+	end
+end)
 
+--[[
+local msgchunks = {}
 net.Receive( "arcphone_comm_text", function(length)
 	local succ = net.ReadInt(8)
 	local part = net.ReadUInt(32)
@@ -153,7 +165,7 @@ net.Receive( "arcphone_comm_text", function(length)
 		MsgN("ARCPhone: Server sent error on text "..hash)
 	end
 end)
-
+]]
 
 ARCPhone.PhoneRingers = {}
 net.Receive( "arcphone_ringer", function(length)

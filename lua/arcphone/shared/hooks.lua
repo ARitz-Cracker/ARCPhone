@@ -1,8 +1,8 @@
 -- hooks.lua - Hooks
 
--- This file is under copyright.
+-- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
--- © Copyright 2014 Aritz Beobide-Cardinal All rights reserved.
+-- © Copyright 2016 Aritz Beobide-Cardinal All rights reserved.
 ARCPhone.Loaded = false
 
 
@@ -15,6 +15,10 @@ if CLIENT then
 	
 	hook.Add("Think","ARCPhone Think",function()
 		if LocalPlayer():GetActiveWeapon().IsDahAwesomePhone then
+			if !ARCPhone.PhoneSys.FirstOpened then
+				ARCPhone.PhoneSys.FirstOpened = true
+				ARCPhone.PhoneSys.ControlHints = SysTime() + 30
+			end
 			if ARCPhone.PhoneSys:GetActiveApp() then
 				ARCPhone.PhoneSys:GetActiveApp():Think(phone)
 				ARCPhone.PhoneSys:GetActiveApp():ForegroundThink(phone)
@@ -29,6 +33,7 @@ if CLIENT then
 			--ARCPhone.PhoneSys:GetActiveApp():BackgroundThink(phone)
 		end
 		if ARCPhone.PhoneSys then
+			--[[
 			for kk,vv in pairs(ARCPhone.PhoneSys.OutgoingTexts) do
 				if vv.place == -1 then
 					vv.place = 0
@@ -42,14 +47,16 @@ if CLIENT then
 					net.SendToServer()
 				end
 			end
+			]]
 		end
-		
+		--[[
 		for k,v in pairs(ARCPhone.PhoneRingers) do
 			local ply = Entity(k)
 			if IsValid(ply) then
 				v:SetPos(ply:GetPos())
 			end
 		end
+		]]
 	end)
 	
 	hook.Add( "StartChat", "ARCPhone OpenChat", function(t) 

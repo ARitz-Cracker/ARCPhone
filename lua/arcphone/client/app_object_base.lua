@@ -1,7 +1,7 @@
 -- app_util.lua - app utilities
--- This file is under copyright, and is bound to the agreement stated in the ELUA.
+-- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
--- © Copyright Aritz Beobide-Cardinal 2014 All rights reserved.
+-- © Copyright 2016 Aritz Beobide-Cardinal All rights reserved.
 ARCPhone.Apps = ARCPhone.Apps or {}
 
 local curapptime = 0
@@ -227,7 +227,7 @@ function ARCPHONE_APP:DrawTiles(mvx,mvy)
 		if curapptime <= CurTime() then
 			surface.DrawOutlinedRect(self.Tiles[self.Phone.SelectedAppTile].x + mvx,self.Tiles[self.Phone.SelectedAppTile].y + mvy,self.Tiles[self.Phone.SelectedAppTile].w,self.Tiles[self.Phone.SelectedAppTile].h)
 		else
-			local thing = ARCLib.BetweenNumberScale(oldapptime,CurTime(),curapptime)
+			local thing = ARCLib.BetweenNumberScale(oldapptime,CurTime(),curapptime)^0.5
 			local negthing = -thing + 1
 			
 			surface.DrawOutlinedRect((self.Tiles[self.Phone.SelectedAppTile].x*thing + self.Tiles[self.Phone.OldSelectedAppTile].x*negthing) + mvx,(self.Tiles[self.Phone.SelectedAppTile].y*thing + self.Tiles[self.Phone.OldSelectedAppTile].y*negthing) + mvy,self.Tiles[self.Phone.SelectedAppTile].w*thing + self.Tiles[self.Phone.OldSelectedAppTile].w*negthing,self.Tiles[self.Phone.SelectedAppTile].h*thing + self.Tiles[self.Phone.OldSelectedAppTile].h*negthing)
@@ -269,7 +269,7 @@ function ARCPHONE_APP:RegisterTextNumber()
 end
 function ARCPHONE_APP:SendText(data)
 	assert(ARCPhone.IsValidPhoneNumber(self.Number),"ARCPHONE_APP.SendText: This app isn't registered to text!")
-	ARCPhone.PhoneSys:SendText(self.Number,data)
+	return ARCPhone.PhoneSys:SendText(self.Number,data,true)
 end
 
 ARCPHONE_APP.ShowTaskbar = true

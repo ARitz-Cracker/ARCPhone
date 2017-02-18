@@ -1,8 +1,8 @@
 -- cmds.lua - Commands for ARCPhone (Can be editable using a plugin)
 
--- This file is under copyright, and is bound to the agreement stated in the ELUA.
+-- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
--- © Copyright 2014 Aritz Beobide-Cardinal All rights reserved.
+-- © Copyright 2016 Aritz Beobide-Cardinal All rights reserved.
 ARCPhone.Loaded = false
 ARCPhone.Commands = { --Make sure they are less then 16 chars long.$
 	["about"] = {

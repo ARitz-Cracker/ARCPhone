@@ -1,6 +1,6 @@
--- This shit is under copyright.
+-- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
--- © Copyright 2014 Aritz Beobide-Cardinal All rights reserved.
+-- © Copyright 2016 Aritz Beobide-Cardinal All rights reserved.
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 include('shared.lua')
@@ -116,7 +116,7 @@ function ENT:ToggleJammer()
 end
 function ENT:ToggleOpen()
 	if self.Opened then
-		self:ARCLib_SetAnimationTime("primaryattack",0.5)
+		self:ARCLib_SetAnimationTime("secondaryattack",0.5)
 			self.Opened = false
 			timer.Simple(0.4,function() self:EmitSound("vehicles/atv_ammo_close.wav") end)
 			timer.Simple(0.55,function()
@@ -131,7 +131,7 @@ function ENT:ToggleOpen()
 				net.Broadcast()
 			end
 	else
-		self:ARCLib_SetAnimationTime("secondaryattack",0.5)
+		self:ARCLib_SetAnimationTime("primaryattack",0.5)
 		self:EmitSound("vehicles/atv_ammo_open.wav")
 		self.Opened = true
 		timer.Simple(0.55,function()

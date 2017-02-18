@@ -1,7 +1,7 @@
--- This shit is under copyright.
+-- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
--- © Copyright 2014 Aritz Beobide-Cardinal All rights reserved.
--- There's no real use to these comments since no one will see them. All this really does is waste ARCLoad bandwidth.
+-- © Copyright 2016 Aritz Beobide-Cardinal All rights reserved.
+
 include('shared.lua')
 function ENT:Initialize()
 	self.Jamming = false

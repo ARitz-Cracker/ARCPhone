@@ -1,6 +1,6 @@
--- This shit is under copyright.
+-- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
--- © Copyright 2014 Aritz Beobide-Cardinal All rights reserved.
+-- © Copyright 2016 Aritz Beobide-Cardinal All rights reserved.
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 include('shared.lua')
@@ -18,6 +18,8 @@ function ENT:Initialize()
 	self.NoiseDelay = CurTime() + 1
 	self.OnSound = CreateSound(self,"ambient/machines/combine_terminal_loop1.wav")
 	self.OnSound:PlayEx(0.05,100)
+	self:SetSubMaterial( 1, "models/arc/server/security_screen" ) 
+	self:SetSubMaterial( 2, "models/arc/server/security_screen2" ) 
 end
 function ENT:SpawnFunction( ply, tr )
  	if ( !tr.Hit ) then return end

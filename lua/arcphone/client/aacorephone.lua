@@ -13,7 +13,7 @@ ARCPhone.PhoneSys.KeyDelay = {}
 ARCPhone.PhoneSys.OutgoingTexts = ARCPhone.PhoneSys.OutgoingTexts or {}
 ARCPhone.PhoneSys.TextApps = {}
 ARCPhone.PhoneSys.Booted = false
-
+ARCPhone.PhoneSys.ControlHints = 0
 ARCPhone.PhoneSys.Ent = NULL
 
 for k,v in pairs(ARCPhone.PhoneSys.ValidKeys) do
@@ -513,7 +513,7 @@ function ARCPhone.PhoneSys:Init_Final()
 	self:OpenApp("home")
 	self.Booted = true
 	self:AddMsgBox("ALPHA VERSION","This is an Alpha version of ARCPhone, and does not represent the final product. Everything is subject to change. (Press ENTER to close this window)","info")
-	self:AddMsgBox("My excuse for a tutorial","Use the Arrow keys to move the cursor. Press BACKSPACE to go back, press CTRL to access the context menu (It's kinda like right-clicking), and press ENTER to select.","info")
+	--self:AddMsgBox("My excuse for a tutorial","Use the Arrow keys to move the cursor. Press BACKSPACE to go back, press CTRL to access the context menu (It's kinda like right-clicking), and press ENTER to select.","info")
 end
 
 	function ARCPhone.PhoneSys:Init_DLFiles(num,retries)
@@ -547,30 +547,50 @@ end
 			ARCPhone.PhoneSys:Init_Final()
 		end
 	end
-
-	function ARCPhone.PhoneSys:SendText(number,message)
+	local maxmsglen = 16000*255
+	function ARCPhone.PhoneSys:SendText(number,message,app)
 		if message == "" then message = " " end
-		local fil = ARCPhone.ROOTDIR.."/messaging/"..number..".txt"
-		if file.Exists(fil,"DATA") then
-			file.Append(fil,"\fs\v"..os.time().."\v"..message)
-		else
-			file.Write(fil,"s\v"..os.time().."\v"..message)
-		end
 
-		local matches = {string.gmatch(message, "({{IMG:([^:]*):IMG}})")()} --WHY DOES string.gmatch RETURN A FUNCTION INSTEAD OF A TABLE? WHY DO I HAVE TO CALL THAT FUNCTION TO MAKE A TABLE MYSELF?!
+		local matches = {string.gmatch(message, "({{IMG\"([^:]*)\"IMG}})")()} --WHY DOES string.gmatch RETURN A FUNCTION INSTEAD OF A TABLE? WHY DO I HAVE TO CALL THAT FUNCTION TO MAKE A TABLE MYSELF?!
 		while #matches > 0 do
-			message = string.Replace(message, matches[1], "{{IMGDATA:"..util.Base64Encode(file.Read(ARCPhone.ROOTDIR.."/photos/"..matches[2],"DATA"))..":IMGDATA}}")
-			matches = {string.gmatch(message, "({{IMG:([^:]*):IMG}})")()}
+			local imgdata = file.Read(ARCPhone.ROOTDIR.."/photos/"..matches[2],"DATA")
+			message = string.Replace(message, matches[1], "{{IMGDATA\""..ARCLib.basexx.to_z85(imgdata..string.rep( "\0", -(#imgdata%4-4) )).."\"IMGDATA}}")
+			matches = {string.gmatch(message, "({{IMG\"([^:]*)\"IMG}})")()}
 		end
-		local hash = ARCLib.JamesHash(message..CurTime())
-		ARCPhone.PhoneSys.OutgoingTexts[hash] = {}
-		ARCPhone.PhoneSys.OutgoingTexts[hash].msg = ARCLib.SplitString(util.Compress(number..message),16384)
-		ARCPhone.PhoneSys.OutgoingTexts[hash].number = number
-		ARCPhone.PhoneSys.OutgoingTexts[hash].place = -1
+		
+		if not app then
+			local fil = ARCPhone.ROOTDIR.."/messaging/"..number..".txt"
+			if file.Exists(fil,"DATA") then
+				file.Append(fil,"\fs\v"..os.time().."\v"..message)
+			else
+				file.Write(fil,"s\v"..os.time().."\v"..message)
+			end
+		end
+		message = number..message
+		if #message > maxmsglen then
+			if not app then
+				self:AddMsgBox("Text too long","The size limit for a message is 3.89MiB or 3.11MiB if the message contains an image.","cross")
+			end
+			return false
+		end
+		
+		local SendMessageCB 
+		SendMessageCB = function(err,per)
+			if err == ARCLib.NET_UPLOADING then
+				MsgN("TODO: ARCPhone text sending progress icon")
+			elseif err == ARCLib.NET_COMPLETE then
+				MsgN("TODO: ARCPhone text sending complete??")
+			else
+				ARCPhone.Msg("Sending message error! "..err)
+				ARCLib.SendBigMessage("arcphone_comm_text",message,nil,SendMessageCB) 
+			end
+		end
+		ARCLib.SendBigMessage("arcphone_comm_text",message,nil,SendMessageCB) 
+		return true
 	end
 	function ARCPhone.PhoneSys:RecieveText(number,timestamp,message)
 
-		local matches = {string.gmatch(message, "({{IMGDATA:([^:]*):IMGDATA}})")()} --WHY DOES string.gmatch RETURN A FUNCTION INSTEAD OF A TABLE? WHY DO I HAVE TO CALL THAT FUNCTION TO MAKE A TABLE MYSELF?!
+		local matches = {string.gmatch(message, "({{IMGDATA\"([^:]*)\"IMGDATA}})")()} --WHY DOES string.gmatch RETURN A FUNCTION INSTEAD OF A TABLE? WHY DO I HAVE TO CALL THAT FUNCTION TO MAKE A TABLE MYSELF?!
 		local i = 1
 		while #matches > 0 do
 			local imgname = "texts/"..number.."_"..i..".photo.jpg"
@@ -578,15 +598,15 @@ end
 				i = i + 1
 				imgname = "texts/"..number.."_"..i..".photo.jpg"
 			end
-			file.Write(ARCPhone.ROOTDIR.."/photos/"..imgname,util.Base64Decode(matches[2]))
-			message = string.Replace(message, matches[1], "{{IMG:"..imgname..":IMG}}")
-			matches = {string.gmatch(message, "({{IMGDATA:([^:]*):IMGDATA}})")()}
+			file.Write(ARCPhone.ROOTDIR.."/photos/"..imgname,ARCLib.basexx.from_z85(matches[2]))
+			message = string.Replace(message, matches[1], "{{IMG\""..imgname.."\"IMG}}")
+			matches = {string.gmatch(message, "({{IMGDATA\"([^:]*)\"IMGDATA}})")()}
 		end
 		if string.sub( number, 1, 3 ) == "000" then
 			if istable(self.TextApps[number]) then
 				self.TextApps[number]:OnText(timestamp,message)
 			else
-				self:AddMsgBox("ERROR","This phone recieved a text from "..number.." but there is no app associated with that number.","cross")
+				self:AddMsgBox("ERROR","This phone received a text from "..number.." but there is no app associated with that number.","cross")
 			end
 		else
 			local fil = ARCPhone.ROOTDIR.."/messaging/"..number..".txt"
@@ -930,15 +950,70 @@ end
 		self.ThumbMati = 1
 		self.ThumbMats = {}
 	end
-	--[[
-	hook.Add( "HUDPaint", "ARCPhone TestCamera", function()
-		if IsValid(ARCPhone.PhoneSys.PreviewRT) then
-			surface.SetDrawColor(255,255,255,255)
-			surface.SetMaterial( ARCPhone.PhoneSys.PreviewRT:GetMaterial() ) 
-			surface.DrawTexturedRect( 16,16,64,64 ) 
+	
+	local color_white_fade = Color(255,255,255,255)
+	local color_black_fade = Color(0,0,0,255)
+	hook.Add( "HUDPaint", "ARCPhone TutorialHud", function()
+		
+		local xpos
+		local xposimg
+		local ypos
+		local w
+	
+		xpos = ScrW() - 96
+		
+		ypos = ScrH() - 96 - 96 - 8
+		
+		
+		if ARCPhone.PhoneSys.ControlHints > SysTime() then
+			color_white_fade.a = (191 + (math.cos(SysTime()*math.pi*2 + math.pi))*64)*ARCLib.BetweenNumberScaleReverse(ARCPhone.PhoneSys.ControlHints-5,SysTime(),ARCPhone.PhoneSys.ControlHints)
+			color_black_fade.a = color_white_fade.a
+			w = draw.SimpleTextOutlined( "Use [ARROW KEYS] to navigate", "ARCPhoneBig", xpos, ypos+16, color_white_fade, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER, 1, color_black_fade ) 
+			xposimg = xpos - w - 36
+			surface.SetMaterial( ARCLib.GetWebIcon32("transform_move") ) 
+			surface.SetDrawColor(color_white_fade)
+			surface.DrawTexturedRect( xposimg,ypos,32,32 )
+			
+			ypos = ypos + 36
+			w = draw.SimpleTextOutlined( "Press [ENTER] to select", "ARCPhoneBig", xpos, ypos+16, color_white_fade, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER, 1, color_black_fade ) 
+			xposimg = xpos - w - 36
+			surface.SetMaterial( ARCLib.GetWebIcon32("mouse_select_left") ) 
+			surface.SetDrawColor(color_white_fade)
+			surface.DrawTexturedRect( xposimg,ypos,32,32 ) 
+			
+			ypos = ypos + 36
+			w = draw.SimpleTextOutlined( "Press [CTRL] to view app options", "ARCPhoneBig", xpos, ypos+16, color_white_fade, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER, 1, color_black_fade ) 
+			xposimg = xpos - w - 36
+			surface.SetMaterial( ARCLib.GetWebIcon32("mouse_select_right") ) 
+			surface.SetDrawColor(color_white_fade)
+			surface.DrawTexturedRect( xposimg,ypos,32,32 )
+			
+			ypos = ypos + 36
+			w = draw.SimpleTextOutlined( "Press [BACKSPACE] to go back", "ARCPhoneBig", xpos, ypos+16, color_white_fade, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER, 1, color_black_fade ) 
+			xposimg = xpos - w - 36
+			surface.SetMaterial( ARCLib.GetWebIcon32("arrow_left") ) 
+			surface.SetDrawColor(color_white_fade)
+			surface.DrawTexturedRect( xposimg,ypos,32,32 ) 
+		end
+		if (ARCPhone.PhoneSys.Status == ARCPHONE_ERROR_RINGING or !ARCPhone.PhoneSys.FirstOpened) and not LocalPlayer():GetActiveWeapon().IsDahAwesomePhone and LocalPlayer():HasWeapon( "sent_arc_phone" ) then
+			xpos = ScrW() - 96
+			ypos = ScrH() - 96 - (SysTime()*0.5%1)*96
+
+			color_white_fade.a = (math.cos(SysTime()*math.pi + math.pi)*0.5+0.5)*255
+			color_black_fade.a = color_white_fade.a
+			surface.SetDrawColor(color_white_fade)
+			w = draw.SimpleTextOutlined( "Press [UP ARROW KEY] to unlock your phone", "ARCPhoneBig", xpos, ypos+16, color_white_fade, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER, 1, color_black_fade ) 
+			xpos = xpos - w - 32
+			if ARCPhone.PhoneSys.Status == ARCPHONE_ERROR_RINGING then
+				surface.SetMaterial( ARCLib.GetWebIcon32("phone_sound") ) 
+			else
+				surface.SetMaterial( ARCLib.GetWebIcon32("phone") ) 
+			end
+			surface.DrawTexturedRect( xpos,ypos,32,32 ) 
+			surface.SetMaterial( ARCLib.GetWebIcon32("bullet_up") ) 
+			surface.DrawTexturedRect( xpos,ypos,32,32 ) 
 		end
 	end)
-]]
 	function ARCPhone.PhoneSys:GetImageMaterials(path)
 		self.PhotoMaterials = self.PhotoMaterials or {}
 		self.ThumbMaterials = self.ThumbMaterials or {}

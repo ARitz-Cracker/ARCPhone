@@ -1,8 +1,8 @@
 -- phone_background.lua - background processes while the phone is holstered.
 
--- This file is under copyright, and is bound to the agreement stated in the ELUA.
+-- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
--- © Copyright Aritz Beobide-Cardinal 2014,2015 All rights reserved.
+-- © Copyright 2016 Aritz Beobide-Cardinal All rights reserved.
 
 local CallingSound
 local RingingSound
@@ -61,7 +61,6 @@ function ARCPhone.OnStatusChanged()
 		end
 		
 		if newstatus == ARCPHONE_ERROR_RINGING then
-			notification.AddLegacy( "You are being called! Press the up arrow key to unlock your phone!", NOTIFY_HINT, 10 ) 
 			local lst = ""
 			local contactapp = ARCPhone.PhoneSys:GetApp("contacts")
 			for k,v in pairs(ARCPhone.PhoneSys.CurrentCall.on) do

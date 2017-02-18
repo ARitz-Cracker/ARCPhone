@@ -1,9 +1,22 @@
 -- clcomm.lua - Client/Server communications for ARCPhone
--- This file is under copyright, and is bound to the agreement stated in the ELUA.
+
+-- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
--- © Copyright 2014 Aritz Beobide-Cardinal All rights reserved.
+-- © Copyright 2016 Aritz Beobide-Cardinal All rights reserved.
 
 --Check if the thing is running
+
+util.AddNetworkString( "arcphone_switchholdtype" ) -- This isn't an exploit, it's purly cosmetic, ok? >_>
+net.Receive( "arcphone_switchholdtype", function(length,ply)
+	local wep = net.ReadString()
+	local wepent = ply:GetActiveWeapon()
+	if !wep then return end
+	if !wepent then return end
+	if wepent.IsDahAwesomePhone then
+		wepent:SetHoldType( wep ) 
+	end
+end)
+	
 
 util.AddNetworkString( "arcphone_switchwep" )
 ARCPhone.Loaded = false
@@ -82,11 +95,22 @@ net.Receive( "arcphone_comm_call", function(length,ply)
 	end
 end)
 
+ARCLib.RegisterBigMessage("arcphone_comm_text",16000,255)
+ARCLib.ReceiveBigMessage("arcphone_comm_text",function(err,per,data,ply)
+	if err == ARCLib.NET_DOWNLOADING then
+		--Nothing?
+	elseif err == ARCLib.NET_COMPLETE then
+		local vnum = ARCPhone.GetPhoneNumber(ply)
+		ARCPhone.SendTextMsg(string.Left( data , 10 ),vnum,string.Right( data, #data-10 ))
+	else
+		ARCPhone.Msg("Incoming arcphone_comm_text message errored! "..err)
+	end
+end)
+--ARCLib.SendBigMessage("arcphone_comm_text","",ply,NULLFUNC)
+
+--[[
 util.AddNetworkString( "arcphone_comm_text" )
-
-
 local msgchunks = {}
-
 
 net.Receive( "arcphone_comm_text", function(length,ply)
 	local succ = net.ReadInt(8)
@@ -184,6 +208,7 @@ net.Receive( "arcphone_comm_text", function(length,ply)
 		MsgN("ARCPhone: Client sent error on text "..hash)
 	end
 end)
+]]
 
 util.AddNetworkString( "arcphone_ringer" )
 net.Receive( "arcphone_ringer", function(length,ply)

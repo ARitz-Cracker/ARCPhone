@@ -1,8 +1,8 @@
 -- aacore.lua - Base Resources and Virtual Netowrking
 
--- This shit is under copyright, and is bound to the agreement stated in the ELUA.
+-- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
--- © Copyright 2014-2016 Aritz Beobide-Cardinal All rights reserved.
+-- © Copyright 2016 Aritz Beobide-Cardinal All rights reserved.
 
 ARCPhone.LogFileWritten = false
 ARCPhone.LogFile = ""
@@ -377,7 +377,7 @@ function ARCPhone.AddToCall(caller,reciever)
 end
 
 function ARCPhone.SendTextMsg(tonum,fromnum,msg)
-	MsgN("Sending text message from "..fromnum.." to "..tonum)
+	ARCPhone.Msg("Sending text message from "..fromnum.." to "..tonum)
 	if string.sub( tonum, 1, 3 ) == "000" or string.sub( tonum, 1, 3 ) == "001" then
 		if istable(ARCPhone.TextApps[tonum]) then
 			ARCPhone.TextApps[tonum]:OnText(fromnum,msg)
@@ -385,25 +385,36 @@ function ARCPhone.SendTextMsg(tonum,fromnum,msg)
 			ARCPhone.Msg("The number "..tonum.." isn't associated with any app.")
 		end
 	else
-		local hash = ARCLib.JamesHash(msg..CurTime())
+		local hash = ARCLib.JamesHash(msg)
 		if !ARCPhone.Disk.Texts[tonum] then
 			ARCPhone.Disk.Texts[tonum] = {}
 		end
+		while ARCPhone.Disk.Texts[tonum][hash] != nil do
+			hash = hash + 1
+		end
+		
 		ARCPhone.Disk.Texts[tonum][hash] = {}
-		ARCPhone.Disk.Texts[tonum][hash].msg = ARCLib.SplitString(util.Compress(fromnum.."\v"..os.time().."\v"..msg),16384)
+		ARCPhone.Disk.Texts[tonum][hash].msg = fromnum.."\v"..os.time().."\v"..msg
 		ARCPhone.Disk.Texts[tonum][hash].number = fromnum
-		local ply = ARCPhone.GetPlayerFromPhoneNumber(tonum)
-		if ply.ARCPhone_Reception > 10 then
-			ARCPhone.Disk.Texts[tonum][hash].place = 0
-			net.Start("arcphone_comm_text")
-			net.WriteInt(0,8)
-			net.WriteUInt(0,32)
-			net.WriteUInt(#ARCPhone.Disk.Texts[tonum][hash].msg,32)
-			net.WriteString(hash) --Hash
-			net.WriteUInt(0,32)
-			net.Send(ply)
+		local fromply = ARCPhone.GetPlayerFromPhoneNumber(fromnum)
+		local toply = ARCPhone.GetPlayerFromPhoneNumber(tonum)
+		if fromply.ARCPhone_Reception > 10 or string.sub( fromnum, 1, 3 ) == "000" or string.sub( tonum, 1, 3 ) == "001"  then
+			ARCPhone.Disk.Texts[tonum][hash].place = 1
+			if toply.ARCPhone_Reception > 10 then
+				ARCPhone.Disk.Texts[tonum][hash].place = 2
+				ARCLib.SendBigMessage("arcphone_comm_text",ARCPhone.Disk.Texts[tonum][hash].msg,toply,function(err,per)
+					if err == ARCLib.NET_UPLOADING then
+						--Do something here?
+					elseif err == ARCLib.NET_COMPLETE then
+						ARCPhone.Disk.Texts[tonum][hash] = nil
+					else
+						ARCPhone.Msg("Sending arcphone_comm_text errored! "..err)
+						ARCPhone.Disk.Texts[tonum][hash].place = 0
+					end
+				end)
+			end
 		else
-			ARCPhone.Disk.Texts[tonum][hash].place = -1
+			ARCPhone.Disk.Texts[tonum][hash].place = 0
 		end
 	end
 end
@@ -465,23 +476,26 @@ function ARCPhone.Think()
 			end
 			local vnum = ARCPhone.GetPhoneNumber(v)
 			if refreshTexts > 1 then
-				if v.ARCPhone_Reception > 10 then
-					if !ARCPhone.Disk.Texts[vnum] then
-						ARCPhone.Disk.Texts[vnum] = {}
+				if !ARCPhone.Disk.Texts[vnum] then
+					ARCPhone.Disk.Texts[vnum] = {}
+				end
+				for kk,vv in pairs(ARCPhone.Disk.Texts[vnum]) do
+					local fromply = ARCPhone.GetPlayerFromPhoneNumber(vv.number)
+					if vv.place == 0 and v.ARCPhone_Reception > 10 then
+						vv.place = 1
 					end
-					--PrintTable(ARCPhone.Disk.Texts[vnum])
-					for kk,vv in pairs(ARCPhone.Disk.Texts[vnum]) do
-						if vv.place == -1 then
-							vv.place = 0
-							-- Send dummy message
-							net.Start("arcphone_comm_text")
-							net.WriteInt(0,8)
-							net.WriteUInt(0,32)
-							net.WriteUInt(#vv.msg,32)
-							net.WriteString(kk) --Hash
-							net.WriteUInt(0,32)
-							net.Send(v)
-						end
+					if vv.place == 1 and IsValid(fromply) and fromply.ARCPhone_Reception > 10 then
+						vv.place = 2
+						ARCLib.SendBigMessage("arcphone_comm_text",vv.msg,v,function(err,per)
+							if err == ARCLib.NET_UPLOADING then
+								--Do something here?
+							elseif err == ARCLib.NET_COMPLETE then
+								ARCPhone.Disk.Texts[vnum][kk] = nil
+							else
+								vv.place = 0
+								ARCPhone.Msg("Sending arcphone_comm_text errored! "..err)
+							end
+						end)
 					end
 				end
 			end
