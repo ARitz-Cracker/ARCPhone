@@ -2,7 +2,7 @@
 
 -- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
--- © Copyright 2016 Aritz Beobide-Cardinal All rights reserved.
+-- Â© Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
 
 ARCPhone.LogFileWritten = false
 ARCPhone.LogFile = ""
@@ -20,7 +20,7 @@ function ARCPhone.FuckIdiotPlayer(ply,reason)
 	ARCPhone.Msg("ARCPHONE ANTI-CHEAT WARNING: Some stupid shit by the name of "..ply:Nick().." ("..ply:SteamID()..") tried to use an exploit: ["..tostring(reason).."]")
 	if ply.ARCPhone_AFuckingIdiot then
 		--ply:Ban(ARCPhone.Settings["autoban_time"], ) 
-		ply:Ban(ARCBank.Settings["autoban_time"])
+		ply:Ban(ARCPhone.Settings["autoban_time"])
 		ply:SendLua("Derma_Message( \"You will be autobanned for "..ARCLib.TimeString( ARCPhone.Settings["autoban_time"]*60 )..".\", \"You're a failure at hacking\", \"Shit, Looks like I'm an idiot.\" )")
 		timer.Simple(10,function()
 			if IsValid(ply) && ply:IsPlayer() then 
@@ -240,6 +240,9 @@ function ARCPhone.GetReceptionFromPos(beginpos,routine,debugtab)
 				if routine then
 					coroutine.yield()
 				end
+				if totalblock > ARCPhone.Settings["antenna_strength"] then
+					break
+				end
 			end
 			if failsafe == 200 then
 				totalblock = dis
@@ -255,10 +258,12 @@ function ARCPhone.GetReceptionFromPos(beginpos,routine,debugtab)
 				debugtab.antpos[debugtab.antlen] = antenna:GetPos()
 				
 			end
-			per = per + thisper*mul
+			local thisper = thisper*mul
+			if thisper > per then
+				per = thisper
+			end
 		end
 	end
-
 	
 	for _,jammer in pairs(ents.FindByClass("sent_arc_phone_jammer")) do
 		if jammer.Jamming then
@@ -273,11 +278,30 @@ function ARCPhone.GetReceptionFromPos(beginpos,routine,debugtab)
 				local endpos = jammer:GetPos() + ang:Forward()*(dis)
 				while math.ceil(totaldistace) < math.floor(dis) && failsafe < 200 do
 					failsafe = failsafe + 1
+					local startpos = jammer:GetPos() + ang:Forward()*(totaldistace+5)
 					local trace = util.TraceLine( {
-						start = jammer:GetPos() + ang:Forward()*(totaldistace+5),
+						start = startpos,
 						endpos = endpos,
 						filter = function( ent ) if ( ent:GetClass() == "sent_arc_radio_blocker" ) then failsafe = 200 return true end end
 					} )
+					
+					if debugtab then
+						debugtab.len = debugtab.len + 1
+						debugtab.startLines[debugtab.len] = startpos
+						if util.IsInWorld(trace.HitPos) then
+							debugtab.colour[debugtab.len] = Color(0,0,0,255)
+							debugtab.endLines[debugtab.len] = startpos + ang:Forward()*(dis-totaldistace)*(trace.FractionLeftSolid)
+
+							debugtab.len = debugtab.len + 1
+							debugtab.startLines[debugtab.len] = debugtab.endLines[debugtab.len-1]
+							debugtab.endLines[debugtab.len] = trace.HitPos
+							debugtab.colour[debugtab.len] = Color(0,0,255,255)
+						else
+							debugtab.endLines[debugtab.len] = trace.HitPos
+							debugtab.colour[debugtab.len] = Color(0,255,255,255)
+						end
+					end
+					
 					--trace.FractionLeftSolid = trace.FractionLeftSolid^2
 					if util.IsInWorld(trace.HitPos) then
 						totalblock = totalblock + (dis-totaldistace)*trace.FractionLeftSolid+1
@@ -288,6 +312,9 @@ function ARCPhone.GetReceptionFromPos(beginpos,routine,debugtab)
 					if routine then
 						coroutine.yield()
 					end
+					if totalblock > ARCPhone.Settings["jammer_strength"] then
+						break
+					end
 				end
 				if failsafe == 200 then
 					totalblock = dis
@@ -295,7 +322,16 @@ function ARCPhone.GetReceptionFromPos(beginpos,routine,debugtab)
 				end
 
 				local mul = math.Clamp(((totalblock/ARCPhone.Settings["jammer_strength"]) - 1)*-1,0,1)^2
-				per = per - math.Clamp((ARCLib.BetweenNumberScaleReverse(10,totaldistace,ARCPhone.Settings["jammer_range"])^0.25)*mul*100,0,100)
+				local thisper = math.Clamp((ARCLib.BetweenNumberScaleReverse(0,totaldistace,ARCPhone.Settings["jammer_range"])^0.25)*100,0,100)
+				if debugtab then
+					debugtab.antlen = debugtab.antlen + 1
+					debugtab.antrange[debugtab.antlen] = thisper
+					debugtab.antblock[debugtab.antlen] = -mul*100+100
+					debugtab.anttotal[debugtab.antlen] = thisper*mul
+					debugtab.antpos[debugtab.antlen] = jammer:GetPos()
+					
+				end
+				per = per - thisper*mul
 			end
 		end
 	end
@@ -461,6 +497,9 @@ local refreshReception = -1
 local refreshTexts = -1
 local calcReception = 0
 function ARCPhone.Think()
+	if ARCPhone.Sedoku then
+		error("Baraaasgghahga! I'm ded")
+	end
 	if calcReception < SysTime() then
 		for k,v in pairs(player.GetAll()) do
 			--MsgN("Status of "..v:Nick())
@@ -536,7 +575,10 @@ function ARCPhone.Think()
 					local chance = math.random(0,rep)
 					if chance < 5 then
 						for kkk,vvv in pairs(v.on) do
-							ARCPhone.GetPlayerFromPhoneNumber(vvv):ConCommand("play ambient/levels/prison/radio_random"..math.random(1,15)..".wav")
+							local someoneInTheCall = ARCPhone.GetPlayerFromPhoneNumber(vvv)
+							if IsValid(someoneInTheCall) then
+								someoneInTheCall:ConCommand("play ambient/levels/prison/radio_random"..math.random(1,15)..".wav")
+							end
 						end
 					end
 					if chance == 0 then
@@ -585,9 +627,13 @@ function ARCPhone.Load()
 			ARCPhone.Msg("LOADING FALIURE!")
 			return
 		end
-		if !file.IsDir( ARCBank.Dir.."/saved_atms","DATA" ) then
-			ARCBank.Msg("Created Folder: "..ARCBank.Dir.."/saved_atms")
-			file.CreateDir(ARCBank.Dir.."/saved_atms")
+		if !file.IsDir( ARCPhone.Dir.."/saved_atms","DATA" ) then
+			ARCPhone.Msg("Created Folder: "..ARCPhone.Dir.."/saved_atms")
+			file.CreateDir(ARCPhone.Dir.."/saved_atms")
+		end
+		if !file.IsDir( ARCPhone.Dir.."/syslogs","DATA" ) then
+			ARCPhone.Msg("Created Folder: "..ARCPhone.Dir.."/syslogs")
+			file.CreateDir(ARCPhone.Dir.."/syslogs")
 		end
 		
 		if file.Exists(ARCPhone.Dir.."/__data.txt","DATA") then
@@ -604,11 +650,13 @@ function ARCPhone.Load()
 		ARCLib.AddonLoadSettings("ARCPhone",backward)
 		--TODO: Language support
 		
-		
-		ARCPhone.LogFile = os.date(ARCPhone.Dir.."/systemlog - %d %b %Y - "..tostring(os.date("%H")*60+os.date("%M"))..".log.txt")
-		file.Write(ARCPhone.LogFile,"***ARCPhone System Log***    \nIT IS RECCOMENDED TO USE NOTEPAD++ TO VIEW THIS FILE!    \nDates are in DD-MM-YYYY\n")
-		ARCPhone.LogFileWritten = true
-		ARCPhone.Msg("Log File Created at "..ARCPhone.LogFile)
+		ARCPhone.LogFile = ARCPhone.Dir.."/syslogs/"..os.date("%Y-%m-%d")..".log.txt"
+		if not file.Exists(ARCPhone.LogFile,"DATA") then
+			file.Write(ARCPhone.LogFile,"***ARCPhone System Log***\r\n"..table.Random({"Oh my god. You're reading this!","WINDOWS LOVES TYPEWRITER COMMANDS IN TXT FILES","What you're referring to as 'Linux' is in fact GNU/Linux.","... did you mess something up this time?"}).."\r\nDates are in YYYY-MM-DD\r\n")
+			ARCPhone.LogFileWritten = true
+			ARCPhone.Msg("Log File Created at "..ARCPhone.LogFile)
+		end
+
 		
 		--[[
 		if timer.Exists( "ARCPHONE_TAKRCOST" ) then
@@ -656,6 +704,7 @@ function ARCPhone.Load()
 			)
 			]]
 		end )
+		ARCPhone.SpawnAntennas()
 		ARCPhone.Msg("ARCPhone is ready!")
 		ARCPhone.Loaded = true
 		calcReception = SysTime()

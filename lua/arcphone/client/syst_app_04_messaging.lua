@@ -1,4 +1,6 @@
-
+-- This file is under copyright, and is bound to the agreement stated in the EULA.
+-- Any 3rd party content has been used as either public domain or with permission.
+-- © Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
 local APP = ARCPhone.NewAppObject()
 APP.Name = "Messaging"
 APP.Author = "ARitz Cracker"
@@ -15,7 +17,7 @@ end
 
 
 function APP:AttachPhoto(photo)
-	local imagetag = "{{IMG:"..photo..":IMG}}"
+	local imagetag = "{{IMG\""..photo.."\"IMG}}"
 	if string.find( self.Tiles[self.TextInputIcon]:GetText(), imagetag ,1 ,false) then
 		ARCPhone.PhoneSys:AddMsgBox("Duplicate image","You cannot attach 2 of the same image","warning")
 	else
@@ -24,6 +26,40 @@ function APP:AttachPhoto(photo)
 		self:SetCurPos(self.SendIcon)
 		end)
 	end
+end
+
+function APP:UpdateCurrentConvo(timestamp,msg,sender)
+	local sendTile = table.remove( self.Tiles )
+	local inputTile = table.remove( self.Tiles )
+
+
+
+	local i = #self.Tiles + 1
+	self.Tiles[i] = ARCPhone.NewAppTextInputTile(self,msg,true,118)
+	self.Tiles[i].Editable = false
+	if i > 1 then
+		self.Tiles[i].y = self.Tiles[i-1].y + self.Tiles[i-1].h + 4
+	else
+		self.Tiles[i].y = 24
+	end
+	if sender then
+		self.Tiles[i].x = 12
+		self.Tiles[i].bgcolor = self.Phone.Settings.Personalization.CL_01_MainColour
+		self.Tiles[i].color = self.Phone.Settings.Personalization.CL_03_MainText
+	else
+		self.Tiles[i].x = 4
+		self.Tiles[i].bgcolor = self.Phone.Settings.Personalization.CL_03_SecondaryColour
+		self.Tiles[i].color = self.Phone.Settings.Personalization.CL_05_SecondaryText
+	end
+	i = i + 1
+	inputTile.y = self.Tiles[i-1].y + self.Tiles[i-1].h + 4
+	self.Tiles[i] = inputTile
+	self.TextInputIcon = i
+	self:SetCurPos(i)
+	i = i + 1
+	sendTile.y = self.Tiles[i-1].y + self.Tiles[i-1].h + 2
+	self.Tiles[i] = sendTile
+	self.SendIcon = i
 end
 
 function APP:OpenConvo(num)
@@ -58,6 +94,9 @@ function APP:OpenConvo(num)
 			end
 		end
 	end
+	
+	
+	
 	len = len + 1
 	self.TextInputIcon = len
 	self.Tiles[len] = ARCPhone.NewAppTextInputTile(self,"",true,118)
@@ -73,7 +112,6 @@ function APP:OpenConvo(num)
 	self.Tiles[len].color = self.Phone.Settings.Personalization.CL_11_QuaternaryText
 	self.Tiles[len].Editable = true
 	self:SetCurPos(len)
-	
 	
 	len = len + 1
 	
@@ -93,7 +131,9 @@ function APP:OpenConvo(num)
 	self.Tiles[len].OnUnPressed = function(tile)
 		local msg = tile.App.Tiles[tile.App.SendIcon-1].TextInput
 		tile.App.Phone:SendText(num,msg)
-		tile.App:OpenConvo(num)
+		
+		tile.App.Tiles[tile.App.SendIcon-1]:SetText("")
+		self:UpdateCurrentConvo(os.time(),msg,true)
 	end
 end
 

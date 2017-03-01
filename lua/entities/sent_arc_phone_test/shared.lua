@@ -1,7 +1,7 @@
 ENT.Base = "base_anim"
 ENT.Type = "anim"
 
-ENT.PrintName		= "Phone Test"
+ENT.PrintName		= "Reception Tester"
 ENT.Author			= "ARitz Cracker"
 ENT.Category 		= "ARitz Cracker Phone"
 ENT.Contact    		= ""

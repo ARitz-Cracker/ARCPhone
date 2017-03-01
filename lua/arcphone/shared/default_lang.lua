@@ -2,7 +2,7 @@
 
 -- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
--- © Copyright 2016 Aritz Beobide-Cardinal All rights reserved.
+-- Â© Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
 
 ARCPhone.Msgs = ARCPhone.Msgs or {}
 ARCPhone.Msgs.Time = ARCPhone.Msgs.Time or {}
@@ -11,6 +11,8 @@ ARCPhone.Msgs.Commands = ARCPhone.Msgs.Commands or {}
 ARCPhone.Msgs.CommandOutput = ARCPhone.Msgs.CommandOutput or {}
 ARCPhone.Msgs.Items = ARCPhone.Msgs.Items or {}
 ARCPhone.Msgs.LogMsgs = ARCPhone.Msgs.LogMsgs or {}
+ARCPhone.Msgs.Phone = ARCPhone.Msgs.Phone or {}
+ARCPhone.Msgs.PhoneCases = ARCPhone.Msgs.PhoneCases or {}
 
 ARCPHONE_ERRORSTRINGS = ARCPHONE_ERRORSTRINGS or {}
 ARCPhone.SettingsDesc = ARCPhone.SettingsDesc or {}
@@ -37,18 +39,6 @@ ARCPhone.SettingsDesc = ARCPhone.SettingsDesc or {}
                                                                                                                          
 																														 
 These are the default values in order to prevent you from screwing it up!
-
-For a tutorial on how to create your own custom language, READ THE README!
-
-There's even a command that lets you select from a range of pre-loaded languages!
-
-type "arcslots settings language (lang)" in console
-(lang) can be the following:
-en -- English
-fr -- French
-ger -- German
-pt_br -- Brazilian Portuguese
-sp -- Spanish
 ]]
 
 ARCPHONE_ERRORSTRINGS[-4] = "Incomming call"
@@ -70,6 +60,21 @@ ARCPHONE_ERRORSTRINGS[18] = "Your phone plan doesn't support this"
 
 ARCPHONE_ERRORSTRINGS[-127] = "The ARCPhone system failed to load."
 ARCPHONE_ERRORSTRINGS[-128] = "Unknown Error. Try again later."
+
+ARCPhone.Msgs.PhoneCases[0] = "Black"
+ARCPhone.Msgs.PhoneCases[1] = "Orange"
+ARCPhone.Msgs.PhoneCases[2] = "Yellow"
+ARCPhone.Msgs.PhoneCases[3] = "Lime"
+ARCPhone.Msgs.PhoneCases[4] = "Bright Green"
+ARCPhone.Msgs.PhoneCases[5] = "Green"
+ARCPhone.Msgs.PhoneCases[6] = "Aquamarine"
+ARCPhone.Msgs.PhoneCases[7] = "Cyan"
+ARCPhone.Msgs.PhoneCases[8] = "Bleu de France"
+ARCPhone.Msgs.PhoneCases[9] = "Blue"
+ARCPhone.Msgs.PhoneCases[10] = "Violet"
+ARCPhone.Msgs.PhoneCases[11] = "Magenta"
+ARCPhone.Msgs.PhoneCases[12] = "Red"
+ARCPhone.Msgs.PhoneCases[13] = "Gray"
 
 ARCPhone.Msgs.CommandOutput.SysReset = "System reset required!"
 ARCPhone.Msgs.CommandOutput.SysSetting = "%SETTING% has been changed to %VALUE%"
@@ -95,6 +100,7 @@ ARCPhone.Msgs.Time.days = "days"
 ARCPhone.Msgs.Time.forever = "forever"
 ARCPhone.Msgs.Time.now = "now"
 
+ARCPhone.Msgs.AdminMenu.Commands = "Commands"
 ARCPhone.Msgs.AdminMenu.Remove = "Remove"
 ARCPhone.Msgs.AdminMenu.Add = "Add"
 ARCPhone.Msgs.AdminMenu.Description = "Description:"

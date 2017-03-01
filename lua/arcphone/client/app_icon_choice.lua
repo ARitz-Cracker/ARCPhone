@@ -1,3 +1,6 @@
+-- This file is under copyright, and is bound to the agreement stated in the EULA.
+-- Any 3rd party content has been used as either public domain or with permission.
+-- © Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
 local choicetile = table.Copy(ARCPhone.TileBase)
 choicetile._choiceinput = true
 choicetile.ChoiceKeys = {}
@@ -8,7 +11,7 @@ choicetile.AnimEnd = 0
 function choicetile:drawfunc(xpos,ypos)
 	local txtcol
 	if (!self.bgcolor) then
-		txtcol = color_white
+		txtcol = ARCPhone.TextOnColor(self.color)
 	else
 		txtcol = self.color
 	end
@@ -18,7 +21,7 @@ function choicetile:drawfunc(xpos,ypos)
 		self.multiplier = (self.multiplier - 1)*-1
 	end
 	if self.multiplier <= 0 then
-		draw.SimpleText( ARCLib.CutOutText(self.ChoiceKeys[self.SelectedChoice],"ARCPhone",self.w-4), "ARCPhone", xpos+2, ypos+self.h*0.5, txtcol, TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER) 
+		draw.SimpleText( ARCLib.CutOutText(self.ChoiceText or self.ChoiceKeys[self.SelectedChoice],"ARCPhone",self.w-4), "ARCPhone", xpos+2, ypos+self.h*0.5, txtcol, TEXT_ALIGN_LEFT,TEXT_ALIGN_CENTER) 
 	end
 end
 
@@ -40,14 +43,14 @@ function choicetile:drawfunc2(xpos,ypos)
 
 		for i = 1,#self.ChoiceKeys do
 			if self.SelectedChoice != i then
-				draw.SimpleText( ARCLib.CutOutText(self.ChoiceKeys[i],"ARCPhone",self.w-4), "ARCPhone", xpos + 2, textypos[i], Color(255,255,255,255), TEXT_ALIGN_LEFT , TEXT_ALIGN_TOP  )
+				draw.SimpleText( ARCLib.CutOutText(self.ChoiceKeys[i],"ARCPhone",self.w-4), "ARCPhone", xpos + 2, textypos[i], self.App.Phone.Settings.Personalization.CL_17_ContextMenuText, TEXT_ALIGN_LEFT , TEXT_ALIGN_TOP  )
 			end
 			
 		end
 		--local textypos = ( ystartpos + ((self.SelectedChoice-1)*14) ) * multiplier + (ypos+(self.h/2 - 6))*multiplierrev
 		surface.SetDrawColor(ARCLib.ConvertColor(self.App.Phone.Settings.Personalization.CL_15_ContextMenuSelect))
 		surface.DrawRect( xpos, ( ystartpos + ((self.SelectedChoice-1)*16) ) * self.multiplier + (ypos)*multiplierrev, self.w, 16*self.multiplier + self.h*multiplierrev)
-		draw.SimpleText( ARCLib.CutOutText(self.ChoiceKeys[self.SelectedChoice],"ARCPhone",self.w-2), "ARCPhone", xpos + 2, textypos[self.SelectedChoice], Color(255,255,255,255), TEXT_ALIGN_LEFT , TEXT_ALIGN_TOP  )
+		draw.SimpleText( ARCLib.CutOutText(self.ChoiceKeys[self.SelectedChoice],"ARCPhone",self.w-2), "ARCPhone", xpos + 2, textypos[self.SelectedChoice], self.App.Phone.Settings.Personalization.CL_17_ContextMenuTextSelect, TEXT_ALIGN_LEFT , TEXT_ALIGN_TOP  )
 		
 		surface.SetDrawColor(ARCLib.ConvertColor(self.App.Phone.Settings.Personalization.CL_16_ContextMenuBorder))
 		surface.DrawOutlinedRect( xpos, textypos[1], self.w, textypos[#textypos] - textypos[1] + 16  )

@@ -2,9 +2,17 @@
 
 -- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
--- © Copyright 2016 Aritz Beobide-Cardinal All rights reserved.
+-- Â© Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
 
 --Check if the thing is running
+util.AddNetworkString( "arcphone_phone_settings" )
+net.Receive( "arcphone_phone_settings", function(length,ply) -- Can't wait until people exploit this to make rainbow phones.
+	local wep = ply:GetWeapon( "weapon_arc_phone" )
+	if not IsValid(wep) then return end
+	local case = net.ReadUInt(4)
+	
+	wep:SetSkin(case)
+end)
 
 util.AddNetworkString( "arcphone_switchholdtype" ) -- This isn't an exploit, it's purly cosmetic, ok? >_>
 net.Receive( "arcphone_switchholdtype", function(length,ply)

@@ -1,7 +1,6 @@
--- app_util.lua - app utilities
 -- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
--- © Copyright 2016 Aritz Beobide-Cardinal All rights reserved.
+-- Â© Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
 ARCPhone.Apps = ARCPhone.Apps or {}
 
 local curapptime = 0

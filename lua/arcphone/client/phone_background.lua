@@ -1,8 +1,7 @@
 -- phone_background.lua - background processes while the phone is holstered.
-
 -- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
--- © Copyright 2016 Aritz Beobide-Cardinal All rights reserved.
+-- Â© Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
 
 local CallingSound
 local RingingSound
@@ -66,7 +65,7 @@ function ARCPhone.OnStatusChanged()
 			for k,v in pairs(ARCPhone.PhoneSys.CurrentCall.on) do
 				lst = lst.."\n"..contactapp:GetNameFromNumber(v).." ("..v..")"
 			end
-			ARCPhone.PhoneSys:AddMsgBox("Incoming call","You're recieving a call from:"..lst,"phone",8,function() ARCPhone.PhoneSys:Answer() ARCPhone.PhoneSys:OpenApp("callscreen") end,function() ARCPhone.PhoneSys:HangUp() end,function() ARCPhone.PhoneSys:AddMsgBox("Coming soon!","That feature hasn't been added yet. (You also ignored the call)","info") ARCPhone.PhoneSys:HangUp() end)
+			ARCPhone.PhoneSys:AddMsgBox("Incoming call","You're recieving a call from:"..lst,"phone",8,function() ARCPhone.PhoneSys:Answer() ARCPhone.PhoneSys:OpenApp("callscreen") end,function() ARCPhone.PhoneSys:HangUp() end,function() ARCPhone.PhoneSys:OpenApp("messaging"):OpenConvo(ARCPhone.PhoneSys.CurrentCall.on[1]) ARCPhone.PhoneSys:HangUp() end)
 			--http://www.aritzcracker.ca/arcphone/ringtones/Reflection.mp3
 			--"http://www.aritzcracker.ca/arcphone/ringtones/generic1.mp3"
 			net.Start("arcphone_ringer")

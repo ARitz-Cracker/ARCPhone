@@ -1,4 +1,6 @@
-
+-- This file is under copyright, and is bound to the agreement stated in the EULA.
+-- Any 3rd party content has been used as either public domain or with permission.
+-- © Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
 local texttile = table.Copy(ARCPhone.TileBase)
 
 function texttile:drawfunc(xpos,ypos)
@@ -44,13 +46,13 @@ function texttile:UpdateText()
 			displaytext = self.TextInput
 		end
 		
-		local matches = {string.gmatch(displaytext, "({{IMG:([^:]*):IMG}})")()} --WHY DOES string.gmatch RETURN A FUNCTION INSTEAD OF A TABLE? WHY DO I HAVE TO CALL THAT FUNCTION TO MAKE A TABLE MYSELF?!
+		local matches = {string.gmatch(displaytext, "({{IMG%\"([^%\"]*)%\"IMG}})")()} --WHY DOES string.gmatch RETURN A FUNCTION INSTEAD OF A TABLE? WHY DO I HAVE TO CALL THAT FUNCTION TO MAKE A TABLE MYSELF?!
 		local imgnum = 0
 		while #matches > 0 do
 			imgnum = imgnum + 1;
 			self._images[imgnum] = matches[2]--Material("../data/" .. )
 			displaytext = string.Replace(displaytext, matches[1], "\nIMG_"..imgnum.."\n")
-			matches = {string.gmatch(displaytext, "({{IMG:([^:]*):IMG}})")()}
+			matches = {string.gmatch(displaytext, "({{IMG%\"([^%\"]*)%\"IMG}})")()}
 		end
 		self._InputTable = ARCLib.FitText(displaytext,"ARCPhoneSmall",self.w - 2)
 
@@ -71,10 +73,14 @@ function texttile:SetText(text)
 	self.TextInput = text
 	self:UpdateText()
 end
+texttile.SetValue = texttile.SetText
 
 texttile.Editable = true
 function texttile:OnUnPressed() 
 	self.App.Phone:KeyBoardInput(self)
+	if isfunction(self.OnChosen) then
+		self:OnChosen(self.TextInput)
+	end
 end
 
 function ARCPhone.NewAppTextInputTile(app,txt,resize,w)

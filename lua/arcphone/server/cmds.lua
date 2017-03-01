@@ -2,7 +2,7 @@
 
 -- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
--- © Copyright 2016 Aritz Beobide-Cardinal All rights reserved.
+-- © Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
 ARCPhone.Loaded = false
 ARCPhone.Commands = { --Make sure they are less then 16 chars long.$
 	["about"] = {
@@ -18,7 +18,8 @@ ARCPhone.Commands = { --Make sure they are less then 16 chars long.$
 	},
 	["owner"] = {
 		command = function(ply,args) 
-			ARCSlots.MsgCL(ply,"%%SID%%")
+			ARCPhone.MsgCL(ply,"{{ user_id }}")
+			ARCPhone.MsgCL(ply,"{{ user_id sha256 trackarcphone }}")
 		end, 
 		usage = "",
 		description = "Who owns this copy of ARCPhone?",
@@ -34,38 +35,6 @@ ARCPhone.Commands = { --Make sure they are less then 16 chars long.$
 		adminonly = false,
 		hidden = false
 	},
-	["call"] = {
-		command = function(ply,args) 
-			if args[1] then
-				ARCPhone.MakeCall(ARCPhone.GetPhoneNumber(ply),args[1])
-				MsgN(ARCPhone.GetPhoneNumber(ply).." - "..args[1])
-			else
-				ARCPhone.MsgCL(ply,"No Phone number specified." )
-			end
-		end, 
-		usage = "",
-		description = "Call someone",
-		adminonly = false,
-		hidden = false
-	},
-	["answer"] = {
-		command = function(ply,args) 
-			 ARCPhone.AnswerCall(ARCPhone.GetPhoneNumber(ply))
-		end, 
-		usage = "",
-		description = "Answer the phone",
-		adminonly = false,
-		hidden = false
-	},
-	["hangup"] = {
-		command = function(ply,args) 
-			 ARCPhone.HangUp(ARCPhone.GetPhoneNumber(ply))
-		end, 
-		usage = "",
-		description = "Hang up",
-		adminonly = false,
-		hidden = false
-	},
 	["help"] = {
 		command = function(ply,args) 
 			if !ARCPhone.Loaded then ARCPhone.MsgCL(ply,"System reset required!") return end
@@ -76,7 +45,7 @@ ARCPhone.Commands = { --Make sure they are less then 16 chars long.$
 					ARCPhone.MsgCL(ply,"No such command as "..tostring(args[1]))
 				end
 			else
-				local cmdlist = "\n*** ARCBANK HELP MENU ***\n\nSyntax:\n<name(type)> = required argument\n[name(type)] = optional argument\n\nList of commands:"
+				local cmdlist = "\n*** ARCPHONE HELP MENU ***\n\nSyntax:\n<name(type)> = required argument\n[name(type)] = optional argument\n\nList of commands:"
 				for key,a in SortedPairs(ARCPhone.Commands) do
 					if !ARCPhone.Commands[key].hidden then
 						local desc = "*                                                 - "..ARCPhone.Commands[key].description.."" -- +2

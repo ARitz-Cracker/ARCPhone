@@ -1,3 +1,6 @@
+-- This file is under copyright, and is bound to the agreement stated in the EULA.
+-- Any 3rd party content has been used as either public domain or with permission.
+-- © Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
 local APP = ARCPhone.NewAppObject()
 APP.Name = "Home"
 APP.Author = "ARitz Cracker"
@@ -197,8 +200,8 @@ function APP:StartCustomization()
 		]]
 		self.Tiles[i].OnUnPressed = function(tile)
 			if tile.moving then
-				tile.bgcolor = Color(25,25,255,100)
-				tile.color = Color(255,255,255,100)
+				tile.bgcolor = self.Phone.Settings.Personalization.CL_02_MainPressed
+				tile.color = self.Phone.Settings.Personalization.CL_03_MainText
 				tile.App.DisableTileSwitching = false
 				tile.moving = false
 				self.MovingTile = false

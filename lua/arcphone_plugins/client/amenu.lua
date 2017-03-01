@@ -1,8 +1,7 @@
 -- GUI for ARitz Cracker Bank (Clientside)
--- This shit is under a Creative Commons Attribution 4.0 International Licence
--- http://creativecommons.org/licenses/by/4.0/
--- You can mess around with it, mod it to your liking, and even redistribute it.
--- However, you must credit me.
+-- This file is under copyright, and is bound to the agreement stated in the EULA.
+-- Any 3rd party content has been used as either public domain or with permission.
+-- © Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
 if ARCPhone then
 	local ARCPhoneGUI = ARCPhoneGUI or {}
 	ARCPhoneGUI.SelectedAccountRank = 0
@@ -44,24 +43,7 @@ if ARCPhone then
 			LogList:SetPos(5,550)
 			LogList:SetSize( 590, 20 )
 			LogList:SetText( "UNAVAILABLE" )
-			
-			for i=1,#tab do 
-				LogList:AddChoice(tab[i])
-			end
-			function LogList:OnSelect(index,value,data)
-				ARCPhone.AdminLog(value,false,function(data,per)
-					if isnumber(data) then
-						if data == ARCBANK_ERROR_DOWNLOADING then
-							Text:SetText(ARCPhone.Msgs.ATMMsgs.Loading.."(%"..math.Round(per*100)..")")
-						else
-							Text:SetText(ARCBANK_ERRORSTRINGS[data])
-						end
-					else
-						Text:SetText(data)
-					end
-				end)
-			end
-			
+		
 		else
 			local MainMenu = vgui.Create( "DFrame" )
 			MainMenu:SetSize( 200, 150 )
@@ -72,18 +54,18 @@ if ARCPhone then
 			MainMenu:ShowCloseButton( true )
 			MainMenu:MakePopup()
 			local LogButton = vgui.Create( "DButton", MainMenu )
-			LogButton:SetText( "// DO NOTHING //" )
+			LogButton:SetText( "System Logs" )
 			LogButton:SetPos( 10, 30 )
 			LogButton:SetSize( 180, 20 )
 			LogButton.DoClick = function()
-				--RunConsoleCommand( "arcphone","admin_gui","logs")
+				Derma_Message( "This feature is coming in a future update.", "Uh oh...", "OK" )
 			end
 			local AccountsButton = vgui.Create( "DButton", MainMenu )
-			AccountsButton:SetText( "// DO NOTHING //" )
+			AccountsButton:SetText( "Advanced settings" )
 			AccountsButton:SetPos( 10, 60 )
 			AccountsButton:SetSize( 180, 20 )
 			AccountsButton.DoClick = function()	
-
+				Derma_Message( "This feature is coming in a future update.", "Uh oh...", "OK" )
 			end
 			local SettingsButton = vgui.Create( "DButton", MainMenu )
 			SettingsButton:SetText( "Settings" )

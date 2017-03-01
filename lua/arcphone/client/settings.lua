@@ -1,16 +1,25 @@
+-- This file is under copyright, and is bound to the agreement stated in the EULA.
+-- Any 3rd party content has been used as either public domain or with permission.
+-- © Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
 ARCPhone.PhoneSys.Settings = {}
 ARCPhone.PhoneSys.SettingChoices = {}
 
 ARCPhone.PhoneSys.Settings.Ringtones = {}
 ARCPhone.PhoneSys.SettingChoices.Ringtones = {}
 ARCPhone.PhoneSys.Settings.Ringtones.PhoneCall = "http://www.aritzcracker.ca/arcphone/ringtones/generic1.mp3"
-ARCPhone.PhoneSys.SettingChoices.Ringtones.PhoneCall = {{"Default","http://www.aritzcracker.ca/arcphone/ringtones/generic1.mp3"},{"BANANA PHONE","http://www.lee.org/blog/wp-content/uploads/2008/03/raffi-bananaphone.mp3"},{"Swiggity Swag","http://www.aritzcracker.ca/texttospeech/3cacecb98e895f27b41e324c745b72a9.mp3"},{"POMF =3","http://www.aritzcracker.ca/texttospeech/63118d6268cbf68ef21cd4625db785b5.mp3"},{"LeaksRbad","https://austinhh.info/leaksrbad.mp3"},{"Dragonborn Comes","http://ndlee.com/thedragonborncomes.mp3"},{"BlueLeaks","http://www.underdone.org/leak/underdone/blue.mp3"}}
+ARCPhone.PhoneSys.SettingChoices.Ringtones.PhoneCall = {
+	{"Default","http://www.aritzcracker.ca/arcphone/ringtones/generic1.mp3"},
+	{"BANANA PHONE","http://www.lee.org/blog/wp-content/uploads/2008/03/raffi-bananaphone.mp3"},
+	{"Swiggity Swag","http://www.aritzcracker.ca/texttospeech/3cacecb98e895f27b41e324c745b72a9.mp3"},
+	{"POMF =3","http://www.aritzcracker.ca/texttospeech/63118d6268cbf68ef21cd4625db785b5.mp3"},
+	{"Dragonborn Comes","http://ndlee.com/thedragonborncomes.mp3"},
+	{"Underdone BlueLeaks","http://www.underdone.org/leak/underdone/blue.mp3"}}
 ARCPhone.PhoneSys.Settings.Ringtones.TextMsg = "http://www.aritzcracker.ca/arcphone/notifications/162464__kastenfrosch__message.mp3"
 ARCPhone.PhoneSys.Settings.Ringtones.Popup = "http://www.aritzcracker.ca/arcphone/notifications/162464__kastenfrosch__message.mp3"
-ARCPhone.PhoneSys.Settings.Ringtones.TestNumber = 1
 
 ARCPhone.PhoneSys.Settings.Personalization = {}
 ARCPhone.PhoneSys.SettingChoices.Personalization = {}
+ARCPhone.PhoneSys.Settings.Personalization.PhoneCase = 0
 ARCPhone.PhoneSys.Settings.Personalization.CL_00_CursorColour = Color(255,255,255,255)
 
 ARCPhone.PhoneSys.Settings.Personalization.CL_01_MainColour = Color(25,25,255,255)
@@ -37,6 +46,7 @@ ARCPhone.PhoneSys.Settings.Personalization.CL_14_ContextMenuMain = Color(0,0,128
 ARCPhone.PhoneSys.Settings.Personalization.CL_15_ContextMenuSelect = Color(0,0,255,255)
 ARCPhone.PhoneSys.Settings.Personalization.CL_16_ContextMenuBorder = Color(50,50,255,255)
 ARCPhone.PhoneSys.Settings.Personalization.CL_17_ContextMenuText = Color(255,255,255,255)
+ARCPhone.PhoneSys.Settings.Personalization.CL_17_ContextMenuTextSelect = Color(255,255,255,255)
 
 ARCPhone.PhoneSys.Settings.Personalization.CL_18_FadeColour = Color(0,0,0,150)
 ARCPhone.PhoneSys.Settings.Personalization.CL_19_MegaFadeColour = Color(0,0,0,225)

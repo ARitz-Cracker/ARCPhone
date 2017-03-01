@@ -1,3 +1,15 @@
+-- This file is under copyright, and is bound to the agreement stated in the EULA.
+-- Any 3rd party content has been used as either public domain or with permission.
+-- © Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
+function ARCPhone.TextOnColor(col)
+	if col.r + col.g + col.b > 450 then
+		return color_black
+	else
+		return color_white
+	end
+end
+
+
 local coltile = table.Copy(ARCPhone.TileBase)
 coltile._colorinput = true
 coltile._colortab = {"r","g","b","a"}
@@ -58,11 +70,7 @@ function coltile:drawfunc(xpos,ypos)
 		surface.DrawLine(polytab2[3].x,polytab2[3].y,polytab2[1].x,polytab2[1].y)
 		
 	end
-	if self.color.r + self.color.g + self.color.b > 450 then
-		self.txtcol = color_black
-	else
-		self.txtcol = color_white
-	end
+	self.txtcol = ARCPhone.TextOnColor(self.color)
 end
 
 function coltile:OnUnPressed() 
@@ -77,6 +85,7 @@ function coltile:GetColor()
 	return self.color
 end
 coltile.GetValue = coltile.GetColor
+coltile.SetValue = coltile.SetColor
 
 function ARCPhone.NewAppColorInputTile(app,col,txt)
 	local tab = table.Copy(coltile)

@@ -1,4 +1,6 @@
-
+-- This file is under copyright, and is bound to the agreement stated in the EULA.
+-- Any 3rd party content has been used as either public domain or with permission.
+-- © Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
 local texttile = table.Copy(ARCPhone.TileBase)
 
 texttile._NumberInput = true
@@ -50,19 +52,19 @@ function texttile:drawfunc(xpos,ypos)
 	end
 	draw.NoTexture()
 	polytab[1].x = self.x + self.w/2
-	polytab[1].y = self.y + self.h - 2
+	polytab[1].y = self.y + self.h - 6
 	polytab[2].x = self.x + 2
-	polytab[2].y = self.y + self.h/2 + 7
+	polytab[2].y = self.y + self.h/2 + 3
 	polytab[3].x = self.x + self.w - 2
-	polytab[3].y = self.y + self.h/2 + 7
+	polytab[3].y = self.y + self.h/2 + 3
 	surface.DrawPoly(polytab)
 	draw.NoTexture()
 	polytab2[1].x = self.x + self.w/2
-	polytab2[1].y = self.y + 2
+	polytab2[1].y = self.y + 0
 	polytab2[2].x = self.x + self.w - 2
-	polytab2[2].y = self.y + self.h/2 - 7
+	polytab2[2].y = self.y + self.h/2 - 9
 	polytab2[3].x = self.x + 2
-	polytab2[3].y = self.y + self.h/2 - 7
+	polytab2[3].y = self.y + self.h/2 - 9
 	surface.DrawPoly(polytab2)
 	
 	surface.SetDrawColor(ARCLib.ConvertColor(txtcol))
@@ -85,6 +87,8 @@ texttile.GetValue = texttile.GetNumber
 function texttile:SetText(text)
 	self.TextInput = tostring(math.Clamp(math.Round(tonumber(text) or self.Min,self.Decimals),self.Min,self.Max))
 end
+texttile.SetNumber = texttile.SetText
+texttile.SetValue = texttile.SetText
 
 texttile.Editable = true
 function texttile:OnUnPressed() 

@@ -2,7 +2,7 @@
 
 -- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
--- © Copyright 2016 Aritz Beobide-Cardinal All rights reserved.
+-- Â© Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
 ARCPhone.Loaded = false
 
 
@@ -154,4 +154,7 @@ else
 	hook.Add( "CanProperty", "ARCPhone BlockProperties", function( ply, property, ent )
 		if ent.ARCPhone_MapEntity then return false end 
 	end )
+	hook.Add( "PhysgunPickup", "ARCPhone NoPhys", function( ply, ent ) 
+		if ent.ARCPhone_MapEntity then return false end 
+	end)
 end

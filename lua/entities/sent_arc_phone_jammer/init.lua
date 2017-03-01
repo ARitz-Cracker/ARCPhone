@@ -1,6 +1,6 @@
 -- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
--- © Copyright 2016 Aritz Beobide-Cardinal All rights reserved.
+-- Â© Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 include('shared.lua')
@@ -104,9 +104,9 @@ function ENT:ToggleJammer()
 		self:EmitSound("arcphone/jammer/knobturn"..math.random(1,3)..".wav",65,120)
 		self.Jamming = !self.Jamming
 		if self.Jamming then
-			self:ARCLib_SetAnimationTime("throw" ,0.2)
-		else
 			self:ARCLib_SetAnimationTime("reload" ,0.2)
+		else
+			self:ARCLib_SetAnimationTime("throw" ,0.2)
 		end
 		net.Start("ARCJammer")
 		net.WriteBit(self.Jamming)
@@ -140,11 +140,13 @@ function ENT:ToggleOpen()
 	end
 end
 net.Receive("ARCJammer",function(len,ply)
-	local open = tobool(net.ReadBit()) 
-	local jammer = net.ReadEntity()
-	if open then
-		jammer:ToggleOpen()
-	else
-		jammer:ToggleJammer()
+	if ply:GetEyeTrace().Entity.IsARCJammer then
+		local open = tobool(net.ReadBit()) 
+		local jammer = net.ReadEntity()
+		if open then
+			jammer:ToggleOpen()
+		else
+			jammer:ToggleJammer()
+		end
 	end
 end)

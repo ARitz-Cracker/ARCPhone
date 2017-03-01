@@ -1,6 +1,6 @@
 -- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
--- © Copyright 2016 Aritz Beobide-Cardinal All rights reserved.
+-- Â© Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
 
 include('shared.lua')
 function ENT:Initialize()
@@ -93,6 +93,18 @@ net.Receive("ARCJammer",function(len,ply)
 	local jammer = net.ReadEntity()
 	if !IsValid(jammer) then return end
 	jammer.Jamming = open
+end)
+
+hook.Add( "PostDrawTranslucentRenderables", "ARCPhone VisualizeReceptionJammer", function(wut,skybox)
+	if skybox then return end
+	local ent = ents.FindByClass("sent_arc_phone_test")[1]
+	if IsValid(ent) then
+		for k,v in pairs(ents.FindByClass("sent_arc_phone_jammer")) do
+			if v.Jamming then
+				render.DrawWireframeSphere( v:GetPos(), ARCPhone.Settings["jammer_range"], 32,32, Color(255,0,0,255), true ) 
+			end
+		end
+	end
 end)
 --[[
 local curtab = {}

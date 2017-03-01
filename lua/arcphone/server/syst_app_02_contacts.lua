@@ -1,5 +1,8 @@
+-- This file is under copyright, and is bound to the agreement stated in the EULA.
+-- Any 3rd party content has been used as either public domain or with permission.
+-- © Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
 local APP = ARCPhone.NewServerAppObject()
-APP.Number = "0000000001" -- Boring, I know. I gues 0000000 to 0000099 is reserved for me, then
+APP.Number = "0000000001" -- Boring, I know. I guess 0000000 to 0000099 is reserved for me, then
 
 
 

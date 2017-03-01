@@ -1,3 +1,6 @@
+-- This file is under copyright, and is bound to the agreement stated in the EULA.
+-- Any 3rd party content has been used as either public domain or with permission.
+-- © Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
 local APP = ARCPhone.NewAppObject()
 APP.Name = "Photos"
 APP.Author = "ARitz Cracker"
@@ -83,7 +86,7 @@ function APP:Init()
 		draw.SimpleText("Received Photos", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_03_MainText, TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
 	end
 	self.Tiles[2].OnPressed = function(tile)
-		tile.color = Color(0,0,255,128)
+		tile.color = self.Phone.Settings.Personalization.CL_02_MainPressed
 	end
 	self.Tiles[2].OnUnPressed = function(tile)
 		tile.color = self.Phone.Settings.Personalization.CL_01_MainColour

@@ -1,6 +1,6 @@
 -- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
--- © Copyright 2014-2016 Aritz Beobide-Cardinal All rights reserved.
+-- © Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
 
 --ENUMS FOR ARC BANKING SYSTEM!
 --137164355
@@ -9,16 +9,16 @@ function ARCPhone.Msg(msg)
 	Msg("ARCPhone: "..tostring(msg).."\n")
 	if !ARCPhone then return end
 	if ARCPhone.LogFileWritten then
-		file.Append(ARCPhone.LogFile, os.date("%d-%m-%Y %H:%M:%S").." > "..tostring(msg).."\r\n")
+		file.Append(ARCPhone.LogFile, os.date("%Y-%m-%d %H:%M:%S").." > "..tostring(msg).."\r\n")
 	end
 end
 ARCPhone.Msg("Running...\n ____ ____ _ ___ ___     ____ ____ ____ ____ _  _ ____ ____    ___  _  _ ____ _  _ ____ \n |__| |__/ |  |    /     |    |__/ |__| |    |_/  |___ |__/    |__] |__| |  | |\\ | |___ \n |  | |  \\ |  |   /__    |___ |  \\ |  | |___ | \\_ |___ |  \\    |    |  | |__| | \\| |___ \n")
 ARCPhone.Msg(table.Random({"HOLY SHIT HE'S FINALLY WORKING ON IT??","RIIING RIIIING!!!","ARitz Cracker's NEXT BIG PROJECT!","fone","Call your friends!","Super fukin' Sexy edition!","3rd party app support!"}))
-ARCPhone.Msg("© Copyright 2014-2016 Aritz Beobide-Cardinal (ARitz Cracker) All rights reserved.")
+ARCPhone.Msg("© Copyright 2016-2017 Aritz Beobide-Cardinal (ARitz Cracker) All rights reserved.")
 
 
-ARCPhone.Update = "October 14th 2016"
-ARCPhone.Version = "0.8.3"
+ARCPhone.Update = "February 28th 2016"
+ARCPhone.Version = "0.9.0"
 
 NULLFUNC = function(...) end
 

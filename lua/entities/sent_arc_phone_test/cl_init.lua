@@ -1,6 +1,6 @@
 -- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
--- © Copyright 2016 Aritz Beobide-Cardinal All rights reserved.
+-- Â© Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
 include('shared.lua')
 function ENT:Initialize()
 end
@@ -40,10 +40,12 @@ hook.Add("HUDPaint", "ARCPhone ReceptionLine", function()
 		for i=1,curtab.len do
 			local spos = curtab.startLines[i]:ToScreen()
 			local epos = curtab.endLines[i]:ToScreen()
-			--draw.SimpleText("S", "default", spos.x,spos.y, Color(0,255,0,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_CENTER)
-			--draw.SimpleText("E", "default", epos.x,epos.y, Color(255,0,0,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_CENTER)
-			surface.SetDrawColor(curtab.colour[i])
-			surface.DrawLine(spos.x,spos.y,epos.x,epos.y)
+			if spos.visible and epos.visible then
+				--draw.SimpleText("S", "default", spos.x,spos.y, Color(0,255,0,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_CENTER)
+				--draw.SimpleText("E", "default", epos.x,epos.y, Color(255,0,0,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_CENTER)
+				surface.SetDrawColor(curtab.colour[i])
+				surface.DrawLine(spos.x,spos.y,epos.x,epos.y)
+			end
 		end
 		draw.SimpleText("Total reception: "..rep, "default", reppos.x,reppos.y, Color(255,255,255,255), TEXT_ALIGN_CENTER , TEXT_ALIGN_CENTER)
 		

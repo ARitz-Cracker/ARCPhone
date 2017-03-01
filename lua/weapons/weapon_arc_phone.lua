@@ -1,6 +1,6 @@
 -- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
--- © Copyright 2016 Aritz Beobide-Cardinal All rights reserved.
+-- Â© Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
 
 if SERVER then
 	AddCSLuaFile()
@@ -9,7 +9,7 @@ SWEP.UseHands = true
 SWEP.WorldModelView = true
 SWEP.IsDahAwesomePhone = true
 SWEP.Author = "ARitz Cracker"
-SWEP.Contact = "aritz-rocks@hotmail.com"
+SWEP.Contact = "aritz@aritzcracker.ca"
 SWEP.Purpose = "Call people n' shiz"
 SWEP.Category = "ARitz Cracker Phone"
 
@@ -147,8 +147,6 @@ function SWEP:Initialize()
 				end
 			end
 		end
-	else
-		--self.Settings = {500,false,ARCBank.Settings["hack_max"],ARCBank.Settings["atm_hack_charge_rate"]}
 	end
 
 end
@@ -184,8 +182,9 @@ function SWEP:TranslateFOV(la)
 	end
 end
 ]]
-
-function SWEP:PreDrawViewModel()
+--SWEP:PreDrawViewModel( Entity vm, Weapon weapon, Player ply ) 
+function SWEP:PreDrawViewModel(vm,wep,ply)
+	vm:SetSkin(ARCPhone.PhoneSys.Settings.Personalization.PhoneCase)
 	if ARCPhone.PhoneSys.Booted then
 		local app = ARCPhone.PhoneSys:GetActiveApp()
 		if app && app.DisableViewModel then
