@@ -584,7 +584,7 @@ if IsValid(LocalPlayer()) then -- Lua autorefresh
 	wep = nil
 end
 	
-	local maxmsglen = 16000*255
+	local maxmsglen = 8000*255
 function ARCPhone.PhoneSys:SendText(number,message,app)
 	if message == "" then message = " " end
 	if not app then
@@ -604,7 +604,7 @@ function ARCPhone.PhoneSys:SendText(number,message,app)
 	message = number..message
 	if #message > maxmsglen then
 		if not app then
-			self:AddMsgBox("Text too long","The size limit for a message is 3.89MiB or 3.11MiB if the message contains an image.","cross")
+			self:AddMsgBox("Text too long","The size limit for a message is 1.95MiB or 1.56MiB if the message contains an image.","cross")
 		end
 		return false
 	end

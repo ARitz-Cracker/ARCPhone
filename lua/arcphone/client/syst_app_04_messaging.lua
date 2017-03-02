@@ -130,10 +130,10 @@ function APP:OpenConvo(num)
 	--end
 	self.Tiles[len].OnUnPressed = function(tile)
 		local msg = tile.App.Tiles[tile.App.SendIcon-1].TextInput
-		tile.App.Phone:SendText(num,msg)
-		
-		tile.App.Tiles[tile.App.SendIcon-1]:SetText("")
-		self:UpdateCurrentConvo(os.time(),msg,true)
+		if tile.App.Phone:SendText(num,msg) then
+			tile.App.Tiles[tile.App.SendIcon-1]:SetText("")
+			self:UpdateCurrentConvo(os.time(),msg,true)
+		end
 	end
 end
 

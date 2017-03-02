@@ -84,7 +84,7 @@ net.Receive( "arcphone_comm_call", function(length,ply)
 		if ply.ARCPhone_Status != ARCPHONE_ERROR_CALL_ENDED then return end
 		if number then
 			ARCPhone.MakeCall(ARCPhone.GetPhoneNumber(ply),number)
-			MsgN(ARCPhone.GetPhoneNumber(ply).." - "..number)
+			ARCPhone.Msg(ARCPhone.GetPhoneNumber(ply).." is calling "..number)
 		else
 			ARCPhone.MsgCL(ply,"No Phone number specified." )
 		end
@@ -103,7 +103,7 @@ net.Receive( "arcphone_comm_call", function(length,ply)
 	end
 end)
 
-ARCLib.RegisterBigMessage("arcphone_comm_text",16000,255)
+ARCLib.RegisterBigMessage("arcphone_comm_text",8000,255)
 ARCLib.ReceiveBigMessage("arcphone_comm_text",function(err,per,data,ply)
 	if err == ARCLib.NET_DOWNLOADING then
 		--Nothing?

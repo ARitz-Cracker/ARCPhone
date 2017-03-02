@@ -41,7 +41,7 @@ function ARCPhone.VisualizeRepThink()
 	if IsValid(receptionPlayer) and receptionPlayer:IsPlayer() then
 		renderSegments = {}
 		local radius = -distanceSteps
-		while radius < ARCPhone.Settings["antenna_range"] do
+		while radius < ARCPhone.Settings["antenna_range"] do -- TODO: Binary search would be more effective
 			radius = radius + distanceSteps
 			MsgN("Progress: "..tostring(radius/ARCPhone.Settings["antenna_range"]))
 			for key, antenna in ipairs( ents.FindByClass("sent_arc_phone_antenna") ) do
@@ -79,6 +79,7 @@ end
 
 local ThisWasAReallyBadIdea = true -- feel free to set this to true and run ARCPhone.SeeReception() on the client! Too much work went into this for it to be deleted
 net.Receive("arcphone_see_reception",function(msgnlen,ply)
+	if not ply:IsListenServerHost() then return end
 	if ThisWasAReallyBadIdea then
 		ARCLib.NotifyBroadcast("This was an interesting, yet very bad idea.",NOTIFY_ERROR,5,true)
 		return

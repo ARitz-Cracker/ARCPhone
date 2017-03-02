@@ -119,7 +119,7 @@ local function photoTileDrawFunc(tile,x,y)
 end
 function APP:ListPhotos(dir)
 	
-	local files, directories = file.Find( ARCPhone.ROOTDIR.."/photos/"..dir.."/*.photo.jpg", "DATA" )
+	local files, directories = file.Find( ARCPhone.ROOTDIR.."/photos/"..dir.."/*.photo.*", "DATA" )
 	if #files == 0 then
 		self.Phone:AddMsgBox("Empty","There aren't any photos here!","warning")
 		return
