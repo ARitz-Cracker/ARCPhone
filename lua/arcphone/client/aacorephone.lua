@@ -539,7 +539,7 @@ function ARCPhone.PhoneSys:Init_Final()
 	self:SetLoading(-2)
 	self:OpenApp("home")
 	self.Booted = true
-	self:AddMsgBox("ALPHA VERSION","This is an Alpha version of ARCPhone, and does not represent the final product. Everything is subject to change. (Press ENTER to close this window)","info")
+	self:AddMsgBox("BETA VERSION","This is an unfinished BETA version of ARCPhone.\nMost of the core functionality is here, and it works, but there's still a bit more to go. Because of this, features might be added, changed, replaced, or even removed.\nThank you for supporting ARitz Cracker! :)\n(Press ENTER to close this window)","info")
 	--self:AddMsgBox("My excuse for a tutorial","Use the Arrow keys to move the cursor. Press BACKSPACE to go back, press CTRL to access the context menu (It's kinda like right-clicking), and press ENTER to select.","info")
 end
 

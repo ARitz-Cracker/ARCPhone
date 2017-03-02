@@ -17,7 +17,7 @@ if CLIENT then
 		if LocalPlayer():GetActiveWeapon().IsDahAwesomePhone then
 			if !ARCPhone.PhoneSys.FirstOpened then
 				ARCPhone.PhoneSys.FirstOpened = true
-				ARCPhone.PhoneSys.ControlHints = SysTime() + 30
+				ARCPhone.PhoneSys.ControlHints = SysTime() + 75
 			end
 			if ARCPhone.PhoneSys:GetActiveApp() then
 				ARCPhone.PhoneSys:GetActiveApp():Think(phone)
