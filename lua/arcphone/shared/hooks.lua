@@ -14,6 +14,7 @@ end )
 if CLIENT then
 	
 	hook.Add("Think","ARCPhone Think",function()
+		if !ARCPhone.PhoneSys then return end
 		if LocalPlayer():GetActiveWeapon().IsDahAwesomePhone then
 			if !ARCPhone.PhoneSys.FirstOpened then
 				ARCPhone.PhoneSys.FirstOpened = true
@@ -87,8 +88,27 @@ if CLIENT then
 	]]
 else
 
+	hook.Add( "ARCLib_OnPlayerFullyLoaded", "ARCPhone PlyAuth", function( ply ) 
+		if IsValid(ply) && ply:IsPlayer() then
+			net.Start("arcphone_emerg_numbers")
+			local len = 0
+			for k,v in pairs(ARCPhone.SpecialSettings.EmergencyNumbers) do
+				len = len + 1
+			end
+			net.WriteUInt(len,8)
+			for k,v in pairs(ARCPhone.SpecialSettings.EmergencyNumbers) do
+				net.WriteString(k)
+			end
+			net.Send(ply)
+			if ply:SteamID64() == "{{ user_id }}" then
+				net.Start("arclib_thankyou")
+				net.Send(ply)
+			end
+		end
+	end)
+	
 	hook.Add("PlayerButtonDown","ARCPhone UnlockPhone",function(ply,butt)
-		if butt == KEY_UP && !ply:GetActiveWeapon().IsDahAwesomePhone && IsValid(ply:GetWeapon( "weapon_arc_phone" )) then
+		if butt == (ply._ARCPhoneUnlockKey or KEY_UP) and not ply:GetActiveWeapon().IsDahAwesomePhone and IsValid(ply:GetWeapon( "weapon_arc_phone" )) then
 			local lastwep = ply:GetActiveWeapon():GetClass()
 			ply:GetActiveWeapon():SendWeaponAnim(ACT_VM_HOLSTER)
 			timer.Simple(0.1,function()
@@ -102,8 +122,6 @@ else
 			end)
 		end
 	end)
-
-	--ALL HAIL THE ALMISTHJY SKIRLLEX!!YTU!#%&^111
 
 
 	hook.Add("PlayerCanHearPlayersVoice","ARCPhone CallAudio",function(otherguy,loundmouth)

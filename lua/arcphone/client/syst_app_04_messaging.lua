@@ -1,11 +1,13 @@
 -- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
 -- © Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
+
+-- TODO: STOP MESSING WITH APP.Tiles and do the stuff properly!!
 local APP = ARCPhone.NewAppObject()
 APP.Name = "Messaging"
 APP.Author = "ARitz Cracker"
 APP.Purpose = "Messaging app for ARCPhone"
-APP.FlatIconName = "comments"
+APP.FlatIconName = "chat-bubbles"
 
 APP.OpenNumber = ""
 function APP:PhoneStart()
@@ -36,6 +38,7 @@ function APP:UpdateCurrentConvo(timestamp,msg,sender)
 
 	local i = #self.Tiles + 1
 	self.Tiles[i] = ARCPhone.NewAppTextInputTile(self,msg,true,118)
+	self.Tiles[i].ID = i
 	self.Tiles[i].Editable = false
 	if i > 1 then
 		self.Tiles[i].y = self.Tiles[i-1].y + self.Tiles[i-1].h + 4
@@ -54,11 +57,13 @@ function APP:UpdateCurrentConvo(timestamp,msg,sender)
 	i = i + 1
 	inputTile.y = self.Tiles[i-1].y + self.Tiles[i-1].h + 4
 	self.Tiles[i] = inputTile
+	self.Tiles[i].ID = i
 	self.TextInputIcon = i
 	self:SetCurPos(i)
 	i = i + 1
 	sendTile.y = self.Tiles[i-1].y + self.Tiles[i-1].h + 2
 	self.Tiles[i] = sendTile
+	self.Tiles[i].ID = i
 	self.SendIcon = i
 end
 
@@ -77,6 +82,7 @@ function APP:OpenConvo(num)
 			msgpart = string.Explode("\v", msgs[i])
 			-- msgpart[2] -- Unix timestamp
 			self.Tiles[i] = ARCPhone.NewAppTextInputTile(self,msgpart[3],true,118)
+			self.Tiles[i].ID = i
 			self.Tiles[i].Editable = false
 			if i > 1 then
 				self.Tiles[i].y = self.Tiles[i-1].y + self.Tiles[i-1].h + 4
@@ -100,6 +106,7 @@ function APP:OpenConvo(num)
 	len = len + 1
 	self.TextInputIcon = len
 	self.Tiles[len] = ARCPhone.NewAppTextInputTile(self,"",true,118)
+	self.Tiles[len].ID = len
 	self.Tiles[len]:SetPlaceholder("Enter your message")
 	if len > 1 then
 		self.Tiles[len].y = self.Tiles[len-1].y + self.Tiles[len-1].h + 4
@@ -118,6 +125,7 @@ function APP:OpenConvo(num)
 	self.InConvo = true
 	self.SendIcon = len
 	self.Tiles[len] = ARCPhone.NewAppTile(self)
+	self.Tiles[len].ID = len
 	self.Tiles[len].x = 12
 	self.Tiles[len].y = self.Tiles[len-1].y + self.Tiles[len-1].h + 2
 	self.Tiles[len].w = 118
@@ -170,6 +178,7 @@ function APP:Init()
 			disp = num
 		end
 		self.Tiles[i] = ARCPhone.NewAppTile(self)
+		self.Tiles[i].ID = i
 		self.Tiles[i].x = 8
 		self.Tiles[i].y = 10 + i*22
 		self.Tiles[i].w = 122
@@ -188,6 +197,7 @@ function APP:Init()
 	end
 	len = len + 1
 	self.Tiles[len] = ARCPhone.NewAppTile(self)
+	self.Tiles[len].ID = len
 	self.Tiles[len].x = 8
 	self.Tiles[len].y = 10 + len*22
 	self.Tiles[len].w = 122
@@ -227,9 +237,9 @@ end
 //APP:Init()
 function APP:OnBack()
 	if self.Home then
-		self.Phone:OpenApp("home")
+		self:Close()
 	else
-		self:Init();
+		self:Init()
 	end
 end
 ARCPhone.RegisterApp(APP,"messaging")

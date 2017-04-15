@@ -1,0 +1,6 @@
+"UnlitGeneric"
+{
+	"$basetexture" "icon_google_material_design/good-wifi-signal-with-three-bars"
+	"$vertexcolor" 1
+	"$translucent" 1
+}

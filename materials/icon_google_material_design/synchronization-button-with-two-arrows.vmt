@@ -1,0 +1,6 @@
+"UnlitGeneric"
+{
+	"$basetexture" "icon_google_material_design/synchronization-button-with-two-arrows"
+	"$vertexcolor" 1
+	"$translucent" 1
+}

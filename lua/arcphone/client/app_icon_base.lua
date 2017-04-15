@@ -17,8 +17,16 @@ ARCPhone.TileBase.OnPressed = NULLFUNC -- (self)
 ARCPhone.TileBase.OnUnPressed = NULLFUNC -- (self)
 ARCPhone.TileBase.OnSelected = NULLFUNC -- (self)
 ARCPhone.TileBase.OnUnSelected = NULLFUNC -- (self)
+function ARCPhone.TileBase:IsValid()
+	return self.ID ~= nil and self.App.Tiles[self.ID] == self
+end
+function ARCPhone.TileBase:Remove()
+	self.App.Tiles[self.ID] = nil
+	self.ID = nil
+end
 function ARCPhone.NewAppTile(app)
 	local tab = table.Copy(ARCPhone.TileBase)
 	tab.App = app
 	return tab
 end
+

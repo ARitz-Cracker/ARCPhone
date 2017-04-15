@@ -1,19 +1,23 @@
 -- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
 -- © Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
+
 ARCPhone.PhoneSys.Settings = {}
 ARCPhone.PhoneSys.SettingChoices = {}
 
 ARCPhone.PhoneSys.Settings.Ringtones = {}
 ARCPhone.PhoneSys.SettingChoices.Ringtones = {}
-ARCPhone.PhoneSys.Settings.Ringtones.PhoneCall = "http://www.aritzcracker.ca/arcphone/ringtones/generic1.mp3"
+ARCPhone.PhoneSys.Settings.Ringtones.PhoneCall = "https://www.aritzcracker.ca/arcphone/ringtones/generic1.mp3"
 ARCPhone.PhoneSys.SettingChoices.Ringtones.PhoneCall = {
-	{"Default","http://www.aritzcracker.ca/arcphone/ringtones/generic1.mp3"},
+	{"Default","https://www.aritzcracker.ca/arcphone/ringtones/generic1.mp3"},
+	{"You're free to do whatever","http://www.billwurtz.com/youre-free-to-do-whatever-you-want-to.mp3"},
+	{"I'm Crazy / It's raining","http://www.billwurtz.com/im-crazy-its-raining.mp3"},
+	{"8bit Nokia tune","https://www.aritzcracker.ca/arcphone/ringtones/8-bit%20Nokia.mp3"},
+	{"SECRET","https://www.aritzcracker.ca/random_shit/BattleBlock%20Theater%20Music%20-%20Secret%20Area.mp3"},
 	{"BANANA PHONE","http://www.lee.org/blog/wp-content/uploads/2008/03/raffi-bananaphone.mp3"},
-	{"Swiggity Swag","http://www.aritzcracker.ca/texttospeech/3cacecb98e895f27b41e324c745b72a9.mp3"},
 	{"POMF =3","http://www.aritzcracker.ca/texttospeech/63118d6268cbf68ef21cd4625db785b5.mp3"},
 	{"Dragonborn Comes","http://ndlee.com/thedragonborncomes.mp3"},
-	{"Underdone BlueLeaks","http://www.underdone.org/leak/underdone/blue.mp3"}}
+}
 ARCPhone.PhoneSys.Settings.Ringtones.TextMsg = "http://www.aritzcracker.ca/arcphone/notifications/162464__kastenfrosch__message.mp3"
 ARCPhone.PhoneSys.Settings.Ringtones.Popup = "http://www.aritzcracker.ca/arcphone/notifications/162464__kastenfrosch__message.mp3"
 
@@ -67,3 +71,11 @@ ARCPhone.PhoneSys.SettingChoices.Privacy = {}
 
 ARCPhone.PhoneSys.Settings.System = {}
 ARCPhone.PhoneSys.SettingChoices.System = {}
+
+ARCPhone.PhoneSys.Settings.System.KeyUp = KEY_UP
+ARCPhone.PhoneSys.Settings.System.KeyDown = KEY_DOWN
+ARCPhone.PhoneSys.Settings.System.KeyLeft = KEY_LEFT
+ARCPhone.PhoneSys.Settings.System.KeyRight = KEY_RIGHT
+ARCPhone.PhoneSys.Settings.System.KeyEnter = KEY_ENTER
+ARCPhone.PhoneSys.Settings.System.KeyBack = KEY_BACKSPACE
+ARCPhone.PhoneSys.Settings.System.KeyContext = KEY_LCONTROL

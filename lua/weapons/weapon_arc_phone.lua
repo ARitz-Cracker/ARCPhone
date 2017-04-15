@@ -95,6 +95,12 @@ function SWEP:SendWeaponAnimTime(anim,time)
 end
 
 function SWEP:Deploy()
+	if CLIENT and IsFirstTimePredicted() then
+		net.Start("arcphone_phone_settings")
+		net.WriteUInt(ARCPhone.PhoneSys.Settings.Personalization.PhoneCase,4)
+		net.WriteUInt(ARCPhone.PhoneSys.Settings.System.KeyUp,8)
+		net.SendToServer()
+	end
 	timer.Simple(1.5,function()
 		if self.Owner:GetActiveWeapon() == self then
 			self:SendWeaponAnimTime( ACT_VM_IDLE , 0.2 )
@@ -113,6 +119,10 @@ function SWEP:Initialize()
 	-- other initialize code goes here
 	self.energystart = CurTime()
 	if CLIENT then
+		net.Start("arcphone_phone_settings")
+		net.WriteUInt(ARCPhone.PhoneSys.Settings.Personalization.PhoneCase,4)
+		net.WriteUInt(ARCPhone.PhoneSys.Settings.System.KeyUp,8)
+		net.SendToServer()
 		
 		self.Msgs = "ARCPhone is up!\n"
 		self.MsgsTab = {"ARCPhone is up!"}

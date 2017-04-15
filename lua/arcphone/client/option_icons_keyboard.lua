@@ -12,16 +12,31 @@ local function BockInput(ply, bind, pressed)
 end
 ]]
 local function ApplyThing()
-		timer.Simple(0.1,function()
-			ARCPhone.PhoneSys.TextInputTile = nil
-		end)
+		local t = ARCPhone.PhoneSys.TextInputTile
+		
+		if t then
+			t._Selected = true
+			if isfunction(t.OnDeselect) then
+				t:OnDeselect()
+			end
+		end
+		--timer.Simple(0.1,function()
+		ARCPhone.PhoneSys.TextInputTile = nil
+		--end)
 		textbox:Remove()
+		
 	--hook.Remove("PlayerBindPress", "ARCPhone Block Movement")
 end
 
 local function KeyPressed(panel,key)
+	local s = ARCPhone.PhoneSys.Settings.System
 	if !textbox:HasFocus() then
 		textbox:RequestFocus()
+	end
+	if ARCPhone.PhoneSys.TextInputTile._KeyInput then
+		ARCPhone.PhoneSys.TextInputTile:SetValue(key)
+		ApplyThing()
+		return true
 	end
 	if (ARCLib.IsCTRLDown()) then
 		if key == KEY_A then return true end
@@ -39,26 +54,28 @@ local function KeyPressed(panel,key)
 			return true
 		end
 	end
-	if key == KEY_UP then
+	if key == s.KeyUp then
 		if ARCPhone.PhoneSys.TextInputTile._NumberInput then
 			ARCPhone.PhoneSys.TextInputTile.TextInput = tostring(math.Clamp(math.Round(tonumber(ARCPhone.PhoneSys.TextInputTile.TextInput) + ARCPhone.PhoneSys.TextInputTile.Increment, ARCPhone.PhoneSys.TextInputTile.Decimals),ARCPhone.PhoneSys.TextInputTile.Min,ARCPhone.PhoneSys.TextInputTile.Max))
 		else
 			return true
 		end
-	elseif key == KEY_DOWN then
+	elseif key == s.KeyDown then
 		if ARCPhone.PhoneSys.TextInputTile._NumberInput then
 			ARCPhone.PhoneSys.TextInputTile.TextInput = tostring(math.Clamp(math.Round(tonumber(ARCPhone.PhoneSys.TextInputTile.TextInput) - ARCPhone.PhoneSys.TextInputTile.Increment, ARCPhone.PhoneSys.TextInputTile.Decimals),ARCPhone.PhoneSys.TextInputTile.Min,ARCPhone.PhoneSys.TextInputTile.Max))
 		else
 			return true
 		end
-	elseif key == KEY_LEFT || key == KEY_RIGHT then 
+	elseif key == s.KeyLeft || key == s.KeyRight then 
 		return true
-	elseif key == KEY_ENTER then
-		if ((input.IsKeyDown( KEY_LSHIFT) || input.IsKeyDown( KEY_RSHIFT) ) && ARCPhone.PhoneSys.TextInputTile.Editable ) then
+	elseif key == KEY_ENTER  then
+		if ((key != s.KeyEnter or input.IsKeyDown( KEY_LSHIFT) or input.IsKeyDown( KEY_RSHIFT) ) and ARCPhone.PhoneSys.TextInputTile.Editable ) then
 			ARCPhone.PhoneSys.TextInputTile:SetText(ARCPhone.PhoneSys.TextInputTile:GetText().."\n")
-		else
+		elseif key == s.KeyEnter then
 			ApplyThing()
 		end
+	elseif key == s.KeyEnter then
+		ApplyThing()
 	end
 end
 

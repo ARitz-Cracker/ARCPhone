@@ -8,10 +8,12 @@
 util.AddNetworkString( "arcphone_phone_settings" )
 net.Receive( "arcphone_phone_settings", function(length,ply) -- Can't wait until people exploit this to make rainbow phones.
 	local wep = ply:GetWeapon( "weapon_arc_phone" )
-	if not IsValid(wep) then return end
 	local case = net.ReadUInt(4)
+	if IsValid(wep) then 
+		wep:SetSkin(case)
+	end
+	ply._ARCPhoneUnlockKey = net.ReadUInt(8)
 	
-	wep:SetSkin(case)
 end)
 
 util.AddNetworkString( "arcphone_switchholdtype" ) -- This isn't an exploit, it's purly cosmetic, ok? >_>
@@ -108,8 +110,12 @@ ARCLib.ReceiveBigMessage("arcphone_comm_text",function(err,per,data,ply)
 	if err == ARCLib.NET_DOWNLOADING then
 		--Nothing?
 	elseif err == ARCLib.NET_COMPLETE then
-		local vnum = ARCPhone.GetPhoneNumber(ply)
-		ARCPhone.SendTextMsg(string.Left( data , 10 ),vnum,string.Right( data, #data-10 ))
+		local fromnum = ARCPhone.GetPhoneNumber(ply)
+		local pos = string.find( data, "\v", 1, true )
+		if not pos then return end
+		local tonum = string.sub(data,1,pos-1)
+		local msg = string.sub(data,pos+1)
+		ARCPhone.SendTextMsg(tonum,fromnum,msg)
 	else
 		ARCPhone.Msg("Incoming arcphone_comm_text message errored! "..err)
 	end

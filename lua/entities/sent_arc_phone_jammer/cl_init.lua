@@ -21,6 +21,10 @@ function ENT:Initialize()
 	self.spriteMaterial = CreateMaterial(name,"UnlitGeneric",params)
 	self.buttonpos = {}
 	self.buttonglow = {}
+	net.Start("ARCJammer")
+	net.WriteBit(true)
+	net.WriteEntity(self)
+	net.SendToServer()
 end
 
 function ENT:Think()
@@ -52,14 +56,24 @@ end
 local ARCJammerTime = CurTime()
 local ARCJammerValid = false
 hook.Add("HUDPaint", "ARCPhone JammerHud", function()
-	surface.SetDrawColor( 255, 255, 255, math.Clamp((((ARCJammerTime - CurTime())/0.5 -1)*-1)*255,0,255) )
+	
 	if ARCJammerValid then
 		local tr = LocalPlayer():GetEyeTrace()
 		if tr.Entity.IsARCJammer && LocalPlayer():GetShootPos():DistToSqr(tr.HitPos) < 8282 then
 			if ARCJammerTime <= CurTime() then
-				surface.SetMaterial(ARCLib.Icons16["lock_open"])
+				surface.SetDrawColor( 0, 255, 0, math.Clamp((((ARCJammerTime - CurTime())/0.5 -1)*-1)*255,0,255) )
+				if tr.Entity.Opened then
+					surface.SetMaterial(ARCLib.GetWebIcon32("lock"))
+				else
+					surface.SetMaterial(ARCLib.GetWebIcon32("lock_open"))
+				end
 			else
-				surface.SetMaterial(ARCLib.Icons16["lock"])
+				surface.SetDrawColor( 255, 255, 255, math.Clamp((((ARCJammerTime - CurTime())/0.5 -1)*-1)*255,0,255) )
+				if tr.Entity.Opened then
+					surface.SetMaterial(ARCLib.GetWebIcon32("lock_open"))
+				else
+					surface.SetMaterial(ARCLib.GetWebIcon32("lock"))
+				end
 			end
 			surface.DrawTexturedRect( ScrW()*0.5-16, ScrH()*0.5-16, 32, 32 )
 		else
@@ -81,18 +95,28 @@ hook.Add("KeyRelease", "ARCPhone JammerUnPress", function(ply,key)
 		local tr = ply:GetEyeTrace()
 		if tr.Entity.IsARCJammer && ply:GetShootPos():DistToSqr(tr.HitPos) < 8282 then
 			net.Start("ARCJammer")
+			net.WriteBit(false)
 			net.WriteBit(ARCJammerTime <= CurTime())
-			net.WriteEntity(tr.Entity)
 			net.SendToServer()
 		end
 		ARCJammerValid = false
 	end
 end)
 net.Receive("ARCJammer",function(len,ply)
-	local open = tobool(net.ReadBit()) 
+	local jamm = tobool(net.ReadBit()) 
+	local open = tobool(net.ReadBit())
 	local jammer = net.ReadEntity()
 	if !IsValid(jammer) then return end
-	jammer.Jamming = open
+	jammer.Jamming = jamm
+	jammer.Opened = open
+	if not jammer.Loaded then
+		if (jamm) then
+			jammer:ARCLib_SetAnimationTime("reload",0.1)
+		elseif (open) then
+			jammer:ARCLib_SetAnimationTime("primaryattack",0.1)
+		end
+		jammer.Loaded = true
+	end
 end)
 
 hook.Add( "PostDrawTranslucentRenderables", "ARCPhone VisualizeReceptionJammer", function(wut,skybox)

@@ -4,6 +4,12 @@
 -- Any 3rd party content has been used as either public domain or with permission.
 -- © Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
 ARCPhone.Loaded = false
+ARCPhone.SpecialSettings = {}
+ARCPhone.SpecialSettings.EmergencyNumbers = {}
+ARCPhone.SpecialSettings.EmergencyNumbers["911"] = {"TEAM_POLICE","TEAM_MAYOR"}
+ARCPhone.EmergencyNumbers = {}
+ARCPhone.EmergencyNumbers["911"] = true
+
 ARCPhone.Settings = {}
 
 --[[
@@ -46,10 +52,11 @@ function ARCPhone.SettingsReset() --DO NOT EDIT THIS!!!!
 	ARCPhone.Settings["name_long"] = "ARitz Cracker Phone" --DO NOT EDIT THIS!!!!
 	ARCPhone.Settings["antenna_range"] = 5000 --DO NOT EDIT THIS!!!!
 	ARCPhone.Settings["antenna_strength"] = 1435 --DO NOT EDIT THIS!!!!
-	ARCPhone.Settings["jammer_range"] = 50 --DO NOT EDIT THIS!!!!
+	ARCPhone.Settings["jammer_range"] = 500 --DO NOT EDIT THIS!!!!
 	ARCPhone.Settings["jammer_strength"] = 75 --DO NOT EDIT THIS!!!!
 	ARCPhone.Settings["max_lines"] = 20
 	ARCPhone.Settings["realistic_reception"] = true
+	ARCPhone.Settings["atmos_support"] = false
 end
 --
 ARCPhone.SettingsReset()

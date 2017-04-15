@@ -34,6 +34,7 @@ end
 
 
 function ARCPhone.ValidPhoneNumberChars(txt)
+	if not isstring(txt) then return false end
 	local len = #txt
 	local valid = true
 	for i=1,len do
@@ -46,6 +47,8 @@ function ARCPhone.ValidPhoneNumberChars(txt)
 end
 
 function ARCPhone.IsValidPhoneNumber(txt)
+	if not isstring(txt) then return false end
+	if ARCPhone.EmergencyNumbers[txt] then return true end
 	if #txt != 10 then return false end
 	return ARCPhone.ValidPhoneNumberChars(txt)
 end

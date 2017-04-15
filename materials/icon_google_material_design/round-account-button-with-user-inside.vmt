@@ -1,0 +1,6 @@
+"UnlitGeneric"
+{
+	"$basetexture" "icon_google_material_design/round-account-button-with-user-inside"
+	"$vertexcolor" 1
+	"$translucent" 1
+}

@@ -1,6 +1,8 @@
 -- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
 -- © Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
+
+-- TODO: STOP MESSING WITH APP.Tiles and do the stuff properly!!
 local APP = ARCPhone.NewAppObject()
 APP.Name = "Camera"
 APP.Author = "ARitz Cracker"
@@ -9,8 +11,55 @@ APP.FlatIconName = "camera"
 APP.Selfie = false
 
 function APP:PhoneStart()
+
+end
+
+
+function APP:TakePicture()
+	local FileName = "arcphone_"..os.date("%Y-%m-%d_%H-%M-%S", os.time())
+	self.Phone:EmitSound("arcphone/camera.wav")
+	self.RT:Capture("jpeg",90,function(data)
+		file.Write(ARCPhone.ROOTDIR.."/photos/camera/"..FileName..".photo.jpg",data)
+	end)
+end
+function APP:ForegroundThink()
+	if IsValid(self.RT) then
+		local ply = LocalPlayer()
+		local dist = 20
+		local leeway =  ply:GetAimVector() * 5
+		if self.Selfie then
+			dist = 30
+			local ang = ply:EyeAngles()
+			ang:RotateAroundAxis( ang:Up(), 180 )
+			self.RT:SetAngles(ang)
+		else
+			self.RT:SetAngles(ply:EyeAngles())
+		end
+		local tr = util.QuickTrace( ply:EyePos(), ply:GetAimVector() * dist, ply )
+		self.RT:SetPos(tr.HitPos-leeway)
+	end
+end
+
+function APP:SwitchCamera()
+	self.Selfie = !self.Selfie
+end
+--tile.App
+function APP:OnRestore()
+	self.RT:Enable()
+	--[[
+	self.RT:SetFunc2D(function()
+		GAMEMODE:HUDPaint()
+	end)
+]]
+	self.Zoom = 64
+end
+function APP:OnMinimize()
+	self.RT:Disable()
+end
+function APP:Init()
 	local ply = LocalPlayer()
 	self.Tiles[1] = ARCPhone.NewAppTile(self)
+	self.Tiles[1].ID = 1
 	self.Tiles[1].x = 8
 	self.Tiles[1].y = self.Phone.ScreenResY - 24
 	self.Tiles[1].w = 122
@@ -26,48 +75,10 @@ function APP:PhoneStart()
 		tile.color = self.Phone.Settings.Personalization.CL_01_MainColour
 		tile.App:TakePicture()
 	end
-end
-
-
-function APP:TakePicture()
-	local FileName = "arcphone_"..os.date("%Y-%m-%d_%H-%M-%S", os.time())
-	self.Phone:EmitSound("arcphone/camera.wav")
-	self.RT:Capture("jpeg",90,function(data)
-		file.Write(ARCPhone.ROOTDIR.."/photos/camera/"..FileName..".photo.jpg",data)
-	end)
-end
-function APP:ForegroundThink()
-	if IsValid(self.RT) then
-		local ply = LocalPlayer()
-		if self.Selfie then
-			local ang = ply:EyeAngles()
-			ang:RotateAroundAxis( ang:Up(), 180 ) 
-			self.RT:SetPos(ply:EyePos()+ply:GetAimVector() * 25)
-			self.RT:SetAngles(ang)
-		else
-			self.RT:SetPos(ply:EyePos()+ply:GetAimVector() * 15)
-			self.RT:SetAngles(ply:EyeAngles())
-		end
-	end
-end
-
-function APP:SwitchCamera()
-	self.Selfie = !self.Selfie
-end
---tile.App
-function APP:Init()
-	self:AddMenuOption("Switch Camera",self.SwitchCamera,self)
 	if !IsValid(self.RT) then
 		self.RT = ARCLib.CreateRenderTarget("arcphone_camera",ScrH()*(self.Phone.ScreenResX/self.Phone.ScreenResY),ScrH(),EyePos(),EyeAngles(),64)
 	end
-	self.RT:Enable()
-	self.RT:SetFunc2D(function()
-		--hook.Call("HUDPaint",GM)
-	end)
-	--net.Start("arcphone_switchholdtype")
-	--net.WriteString("pistol")
-	--net.SendToServer()
-	self.Zoom = 64
+	self:AddMenuOption("Switch Camera",self.SwitchCamera,self)
 end
 
 function APP:OnClose()
@@ -81,6 +92,7 @@ function APP:OnClose()
 end
 function APP:OnBack()
 	self.Phone:OpenApp("home")
+	self:Close()
 end
 
 function APP:BackgroundDraw(movex,movey)

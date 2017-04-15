@@ -7,23 +7,19 @@ function ARCPhone.PhoneSys:ChoiceInput(tile)
 	tile.AnimEnd = CurTime() + 0.5
 	--hook.Add("PlayerBindPress", "ARCPhone Block Movement", BockInput)
 end
-local funcs = {}
-funcs[KEY_DOWN]=function(self)
-	self.ChoiceInputTile.ChoiceText = nil
-	self.ChoiceInputTile.SelectedChoice = self.ChoiceInputTile.SelectedChoice + 1
-	if self.ChoiceInputTile.SelectedChoice > #self.ChoiceInputTile.ChoiceKeys then
-		self.ChoiceInputTile.SelectedChoice = #self.ChoiceInputTile.ChoiceKeys
-	end
-end
-funcs[KEY_UP]=function(self)
-	self.ChoiceInputTile.ChoiceText = nil
-	self.ChoiceInputTile.SelectedChoice = self.ChoiceInputTile.SelectedChoice - 1
-	if self.ChoiceInputTile.SelectedChoice < 1 then
-		self.ChoiceInputTile.SelectedChoice = 1
-	end
-end
 function ARCPhone.PhoneSys:ChoiceInputFunc(key)
-	if funcs[key] then
-		funcs[key](self)
+	local s = self.Settings.System
+	if key == s.KeyUp then
+		self.ChoiceInputTile.ChoiceText = nil
+		self.ChoiceInputTile.SelectedChoice = self.ChoiceInputTile.SelectedChoice - 1
+		if self.ChoiceInputTile.SelectedChoice < 1 then
+			self.ChoiceInputTile.SelectedChoice = 1
+		end
+	elseif key == s.KeyDown then
+		self.ChoiceInputTile.ChoiceText = nil
+		self.ChoiceInputTile.SelectedChoice = self.ChoiceInputTile.SelectedChoice + 1
+		if self.ChoiceInputTile.SelectedChoice > #self.ChoiceInputTile.ChoiceKeys then
+			self.ChoiceInputTile.SelectedChoice = #self.ChoiceInputTile.ChoiceKeys
+		end
 	end
 end

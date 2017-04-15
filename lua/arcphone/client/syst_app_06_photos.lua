@@ -1,11 +1,13 @@
 -- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
 -- © Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
+
+-- TODO: STOP MESSING WITH APP.Tiles and do the stuff properly!!
 local APP = ARCPhone.NewAppObject()
 APP.Name = "Photos"
 APP.Author = "ARitz Cracker"
 APP.Purpose = "Photo viewer for ARCPhone!"
-APP.FlatIconName = "images"
+APP.FlatIconName = "photo-library"
 
 --[[
 function APP:PhoneStart()
@@ -60,6 +62,7 @@ function APP:Init()
 	self.CurrentDir = ""
 	self:ClearScreen()
 	self.Tiles[1] = ARCPhone.NewAppTile(self)
+	self.Tiles[1].ID = 1
 	self.Tiles[1].x = 8
 	self.Tiles[1].y = 32
 	self.Tiles[1].w = 122
@@ -77,6 +80,7 @@ function APP:Init()
 	end
 	
 	self.Tiles[2] = ARCPhone.NewAppTile(self)
+	self.Tiles[2].ID = 2
 	self.Tiles[2].x = 8
 	self.Tiles[2].y = 54
 	self.Tiles[2].w = 122
@@ -94,6 +98,7 @@ function APP:Init()
 	end
 	
 	self.Tiles[3] = ARCPhone.NewAppTile(self)
+	self.Tiles[3].ID = 3
 	self.Tiles[3].x = 8
 	self.Tiles[3].y = 76
 	self.Tiles[3].w = 122
@@ -127,6 +132,7 @@ function APP:ListPhotos(dir)
 	self:ClearScreen()
 	for i=1,#files do
 		self.Tiles[i] = ARCPhone.NewAppTile(self)
+		self.Tiles[i].ID = i
 		self.Tiles[i].x = 4 + (43*((i-1)%3))
 		--MsgN(i.." "..self.Tiles[i].x)
 		self.Tiles[i].y = 28 + 43*(math.floor((i-1)/3))
@@ -164,8 +170,9 @@ function APP:OnBack()
 	else
 		if self.AttachFunc then
 			self.Phone:OpenApp(self.AttachFuncApp,true,false)
+			self:Close()
 		else
-			self.Phone:OpenApp("home")
+			self:Close()
 		end
 	end
 end
@@ -173,9 +180,11 @@ end
 function APP:AttachPhoto(app,func,...)
 	self.AttachFunc = func
 	self.AttachFuncArgs = {...}
+	--[[
 	for i=1,#self.AttachFuncArgs do
 		MsgN("i => "..tostring(self.AttachFuncArgs[i]))
 	end
+	]]
 	self.AttachFuncApp = app
 end
 
@@ -217,7 +226,7 @@ function APP:SelectPhoto(i)
 	local imgpath = --[[ARCPhone.ROOTDIR.."/photos/"..]]self.CurrentDir.."/"..self.Photos[i]
 	if self.AttachFunc then
 		self.AttachFunc(unpack(self.AttachFuncArgs),imgpath)
-		self.Phone:OpenApp(self.AttachFuncApp,true,false)
+		self.Phone:OpenApp(self.AttachFuncApp)
 	else
 		self.ViewImage = self.Phone:GetImageMaterials(imgpath)
 		self.DisableTileSwitching = true

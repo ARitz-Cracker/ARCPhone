@@ -1,0 +1,6 @@
+"UnlitGeneric"
+{
+	"$basetexture" "icon_google_material_design/black-keyboard-with-white-keys"
+	"$vertexcolor" 1
+	"$translucent" 1
+}

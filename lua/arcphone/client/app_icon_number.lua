@@ -51,20 +51,20 @@ function texttile:drawfunc(xpos,ypos)
 		surface.SetDrawColor(ARCLib.ConvertColor(txtcol))
 	end
 	draw.NoTexture()
-	polytab[1].x = self.x + self.w/2
-	polytab[1].y = self.y + self.h - 6
-	polytab[2].x = self.x + 2
-	polytab[2].y = self.y + self.h/2 + 3
-	polytab[3].x = self.x + self.w - 2
-	polytab[3].y = self.y + self.h/2 + 3
+	polytab[1].x = xpos + self.w/2
+	polytab[1].y = ypos + self.h - 3
+	polytab[2].x = xpos + 2
+	polytab[2].y = ypos + self.h/2 + 6
+	polytab[3].x = xpos + self.w - 2
+	polytab[3].y = ypos + self.h/2 + 6
 	surface.DrawPoly(polytab)
 	draw.NoTexture()
-	polytab2[1].x = self.x + self.w/2
-	polytab2[1].y = self.y + 0
-	polytab2[2].x = self.x + self.w - 2
-	polytab2[2].y = self.y + self.h/2 - 9
-	polytab2[3].x = self.x + 2
-	polytab2[3].y = self.y + self.h/2 - 9
+	polytab2[1].x = xpos + self.w/2
+	polytab2[1].y = ypos + 3
+	polytab2[2].x = xpos + self.w - 2
+	polytab2[2].y = ypos + self.h/2 - 6
+	polytab2[3].x = xpos + 2
+	polytab2[3].y = ypos + self.h/2 - 6
 	surface.DrawPoly(polytab2)
 	
 	surface.SetDrawColor(ARCLib.ConvertColor(txtcol))
@@ -91,7 +91,11 @@ texttile.SetNumber = texttile.SetText
 texttile.SetValue = texttile.SetText
 
 texttile.Editable = true
-function texttile:OnUnPressed() 
+function texttile:OnUnPressed()
+	if self._Selected then
+		self._Selected = false
+		return
+	end
 	self.App.Phone:KeyBoardInput(self)
 end
 

@@ -16,6 +16,9 @@ ARCPhone.Disk.Texts = ARCPhone.Disk.Texts or {}
 ARCPhone.Disk.ProperShutdown = false
 ARCPhone.Calls = ARCPhone.Calls or {}
 ARCPhone.TextApps = ARCPhone.TextApps or {}
+
+ARCSlots.SpecialSettings = ARCSlots.SpecialSettings or {}
+
 function ARCPhone.FuckIdiotPlayer(ply,reason)
 	ARCPhone.Msg("ARCPHONE ANTI-CHEAT WARNING: Some stupid shit by the name of "..ply:Nick().." ("..ply:SteamID()..") tried to use an exploit: ["..tostring(reason).."]")
 	if ply.ARCPhone_AFuckingIdiot then
@@ -67,12 +70,26 @@ function ARCPhone.IsInCall(number)
 end
  
  -- Makes a phone call. (Takes in phone numbers)
+function ARCPhone.MakeGroupCall(caller,recievers)
+	if #recievers == 0 then return end
+	ARCPhone.MakeCall(caller,recievers[1])
+	--MsgN("operation "..operation*-1)
+	for i=2, #recievers do
+		ARCPhone.AddToCall(caller,recievers[i])
+	end
+end
+
 function ARCPhone.MakeCall(caller,reciever)
-	
+	--[[
+		
+
+	]]
 	local plycall = ARCPhone.GetPlayerFromPhoneNumber(caller)
 	
 	if !plycall:IsPlayer() then return end
 
+	
+	
 	if !ARCPhone.Loaded then 
 		plycall.ARCPhone_Status = ARCPHONE_ERROR_NOT_LOADED
 		return
@@ -86,11 +103,26 @@ function ARCPhone.MakeCall(caller,reciever)
 	end
 	
 	--Process Special recievers here.
+	if ARCPhone.EmergencyNumbers[reciever] then
+		for k,v in ipairs(ARCPhone.SpecialSettings.EmergencyNumbers[reciever]) do
+			local plys = team.GetPlayers( _G[v] or TEAM_UNASSIGNED )
+			if #plys > 0 then
+				local numbers = {}
+				for ii=1,#plys do
+					numbers[ii] = ARCPhone.GetPhoneNumber(plys[ii])
+				end
+				ARCPhone.MakeGroupCall(caller,numbers)
+				return
+			end
+		end
+		plycall.ARCPhone_Status = ARCPHONE_ERROR_PLAYER_OFFLINE
+		return
+	end
 	
-	--if !isnumber(reciever) then
-	--	plycall.ARCPhone_Status = ARCPHONE_ERROR_NIL_NUMBER
-	--	return 
-	--end
+	if not ARCPhone.IsValidPhoneNumber(reciever) then
+		plycall.ARCPhone_Status = ARCPHONE_ERROR_NIL_NUMBER
+		return 
+	end
 	if #ARCPhone.Calls >= ARCPhone.Settings["max_lines"] then
 		plycall.ARCPhone_Status = ARCPHONE_ERROR_TOO_MANY_CALLS
 		return 
@@ -413,7 +445,24 @@ function ARCPhone.AddToCall(caller,reciever)
 end
 
 function ARCPhone.SendTextMsg(tonum,fromnum,msg)
-	ARCPhone.Msg("Sending text message from "..fromnum.." to "..tonum)
+	if ARCPhone.EmergencyNumbers[tonum] then
+		for k,v in ipairs(ARCPhone.SpecialSettings.EmergencyNumbers[tonum]) do
+			local plys = team.GetPlayers( _G[v] or TEAM_UNASSIGNED )
+			if #plys > 0 then
+				msg = "--"..fromnum.."--\n"..msg
+				for ii=1,#plys do
+					ARCPhone.SendTextMsg(ARCPhone.GetPhoneNumber(plys[ii]),tonum,msg)
+				end
+				return
+			end
+		end
+		ARCPhone.SendTextMsg(fromnum,tonum,"AUTO REPLY:\nNobody is currently available for this emergency number.")
+		return
+	end
+	if not ARCPhone.IsValidPhoneNumber(tonum) then
+		ARCPhone.SendTextMsg(fromnum,tonum,"AUTO REPLY:\nThis is not a valid number. :(")
+		return
+	end
 	if string.sub( tonum, 1, 3 ) == "000" or string.sub( tonum, 1, 3 ) == "001" then
 		if istable(ARCPhone.TextApps[tonum]) then
 			ARCPhone.TextApps[tonum]:OnText(fromnum,msg)
@@ -434,7 +483,7 @@ function ARCPhone.SendTextMsg(tonum,fromnum,msg)
 		ARCPhone.Disk.Texts[tonum][hash].number = fromnum
 		local fromply = ARCPhone.GetPlayerFromPhoneNumber(fromnum)
 		local toply = ARCPhone.GetPlayerFromPhoneNumber(tonum)
-		if fromply.ARCPhone_Reception > 10 or string.sub( fromnum, 1, 3 ) == "000" or string.sub( tonum, 1, 3 ) == "001"  then
+		if fromply.ARCPhone_Reception > 10 or string.sub( fromnum, 1, 3 ) == "000" or string.sub( fromnum, 1, 3 ) == "001" or ARCPhone.EmergencyNumbers[fromnum] then
 			ARCPhone.Disk.Texts[tonum][hash].place = 1
 			if toply.ARCPhone_Reception > 10 then
 				ARCPhone.Disk.Texts[tonum][hash].place = 2
@@ -514,52 +563,58 @@ function ARCPhone.Think()
 				v.ARCPhone_Reception = ARCPhone.GetReception(v,true)
 			end
 			local vnum = ARCPhone.GetPhoneNumber(v)
-			if refreshTexts > 1 then
-				if !ARCPhone.Disk.Texts[vnum] then
-					ARCPhone.Disk.Texts[vnum] = {}
-				end
-				for kk,vv in pairs(ARCPhone.Disk.Texts[vnum]) do
-					local fromply = ARCPhone.GetPlayerFromPhoneNumber(vv.number)
-					if vv.place == 0 and v.ARCPhone_Reception > 10 then
-						vv.place = 1
+			if IsValid(v) then
+				if refreshTexts > 1 then
+					if !ARCPhone.Disk.Texts[vnum] then
+						ARCPhone.Disk.Texts[vnum] = {}
 					end
-					if vv.place == 1 and IsValid(fromply) and fromply.ARCPhone_Reception > 10 then
-						vv.place = 2
-						ARCLib.SendBigMessage("arcphone_comm_text",vv.msg,v,function(err,per)
-							if err == ARCLib.NET_UPLOADING then
-								--Do something here?
-							elseif err == ARCLib.NET_COMPLETE then
-								ARCPhone.Disk.Texts[vnum][kk] = nil
-							else
-								vv.place = 0
-								ARCPhone.Msg("Sending arcphone_comm_text errored! "..err)
-							end
-						end)
+					for kk,vv in pairs(ARCPhone.Disk.Texts[vnum]) do
+						coroutine.yield()
+						local fromply = ARCPhone.GetPlayerFromPhoneNumber(vv.number)
+						if vv.place == 0 and v.ARCPhone_Reception > 10 then
+							vv.place = 1
+						end
+						if vv.place == 1 and (fromply.ARCPhone_Reception > 10 or string.sub( vv.number, 1, 3 ) == "000" or string.sub( vv.number, 1, 3 ) == "001" or ARCPhone.EmergencyNumbers[vv.number]) then
+							vv.place = 2
+							ARCLib.SendBigMessage("arcphone_comm_text",vv.msg,v,function(err,per)
+								if err == ARCLib.NET_UPLOADING then
+									--Do something here?
+								elseif err == ARCLib.NET_COMPLETE then
+									ARCPhone.Disk.Texts[vnum][kk] = nil
+								else
+									vv.place = 0
+									ARCPhone.Msg("Sending arcphone_comm_text errored! "..err)
+								end
+							end)
+						end
 					end
 				end
 			end
 			--MsgN("Texting Refresh done - "..v:Nick())
-			net.Start("arcphone_comm_status")
-			net.WriteInt(v.ARCPhone_Reception,8)
-			net.WriteInt(v.ARCPhone_Status,ARCPHONE_ERRORBITRATE)
-			local line = ARCPhone.GetLineFromCaller(vnum)
-			--MsgN("Got line - "..v:Nick())
-			if ARCPhone.Calls[line] then
-				--MsgN("Line IsValid - "..v:Nick())
-				local tab = {on = {},pending = {}}
-				for k,v in pairs(ARCPhone.Calls[line].on) do
-					table.insert(tab.on,v)
+			if IsValid(v) then
+				net.Start("arcphone_comm_status")
+				net.WriteInt(v.ARCPhone_Reception,8)
+				net.WriteInt(v.ARCPhone_Status,ARCPHONE_ERRORBITRATE)
+				local line = ARCPhone.GetLineFromCaller(vnum)
+				--MsgN("Got line - "..v:Nick())
+				if ARCPhone.Calls[line] then
+					--MsgN("Line IsValid - "..v:Nick())
+					local tab = {on = {},pending = {}}
+					for k,v in pairs(ARCPhone.Calls[line].on) do
+						table.insert(tab.on,v)
+					end
+					for k,v in pairs(ARCPhone.Calls[line].pending) do
+						table.insert(tab.pending,v)
+					end
+					net.WriteTable(tab)
+				else
+					net.WriteTable({on = {},pending = {}})
 				end
-				for k,v in pairs(ARCPhone.Calls[line].pending) do
-					table.insert(tab.pending,v)
+				net.Send(v)
+				if v.ARCPhone_Status > 0 then
+					v.ARCPhone_Status = ARCPHONE_ERROR_CALL_ENDED
 				end
-				net.WriteTable(tab)
-			else
-				net.WriteTable({on = {},pending = {}})
-			end
-			net.Send(v)
-			if v.ARCPhone_Status > 0 then
-				v.ARCPhone_Status = ARCPHONE_ERROR_CALL_ENDED
+				coroutine.yield()
 			end
 		end
 		
@@ -569,7 +624,6 @@ function ARCPhone.Think()
 			for kk,vv in pairs(v.on) do
 				--MsgN("      ON: "..tostring(vv))
 				local ply = ARCPhone.GetPlayerFromPhoneNumber(vv)
-				coroutine.yield()
 				local rep = ARCPhone.GetReception(ply,true)
 				if rep < 40 then
 					local chance = math.random(0,rep)
@@ -589,6 +643,7 @@ function ARCPhone.Think()
 						ARCPhone.DropAllFromCall(k) 
 					end
 				end
+				coroutine.yield()
 			end
 		end
 		if refreshReception > 2 then
@@ -648,7 +703,22 @@ function ARCPhone.Load()
 		
 		
 		ARCLib.AddonLoadSettings("ARCPhone",backward)
+		ARCLib.AddonLoadSpecialSettings("ARCPhone")
 		--TODO: Language support
+		
+		ARCPhone.EmergencyNumbers = {}
+		
+		local len = 0
+		for k,v in pairs(ARCPhone.SpecialSettings.EmergencyNumbers) do
+			len = len + 1
+			ARCPhone.EmergencyNumbers[k] = true
+		end
+		net.Start("arcphone_emerg_numbers")
+		net.WriteUInt(len,8)
+		for k,v in pairs(ARCPhone.SpecialSettings.EmergencyNumbers) do
+			net.WriteString(k)
+		end
+		net.Broadcast()
 		
 		ARCPhone.LogFile = ARCPhone.Dir.."/syslogs/"..os.date("%Y-%m-%d")..".log.txt"
 		if not file.Exists(ARCPhone.LogFile,"DATA") then

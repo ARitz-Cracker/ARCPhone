@@ -77,10 +77,14 @@ texttile.SetValue = texttile.SetText
 
 texttile.Editable = true
 function texttile:OnUnPressed() 
-	self.App.Phone:KeyBoardInput(self)
-	if isfunction(self.OnChosen) then
-		self:OnChosen(self.TextInput)
+	if self._Selected then
+		if isfunction(self.OnChosen) then
+			self:OnChosen(self.TextInput)
+		end
+		self._Selected = false
+		return
 	end
+	self.App.Phone:KeyBoardInput(self)
 end
 
 function ARCPhone.NewAppTextInputTile(app,txt,resize,w)

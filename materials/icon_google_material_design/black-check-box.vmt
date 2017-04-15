@@ -1,0 +1,6 @@
+"UnlitGeneric"
+{
+	"$basetexture" "icon_google_material_design/black-check-box"
+	"$vertexcolor" 1
+	"$translucent" 1
+}

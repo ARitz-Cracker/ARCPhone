@@ -4,6 +4,13 @@
 -- Any 3rd party content has been used as either public domain or with permission.
 -- © Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
 
+net.Receive( "arcphone_emerg_numbers", function(length)
+	local len = net.ReadUInt(8)
+	for i=1,len do
+		ARCPhone.EmergencyNumbers[net.ReadString()] = true
+	end
+end)
+
 local ARCPhone_PingBusy = false
 local ARCPhone_PingCallBack = {}
 local ARCPhone_PingCount = 1
@@ -56,7 +63,7 @@ net.Receive( "arcphone_comm_status", function(length)
 	end
 	local app = ARCPhone.PhoneSys:GetActiveApp()
 	if (app) then
-		if app.sysname == "callscreen" then
+		if app.sysname == "dialer" and app.InCallScreen then
 			app:UpdateCallList()
 		end
 	end
@@ -68,7 +75,7 @@ ARCLib.ReceiveBigMessage("arcphone_comm_text",function(err,per,data,ply)
 	if err == ARCLib.NET_DOWNLOADING then
 		MsgN("TODO: ARCPhone text receive progress icon")
 	elseif err == ARCLib.NET_COMPLETE then
-		ARCPhone.PhoneSys:RecieveText(unpack(string.Explode( "\v", data)))
+		ARCPhone.PhoneSys:ReceiveText(unpack(string.Explode( "\v", data)))
 	else
 		ARCPhone.Msg("Incomming arcphone_comm_text message errored! "..err)
 	end
@@ -139,7 +146,7 @@ net.Receive( "arcphone_comm_text", function(length)
 		else
 			msgchunks[hash].msg = msgchunks[hash].msg .. str
 			if part == whole then
-					ARCPhone.PhoneSys:RecieveText(unpack(string.Explode( "\v", util.Decompress(msgchunks[hash].msg))))
+					ARCPhone.PhoneSys:ReceiveText(unpack(string.Explode( "\v", util.Decompress(msgchunks[hash].msg))))
 					msgchunks[hash] = nil
 					net.Start("arcphone_comm_text")
 					net.WriteInt(-2,8)
@@ -178,7 +185,7 @@ net.Receive( "arcphone_ringer", function(length)
 	end
 	local ply = Entity(pid)
 	if url != "" && IsValid(ply) then
-		sound.PlayURL ( url, "3d noblock", function( station,errid,errstr )
+		ARCLib.PlayCachedURL ( url, "3d noblock", function( station,errid,errstr )
 			if IsValid(ARCPhone.PhoneRingers[pid]) then
 				ARCPhone.PhoneRingers[pid]:Stop()
 			end
@@ -195,3 +202,12 @@ net.Receive( "arcphone_ringer", function(length)
 		end)
 	end
 end)
+ARCPhone.AtmosTime = "--:--"
+net.Receive( "arcphone_atmos_support", function(length)
+	local hours = net.ReadUInt(5)
+	local minutes = net.ReadUInt(6)
+	ARCPhone.AtmosTime = string.format( "%02i:%02i", hours, minutes )
+end)
+
+
+--string.format( "%02i:%02i", hours, minutes ) )

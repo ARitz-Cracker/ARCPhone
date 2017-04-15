@@ -108,11 +108,12 @@ function ENT:ToggleJammer()
 		else
 			self:ARCLib_SetAnimationTime("throw" ,0.2)
 		end
-		net.Start("ARCJammer")
-		net.WriteBit(self.Jamming)
-		net.WriteEntity(self.Entity)
-		net.Broadcast()
 	end
+	net.Start("ARCJammer")
+	net.WriteBit(self.Jamming)
+	net.WriteBit(self.Opened)
+	net.WriteEntity(self.Entity)
+	net.Broadcast()
 end
 function ENT:ToggleOpen()
 	if self.Opened then
@@ -125,10 +126,6 @@ function ENT:ToggleOpen()
 			if self.Jamming then
 				self:EmitSound("arcphone/jammer/knobturn"..math.random(1,3)..".wav",65,120)
 				self.Jamming = false
-				net.Start("ARCJammer")
-				net.WriteBit(self.Jamming)
-				net.WriteEntity(self.Entity)
-				net.Broadcast()
 			end
 	else
 		self:ARCLib_SetAnimationTime("primaryattack",0.5)
@@ -138,15 +135,30 @@ function ENT:ToggleOpen()
 			self:ARCLib_SetAnimationTime("draw",0)
 		end)
 	end
+	net.Start("ARCJammer")
+	net.WriteBit(self.Jamming)
+	net.WriteBit(self.Opened)
+	net.WriteEntity(self.Entity)
+	net.Broadcast()
 end
 net.Receive("ARCJammer",function(len,ply)
-	if ply:GetEyeTrace().Entity.IsARCJammer then
-		local open = tobool(net.ReadBit()) 
+	local tr = ply:GetEyeTrace()
+	local status = tobool(net.ReadBit())
+	if status then
 		local jammer = net.ReadEntity()
-		if open then
-			jammer:ToggleOpen()
-		else
-			jammer:ToggleJammer()
+		net.Start("ARCJammer")
+		net.WriteBit(jammer.Jamming)
+		net.WriteBit(jammer.Opened)
+		net.WriteEntity(jammer)
+		net.Send(ply)
+	else
+		if tr.Entity.IsARCJammer and ply:GetShootPos():DistToSqr(tr.HitPos) < 8282 then
+			local open = tobool(net.ReadBit()) 
+			if open then
+				tr.Entity:ToggleOpen()
+			else
+				tr.Entity:ToggleJammer()
+			end
 		end
 	end
 end)

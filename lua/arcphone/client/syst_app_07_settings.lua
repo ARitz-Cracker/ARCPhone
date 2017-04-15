@@ -1,11 +1,13 @@
 -- This file is under copyright, and is bound to the agreement stated in the EULA.
 -- Any 3rd party content has been used as either public domain or with permission.
 -- © Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
+
+-- TODO: STOP MESSING WITH APP.Tiles and do the stuff properly!!
 local APP = ARCPhone.NewAppObject()
 APP.Name = "Settings"
 APP.Author = "ARitz Cracker"
 APP.Purpose = "Something I put off until the last minute"
-APP.FlatIconName = "settings"
+APP.FlatIconName = "settings-cogwheel-button"
 
 --[[
 function APP:PhoneStart()
@@ -30,13 +32,14 @@ function APP:SelectCategory(a)
 			ypos = ypos + 16
 			
 			self.Tiles[i] = ARCPhone.NewAppChoiceInputTile(self)
+			self.Tiles[i].ID = i
 			self.Tiles[i].x = 8
 			self.Tiles[i].y = ypos
 			self.Tiles[i].w = 122
 			self.Tiles[i].h = 20
 			self.Tiles[i].color = self.Phone.Settings.Personalization.CL_03_MainText
 			self.Tiles[i].bgcolor = self.Phone.Settings.Personalization.CL_01_MainColour
-			PrintTable(self.Phone.SettingChoices[a][k])
+			--PrintTable(self.Phone.SettingChoices[a][k])
 			local customChoice = true
 			for ii=1,#self.Phone.SettingChoices[a][k] do
 				self.Tiles[i]:AddChoice(self.Phone.SettingChoices[a][k][ii][1],self.Phone.SettingChoices[a][k][ii][2])
@@ -55,6 +58,7 @@ function APP:SelectCategory(a)
 		if IsColor(v) then
 			i = i + 1
 			self.Tiles[i] = ARCPhone.NewAppColorInputTile(self,v,k)
+			self.Tiles[i].ID = i
 			self.Tiles[i].x = 8
 			self.Tiles[i].y = ypos
 			self.Tiles[i].w = 122
@@ -65,6 +69,7 @@ function APP:SelectCategory(a)
 			self:CreateNewLabel(8,ypos,90,30,k,"ARCPhone",self.Phone.Settings.Personalization.CL_03_MainText,self.Phone.Settings.Personalization.CL_01_MainColour)
 			i = i + 1
 			self.Tiles[i] = ARCPhone.NewAppNumberInputTile(self,v)
+			self.Tiles[i].ID = i
 			self.Tiles[i].x = 100
 			self.Tiles[i].y = ypos
 			self.Tiles[i].w = 24
@@ -72,6 +77,9 @@ function APP:SelectCategory(a)
 			self.Tiles[i].Setting = k
 			self.Tiles[i].color = self.Phone.Settings.Personalization.CL_03_MainText
 			self.Tiles[i].bgcolor = self.Phone.Settings.Personalization.CL_01_MainColour
+			self.Tiles[i]:SetMax(100000000000-1)
+			self.Tiles[i]:SetMin(-100000000000+1)
+			self.Tiles[i]:SetValue(v)
 			ypos = ypos + 32 + 5
 		elseif isstring(v) then
 			if not multiChoice then
@@ -82,6 +90,7 @@ function APP:SelectCategory(a)
 			end
 			i = i + 1
 			self.Tiles[i] = ARCPhone.NewAppTextInputTile(self,v,false,122)
+			self.Tiles[i].ID = i
 			self.Tiles[i].y = ypos
 			self.Tiles[i].w = 122
 			self.Tiles[i].x = 8
@@ -90,31 +99,49 @@ function APP:SelectCategory(a)
 			self.Tiles[i].SingleLine = true
 			self.Tiles[i].Setting = k
 			ypos = ypos + 18 + 5
+			
+			if a == "Ringtones" then
+				i = i + 1
+				ypos = ypos - 5
+				local textInput = self.Tiles[i-1]
+				self.Tiles[i] = ARCPhone.NewAppColorInputTile(self,v,k)
+				self.Tiles[i].ID = i
+				self.Tiles[i].x = 8
+				self.Tiles[i].y = ypos
+				self.Tiles[i].w = 122
+				self.Tiles[i].h = 18
+				self.Tiles[i].color = self.Phone.Settings.Personalization.CL_01_MainColour
+				self.Tiles[i].drawfunc = function(tile,x,y)
+					draw.SimpleText("Preview ringtone", "ARCPhone", x+tile.w*0.5, y+tile.h*0.5, self.Phone.Settings.Personalization.CL_03_MainText, TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER) 
+				end
+				self.Tiles[i].OnPressed = function(tile)
+					tile.color = tile.App.Phone.Settings.Personalization.CL_02_MainPressed
+				end
+				self.Tiles[i].OnUnPressed = function(tile)
+					tile.color = tile.App.Phone.Settings.Personalization.CL_01_MainColour
+					tile.App.Phone:OpenApp("music"):PlayURL(textInput:GetValue())
+				end
+				
+				ypos = ypos + 18 + 5
+			end
 		end
 		if multiChoice then
+
 			local ii = i
+			if a == "Ringtones" then
+				ii = ii - 1
+			end
 			self.Tiles[ii-1].OnChosen = function(tile,val)
 				MsgN(val)
 				self.Tiles[ii]:SetValue(val)
 			end
-			self.Tiles[i].OnChosen = function(tile,val)
+			self.Tiles[ii].OnChosen = function(tile)
 				self.Tiles[ii-1].ChoiceText = "*CUSTOM*"
 			end
 		end
 	end
 	if a == "System" then
-		self:CreateNewLabel(8,ypos,0,0,"Your phone number","ARCPhone",self.Phone.Settings.Personalization.CL_03_MainText,self.Phone.Settings.Personalization.CL_01_MainColour)
-		ypos = ypos + 16
-		i = i + 1
-		self.Tiles[i] = ARCPhone.NewAppTextInputTile(self,ARCPhone.GetPhoneNumber(LocalPlayer()),false,122)
-		self.Tiles[i].y = ypos
-		self.Tiles[i].w = 122
-		self.Tiles[i].x = 8
-		self.Tiles[i].color = self.Phone.Settings.Personalization.CL_11_QuaternaryText
-		self.Tiles[i].bgcolor = self.Phone.Settings.Personalization.CL_09_QuaternaryColour
-		self.Tiles[i].SingleLine = true
-		self.Tiles[i].Editable = false
-		ypos = ypos + 18 + 5
+		
 	end
 end
 
@@ -126,6 +153,7 @@ function APP:Init()
 	for k in SortedPairs(self.Phone.Settings) do
 		i = i + 1
 		self.Tiles[i] = ARCPhone.NewAppTile(self)
+		self.Tiles[i].ID = i
 		self.Tiles[i].x = 8
 		self.Tiles[i].y = 12 + 20*i
 		self.Tiles[i].w = 122
@@ -140,14 +168,232 @@ function APP:Init()
 		self.Tiles[i].OnUnPressed = function(tile)
 			tile.bgcolor = self.Phone.Settings.Personalization.CL_01_MainColour
 			if k == "Privacy" then
-				tile.App.Phone:AddMsgBox("Coming soon!","There's nothing here yet!","info")
+				tile.App.Phone:AddMsgBox("Coming soon!","There's nothing here yet!")
+			elseif k == "System" then
+				self.FriendlyScreen = true
+				self:ClearScreen()
+				local i = 1
+				local ypos = 32
+				self:CreateNewLabel(8,ypos,0,0,"Your phone number","ARCPhone",self.Phone.Settings.Personalization.CL_03_MainText,self.Phone.Settings.Personalization.CL_01_MainColour)
+				ypos = ypos + 16
+				self.Tiles[i] = ARCPhone.NewAppTextInputTile(self,ARCPhone.GetPhoneNumber(LocalPlayer()),false,122)
+				self.Tiles[i].ID = i
+				self.Tiles[i].y = ypos
+				self.Tiles[i].w = 122
+				self.Tiles[i].x = 8
+				self.Tiles[i].color = self.Phone.Settings.Personalization.CL_11_QuaternaryText
+				self.Tiles[i].bgcolor = self.Phone.Settings.Personalization.CL_09_QuaternaryColour
+				self.Tiles[i].SingleLine = true
+				self.Tiles[i].Editable = false
+				ypos = ypos + 18 + 5
+				--{s.KeyUp,s.KeyDown,s.KeyLeft,s.KeyRight,s.KeyEnter,s.KeyBack,s.KeyContext}
+				
+				self:CreateNewLabel(8,ypos,0,0,"Move Up","ARCPhone",self.Phone.Settings.Personalization.CL_03_MainText,self.Phone.Settings.Personalization.CL_01_MainColour)
+				ypos = ypos + 16 
+				i = i + 1
+				self.Tiles[i] = ARCPhone.NewAppKeyInputTile(self,self.Phone.Settings.System.KeyUp)
+				self.Tiles[i].ID = i
+				self.Tiles[i].y = ypos
+				self.Tiles[i].w = 122
+				self.Tiles[i].x = 8
+				self.Tiles[i].h = 18
+				self.Tiles[i].color = self.Phone.Settings.Personalization.CL_11_QuaternaryText
+				self.Tiles[i].bgcolor = self.Phone.Settings.Personalization.CL_09_QuaternaryColour
+				self.Tiles[i].OnDeselect = function(tile)
+					local s = tile.App.Phone.Settings.System
+					local val = tile:GetValue()
+					if s.KeyUp == val then return end
+					if table.HasValue( tile.App.Phone.ValidKeys, val ) then
+						tile.App.Phone:AddMsgBox("I just saved your ass","Your actions would have made your phone unusable","report-symbol")
+						tile:SetValue(s.KeyUp)
+						return
+					end
+					
+					s.KeyUp = val
+					tile.App.Phone:SetValidKeys({s.KeyUp,s.KeyDown,s.KeyLeft,s.KeyRight,s.KeyEnter,s.KeyBack,s.KeyContext})
+					net.Start("arcphone_phone_settings")
+					net.WriteUInt(tile.App.Phone.Settings.Personalization.PhoneCase,4)
+					net.WriteUInt(s.KeyUp,8)
+					net.SendToServer()
+				end
+				ypos = ypos + 18 + 5
+				
+				self:CreateNewLabel(8,ypos,0,0,"Move Down","ARCPhone",self.Phone.Settings.Personalization.CL_03_MainText,self.Phone.Settings.Personalization.CL_01_MainColour)
+				ypos = ypos + 16 
+				i = i + 1
+				self.Tiles[i] = ARCPhone.NewAppKeyInputTile(self,self.Phone.Settings.System.KeyDown)
+				self.Tiles[i].ID = i
+				self.Tiles[i].y = ypos
+				self.Tiles[i].w = 122
+				self.Tiles[i].x = 8
+				self.Tiles[i].h = 18
+				self.Tiles[i].color = self.Phone.Settings.Personalization.CL_11_QuaternaryText
+				self.Tiles[i].bgcolor = self.Phone.Settings.Personalization.CL_09_QuaternaryColour
+				self.Tiles[i].OnDeselect = function(tile)
+					local s = tile.App.Phone.Settings.System
+					local val = tile:GetValue()
+					if s.KeyDown == val then return end
+					if table.HasValue( tile.App.Phone.ValidKeys, val ) then
+						tile.App.Phone:AddMsgBox("I just saved your ass","Your actions would have made your phone unusable","report-symbol")
+						tile:SetValue(s.KeyDown)
+						return
+					end
+					s.KeyDown = val
+					tile.App.Phone:SetValidKeys({s.KeyUp,s.KeyDown,s.KeyLeft,s.KeyRight,s.KeyEnter,s.KeyBack,s.KeyContext})
+				end
+				ypos = ypos + 18 + 5
+				
+				self:CreateNewLabel(8,ypos,0,0,"Move Left","ARCPhone",self.Phone.Settings.Personalization.CL_03_MainText,self.Phone.Settings.Personalization.CL_01_MainColour)
+				ypos = ypos + 16 
+				i = i + 1
+				self.Tiles[i] = ARCPhone.NewAppKeyInputTile(self,self.Phone.Settings.System.KeyLeft)
+				self.Tiles[i].ID = i
+				self.Tiles[i].y = ypos
+				self.Tiles[i].w = 122
+				self.Tiles[i].x = 8
+				self.Tiles[i].h = 18
+				self.Tiles[i].color = self.Phone.Settings.Personalization.CL_11_QuaternaryText
+				self.Tiles[i].bgcolor = self.Phone.Settings.Personalization.CL_09_QuaternaryColour
+				self.Tiles[i].OnDeselect = function(tile)
+					local s = tile.App.Phone.Settings.System
+					local val = tile:GetValue()
+					if s.KeyLeft == val then return end
+					if table.HasValue( tile.App.Phone.ValidKeys, val ) then
+						tile.App.Phone:AddMsgBox("I just saved your ass","Your actions would have made your phone unusable","report-symbol")
+						tile:SetValue(s.KeyLeft)
+						return
+					end
+					s.KeyLeft = val
+					tile.App.Phone:SetValidKeys({s.KeyUp,s.KeyDown,s.KeyLeft,s.KeyRight,s.KeyEnter,s.KeyBack,s.KeyContext})
+				end
+				ypos = ypos + 18 + 5
+				
+				self:CreateNewLabel(8,ypos,0,0,"Move Right","ARCPhone",self.Phone.Settings.Personalization.CL_03_MainText,self.Phone.Settings.Personalization.CL_01_MainColour)
+				ypos = ypos + 16 
+				i = i + 1
+				self.Tiles[i] = ARCPhone.NewAppKeyInputTile(self,self.Phone.Settings.System.KeyRight)
+				self.Tiles[i].ID = i
+				self.Tiles[i].y = ypos
+				self.Tiles[i].w = 122
+				self.Tiles[i].x = 8
+				self.Tiles[i].h = 18
+				self.Tiles[i].color = self.Phone.Settings.Personalization.CL_11_QuaternaryText
+				self.Tiles[i].bgcolor = self.Phone.Settings.Personalization.CL_09_QuaternaryColour
+				self.Tiles[i].OnDeselect = function(tile)
+					local s = tile.App.Phone.Settings.System
+					local val = tile:GetValue()
+					if s.KeyRight == val then return end
+					if table.HasValue( tile.App.Phone.ValidKeys, val ) then
+						tile.App.Phone:AddMsgBox("I just saved your ass","Your actions would have made your phone unusable","report-symbol")
+						tile:SetValue(s.KeyRight)
+						return
+					end
+					s.KeyRight = val
+					tile.App.Phone:SetValidKeys({s.KeyUp,s.KeyDown,s.KeyLeft,s.KeyRight,s.KeyEnter,s.KeyBack,s.KeyContext})
+				end
+				ypos = ypos + 18 + 5
+				
+				self:CreateNewLabel(8,ypos,0,0,"Select","ARCPhone",self.Phone.Settings.Personalization.CL_03_MainText,self.Phone.Settings.Personalization.CL_01_MainColour)
+				ypos = ypos + 16 
+				i = i + 1
+				self.Tiles[i] = ARCPhone.NewAppKeyInputTile(self,self.Phone.Settings.System.KeyEnter)
+				self.Tiles[i].ID = i
+				self.Tiles[i].y = ypos
+				self.Tiles[i].w = 122
+				self.Tiles[i].x = 8
+				self.Tiles[i].h = 18
+				self.Tiles[i].color = self.Phone.Settings.Personalization.CL_11_QuaternaryText
+				self.Tiles[i].bgcolor = self.Phone.Settings.Personalization.CL_09_QuaternaryColour
+				self.Tiles[i].OnDeselect = function(tile)
+					local s = tile.App.Phone.Settings.System
+					local val = tile:GetValue()
+					if s.KeyEnter == val then return end
+					if table.HasValue( tile.App.Phone.ValidKeys, val ) then
+						tile.App.Phone:AddMsgBox("I just saved your ass","Your actions would have made your phone unusable","report-symbol")
+						tile:SetValue(s.KeyEnter)
+						return
+					end
+					s.KeyEnter = val
+					tile.App.Phone:SetValidKeys({s.KeyUp,s.KeyDown,s.KeyLeft,s.KeyRight,s.KeyEnter,s.KeyBack,s.KeyContext})
+				end
+				ypos = ypos + 18 + 5
+				
+				self:CreateNewLabel(8,ypos,0,0,"Back","ARCPhone",self.Phone.Settings.Personalization.CL_03_MainText,self.Phone.Settings.Personalization.CL_01_MainColour)
+				ypos = ypos + 16 
+				i = i + 1
+				self.Tiles[i] = ARCPhone.NewAppKeyInputTile(self,self.Phone.Settings.System.KeyBack)
+				self.Tiles[i].ID = i
+				self.Tiles[i].y = ypos
+				self.Tiles[i].w = 122
+				self.Tiles[i].x = 8
+				self.Tiles[i].h = 18
+				self.Tiles[i].color = self.Phone.Settings.Personalization.CL_11_QuaternaryText
+				self.Tiles[i].bgcolor = self.Phone.Settings.Personalization.CL_09_QuaternaryColour
+				self.Tiles[i].OnDeselect = function(tile)
+					local s = tile.App.Phone.Settings.System
+					local val = tile:GetValue()
+					if s.KeyBack == val then return end
+					if table.HasValue( tile.App.Phone.ValidKeys, val ) then
+						tile.App.Phone:AddMsgBox("I just saved your ass","Your actions would have made your phone unusable","report-symbol")
+						tile:SetValue(s.KeyBack)
+						return
+					end
+					s.KeyBack = val
+					tile.App.Phone:SetValidKeys({s.KeyUp,s.KeyDown,s.KeyLeft,s.KeyRight,s.KeyEnter,s.KeyBack,s.KeyContext})
+				end
+				ypos = ypos + 18 + 5
+				
+				self:CreateNewLabel(8,ypos,0,0,"Context Menu","ARCPhone",self.Phone.Settings.Personalization.CL_03_MainText,self.Phone.Settings.Personalization.CL_01_MainColour)
+				ypos = ypos + 16 
+				i = i + 1
+				self.Tiles[i] = ARCPhone.NewAppKeyInputTile(self,self.Phone.Settings.System.KeyContext)
+				self.Tiles[i].ID = i
+				self.Tiles[i].y = ypos
+				self.Tiles[i].w = 122
+				self.Tiles[i].x = 8
+				self.Tiles[i].h = 18
+				self.Tiles[i].color = self.Phone.Settings.Personalization.CL_11_QuaternaryText
+				self.Tiles[i].bgcolor = self.Phone.Settings.Personalization.CL_09_QuaternaryColour
+				self.Tiles[i].OnDeselect = function(tile)
+					local s = tile.App.Phone.Settings.System
+					local val = tile:GetValue()
+					if s.KeyContext == val then return end
+					if table.HasValue( tile.App.Phone.ValidKeys, val ) then
+						tile.App.Phone:AddMsgBox("I just saved your ass","Your actions would have made your phone unusable","report-symbol")
+						tile:SetValue(s.KeyContext)
+						return
+					end
+					s.KeyContext = val
+					tile.App.Phone:SetValidKeys({s.KeyUp,s.KeyDown,s.KeyLeft,s.KeyRight,s.KeyEnter,s.KeyBack,s.KeyContext})
+				end
+				ypos = ypos + 18 + 5
+				
+				i = i + 1
+				self.Tiles[i] = ARCPhone.NewAppTile(self)
+				self.Tiles[i].ID = i
+				self.Tiles[i].x = 8
+				self.Tiles[i].y = ypos
+				self.Tiles[i].w = 122
+				self.Tiles[i].h = 18
+				self.Tiles[i].color = self.Phone.Settings.Personalization.CL_03_MainText
+				self.Tiles[i].bgcolor = self.Phone.Settings.Personalization.CL_01_MainColour
+				self.Tiles[i].text = "Advanced settings"
+				
+				self.Tiles[i].OnPressed = function(tile)
+					tile.bgcolor = self.Phone.Settings.Personalization.CL_02_MainPressed
+				end
+				self.Tiles[i].OnUnPressed = function(tile)
+					tile.App:SelectCategory(k)
+				end
+				
 			elseif k == "Personalization" then
 				self.FriendlyScreen = true
 				self:ClearScreen()
-				i = 1
+				local i = 1
 				local ypos = 32
 				
 				self.Tiles[i] = ARCPhone.NewAppColorInputTile(self,self.Phone.Settings.Personalization.CL_01_MainColour,"Phone Theme")
+				self.Tiles[i].ID = i
 				self.Tiles[i].x = 8
 				self.Tiles[i].y = ypos
 				self.Tiles[i].w = 122
@@ -203,6 +449,7 @@ function APP:Init()
 				ypos = ypos + 16
 				i = i + 1
 				self.Tiles[i] = ARCPhone.NewAppChoiceInputTile(self)
+				self.Tiles[i].ID = i
 				self.Tiles[i].x = 8
 				self.Tiles[i].y = ypos
 				self.Tiles[i].w = 122
@@ -218,12 +465,14 @@ function APP:Init()
 					self.Phone.Settings.Personalization.PhoneCase = val
 					net.Start("arcphone_phone_settings")
 					net.WriteUInt(val,4)
+					net.WriteUInt(tile.App.Phone.Settings.System.KeyUp,8)
 					net.SendToServer()
 				end
 				
 				ypos = ypos + 22 + 5
 				i = i + 1
 				self.Tiles[i] = ARCPhone.NewAppTile(self)
+				self.Tiles[i].ID = i
 				self.Tiles[i].x = 8
 				self.Tiles[i].y = ypos
 				self.Tiles[i].w = 122
@@ -259,27 +508,35 @@ function APP:Init()
 end
 
 function APP:OnBack()
+	
 	if self.FriendlyScreen then
-	
-	
 		self:Init()
-	elseif #self.Section > 0 then
+	elseif self.Section and #self.Section > 0 then
 		for i=1,#self.Tiles-1 do
 			if self.Tiles[i].Setting then
 				self.Phone.Settings[self.Section][self.Tiles[i].Setting] = self.Tiles[i]:GetValue()
 			end
 		end
+		local s = self.Phone.Settings.System
+		net.Start("arcphone_phone_settings")
+		net.WriteUInt(self.Phone.Settings.Personalization.PhoneCase,4)
+		net.WriteUInt(s.KeyUp,8)
+		net.SendToServer()
+		self.Phone:SetValidKeys({s.KeyUp,s.KeyDown,s.KeyLeft,s.KeyRight,s.KeyEnter,s.KeyBack,s.KeyContext})
 		self:Init()
 	else
-		self.Phone:OpenApp("home")
+		self:Close()
 	end
 end
 
 
 function APP:OnClose()
+	local s = self.Phone.Settings.System
 	net.Start("arcphone_phone_settings")
 	net.WriteUInt(self.Phone.Settings.Personalization.PhoneCase,4)
+	net.WriteUInt(s.KeyUp,8)
 	net.SendToServer()
+	self.Phone:SetValidKeys({s.KeyUp,s.KeyDown,s.KeyLeft,s.KeyRight,s.KeyEnter,s.KeyBack,s.KeyContext})
 	self:SaveData()
 end
 
