@@ -17,8 +17,6 @@ ARCPhone.Disk.ProperShutdown = false
 ARCPhone.Calls = ARCPhone.Calls or {}
 ARCPhone.TextApps = ARCPhone.TextApps or {}
 
-ARCSlots.SpecialSettings = ARCSlots.SpecialSettings or {}
-
 function ARCPhone.FuckIdiotPlayer(ply,reason)
 	ARCPhone.Msg("ARCPHONE ANTI-CHEAT WARNING: Some stupid shit by the name of "..ply:Nick().." ("..ply:SteamID()..") tried to use an exploit: ["..tostring(reason).."]")
 	if ply.ARCPhone_AFuckingIdiot then
