@@ -69,8 +69,7 @@ net.Receive("ARCPhone_Admin_GUI",function(len,ply)
 		end
 		net.Broadcast()
 	end
-	ARCLib.RecursiveTableMerge(ARCPhone.SpecialSettings[setting],tab)
-
+	ARCPhone.SpecialSettings[setting] = tab
 
 	ARCLib.AddonSaveSpecialSettings("ARCPhone")
 end)

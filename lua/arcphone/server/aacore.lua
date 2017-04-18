@@ -706,6 +706,21 @@ function ARCPhone.Load()
 		
 		ARCPhone.EmergencyNumbers = {}
 		
+		local numbers = {}
+		
+		-- util.JSONToTable makes "123" -> 123 for keys, which is a problem for ARCPhone as phone numbers are strings.
+		-- So we gotta make 123 -> "123". This wouldn't be an issue in JS since all keys are strings anyway >_>
+		for k,v in pairs(ARCPhone.SpecialSettings.EmergencyNumbers) do 
+			if isnumber(k) then
+				table.insert(numbers,k)
+			end
+		end
+		for i=1,#numbers do
+			ARCPhone.SpecialSettings.EmergencyNumbers[tostring(numbers[i])] = ARCPhone.SpecialSettings.EmergencyNumbers[numbers[i]]
+			ARCPhone.SpecialSettings.EmergencyNumbers[numbers[i]] = nil
+		end
+		
+		
 		local len = 0
 		for k,v in pairs(ARCPhone.SpecialSettings.EmergencyNumbers) do
 			len = len + 1

@@ -28,7 +28,7 @@ if ARCPhone then
 			local selectedNumber = ""
 			
 			local MainPanel = vgui.Create( "DFrame" )
-			MainPanel:SetSize( 200, 245 )
+			MainPanel:SetSize( 232, 245 )
 			MainPanel:Center()
 			MainPanel:SetTitle( "Emergency Numbers" )
 			MainPanel:SetVisible( true )
@@ -39,7 +39,7 @@ if ARCPhone then
 			
 			local TeamList = vgui.Create( "DListView",MainPanel )
 			TeamList:SetPos( 10, 60 ) -- Set the position of the label
-			TeamList:SetSize( 180, 120  )
+			TeamList:SetSize( 213, 120  )
 			
 			TeamList:SetMultiSelect( false )
 			TeamList:AddColumn("Team")
@@ -76,7 +76,7 @@ if ARCPhone then
 			local TeamUp = vgui.Create( "DButton", MainPanel )
 			TeamUp:SetText( "" )
 			TeamUp:SetImage( "icon16/arrow_up.png" )
-			TeamUp:SetPos( 166, 60+120+5)
+			TeamUp:SetPos( 166+33, 60+120+5)
 			TeamUp:SetSize( 24, 20+25 )
 			TeamUp.DoClick=function()
 				local i = TeamList:GetSelectedLine()
@@ -106,7 +106,7 @@ if ARCPhone then
 			local TeamAdd = vgui.Create( "DButton", MainPanel )
 			TeamAdd:SetText( "Add new team..." )
 			TeamAdd:SetPos( 35, 60+120+5)
-			TeamAdd:SetSize( 130, 20 )
+			TeamAdd:SetSize( 130+33, 20 )
 			TeamAdd.DoClick = function()			
 			local teams = tab[selectedNumber]
 			if not teams then
@@ -124,7 +124,7 @@ if ARCPhone then
 			local TeamRm = vgui.Create( "DButton", MainPanel )
 			TeamRm:SetText( "Remove selected team" )
 			TeamRm:SetPos( 35, 60+120+30)
-			TeamRm:SetSize( 130, 20 )
+			TeamRm:SetSize( 130+33, 20 )
 			TeamRm.DoClick = function()
 				local i = TeamList:GetSelectedLine()
 				if i == nil then
@@ -193,10 +193,36 @@ if ARCPhone then
 				end
 			end
 			
+			local Delete = vgui.Create( "DButton", MainPanel )
+			Delete:SetText( "" )
+			Delete:SetPos( 10+180-20, 30 )
+			Delete:SetSize( 24, 20 )
+			Delete:SetImage( "icon16/bin.png" )
+			Delete.DoClick = function()
+				--selectedNumber = numberList[index]
+				if not tab[selectedNumber] then
+					Derma_Message( "No number selected.", "tab[selectedNumber] == nil", "OK" )
+					return
+				end
+				TeamList:Clear()
+				table.RemoveByValue(numberList,selectedNumber)
+				numberListLen = numberListLen - 1
+				
+				tab[selectedNumber] = nil
+				selectedNumber = ""
+				
+				NumSelector:Clear()
+				for i=1,numberListLen do
+					NumSelector:AddChoice(numberList[i])
+				end
+				NumSelector:AddChoice("Add new number...")
+				NumSelector:SetText( "Select Emergency Number" )
+			end
 			local Hint = vgui.Create( "DButton", MainPanel )
-			Hint:SetText( "?" )
-			Hint:SetPos( 10+180-20, 30 )
-			Hint:SetSize( 20, 20 )
+			Hint:SetText( "" )
+			Hint:SetPos( 10+180-15+24, 30 )
+			Hint:SetSize( 24, 20 )
+			Hint:SetImage( "icon16/information.png" )
 			Hint.DoClick = function()
 				Derma_Message( "When someone dials an emergency number, it will start a group chat between the caller and everyone on the first team of the list. If there's nobody on the first team, it will attempt to do the same with the second team, and so on.\nIf someone sends a text message to an emergency number, it will use the same process described above to decide who to forward the text to.	", "Emergency Numbers Description", "I got it!" )
 			end
