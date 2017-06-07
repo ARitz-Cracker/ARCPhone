@@ -56,6 +56,52 @@ end
 function APP:OnMinimize()
 	self.RT:Disable()
 end
+
+function APP:ScanQRCode()
+	self.Phone:SetLoading(-1)
+	local DHTML = vgui.Create( "DHTML", frame )
+	DHTML:SetSize( 1, 1 )
+	DHTML:OpenURL( "asset://garrysmod/data/qr_decode/index.html" )
+	DHTML:AddFunction( "console", "luadecode", function( err, str )
+		DHTML:Remove()
+		self.Phone:SetLoading(-2)
+		if (err) then
+			self.Phone:AddMsgBox("QRCode",err,"warning-sign")
+		else
+			if (string.StartWith( str, "https://" ) or string.StartWith( str, "http://" ) ) then
+				self.Phone:AddMsgBox("URL QR Code","Would you like to go to the following URL?\n"..str,"help-round-button",ARCPHONE_MSGBOX_YESNO,function()
+					gui.OpenURL( str )
+				end,rfunc)
+			elseif string.StartWith( string.lower(str), "tel:" ) then
+				local num = string.sub(str,5)
+				self.Phone:AddMsgBox("Call QR Code","Would you like to call the following phone number?\n"..num,"help-round-button",ARCPHONE_MSGBOX_YESNO,function()
+					self.Phone:Call(num)
+				end,rfunc)
+			elseif string.StartWith( string.lower(str), "smsto:" ) then
+				local seperator = string.find( str, ":", 7, true )
+				local num = string.sub(str,7,seperator-1)
+				local msg = string.sub(str,seperator+1)
+				self.Phone:AddMsgBox("SMS QR Code","Would you like to open a text message conversation with the following phone number?\n"..num,"help-round-button",ARCPHONE_MSGBOX_YESNO,function()
+					ARCPhone.PhoneSys:OpenApp("messaging"):OpenConvo(num,msg)
+				end,rfunc)
+			else
+				self.Phone:AddMsgBox("QRCode",str)
+			end
+		end
+	end )
+
+	DHTML:AddFunction( "console", "luaready", function()
+		self.RT:Capture("png",nil,function(data)
+			file.Write("qr_decode/qrimg.png",data)
+			--DHTML:RunJavascript( "dec(\"data:image/png;base64,"..ARCLib.basexx.to_base64(data).."\")")
+			DHTML:RunJavascript( "dec(\"asset://garrysmod/data/qr_decode/qrimg.png\")")
+		end)
+
+	end )
+
+
+end
+
 function APP:Init()
 	local ply = LocalPlayer()
 	self.Tiles[1] = ARCPhone.NewAppTile(self)
@@ -78,6 +124,7 @@ function APP:Init()
 	if !IsValid(self.RT) then
 		self.RT = ARCLib.CreateRenderTarget("arcphone_camera",ScrH()*(self.Phone.ScreenResX/self.Phone.ScreenResY),ScrH(),EyePos(),EyeAngles(),64)
 	end
+	self:AddMenuOption("Scan QR Code",self.ScanQRCode,self)
 	self:AddMenuOption("Switch Camera",self.SwitchCamera,self)
 end
 

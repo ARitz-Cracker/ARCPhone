@@ -225,8 +225,13 @@ function APP:SelectPhoto(i)
 	assert(self.Photos[i],"Photos[i] is nil!")
 	local imgpath = --[[ARCPhone.ROOTDIR.."/photos/"..]]self.CurrentDir.."/"..self.Photos[i]
 	if self.AttachFunc then
-		self.AttachFunc(unpack(self.AttachFuncArgs),imgpath)
+		if (#self.AttachFuncArgs == 0) then
+			self.AttachFunc(imgpath)
+		else
+			self.AttachFunc(unpack(self.AttachFuncArgs),imgpath)
+		end
 		self.Phone:OpenApp(self.AttachFuncApp)
+		self:Close()
 	else
 		self.ViewImage = self.Phone:GetImageMaterials(imgpath)
 		self.DisableTileSwitching = true

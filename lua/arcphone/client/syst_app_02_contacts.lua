@@ -41,6 +41,20 @@ end
 
 
 function APP:SelectContact(tileid)
+	
+	
+	if self.AttachFunc then
+		local result = {name=self.Disk[tileid][ARCPHONE_CONTACT_NAME],number=self.Disk[tileid][ARCPHONE_CONTACT_NUMBER]}
+		if (#self.AttachFuncArgs == 0) then
+			self.AttachFunc(result)
+		else
+			self.AttachFunc(unpack(self.AttachFuncArgs),result)
+		end
+		self.Phone:OpenApp(self.AttachFuncApp)
+		self:Close()
+		return
+	end
+	
 	self:ResetCurPos()
 	self.Home = false
 	table.Empty(self.Tiles)
@@ -396,10 +410,30 @@ end
 
 function APP:OnBack()
 	if self.Home then
-		self:Close()
+		if self.AttachFunc then
+			self.Phone:OpenApp(self.AttachFuncApp,true,false)
+			self:Close()
+		else
+			self:Close()
+		end
 	else
 		self:Init()
 	end
+end
+function APP:ChooseContact(app,func,...)
+	self.AttachFunc = func
+	self.AttachFuncArgs = {...}
+	--[[
+	for i=1,#self.AttachFuncArgs do
+		MsgN("i => "..tostring(self.AttachFuncArgs[i]))
+	end
+	]]
+	self.AttachFuncApp = app
+end
+function APP:OnClose()
+	self.AttachFunc = nil
+	self.AttachFuncArgs = nil
+	self.AttachFuncApp = nil
 end
 
 ARCPhone.RegisterApp(APP,"contacts")

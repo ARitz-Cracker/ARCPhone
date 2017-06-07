@@ -186,6 +186,7 @@ net.Receive( "arcphone_ringer", function(length)
 	local ply = Entity(pid)
 	if url != "" && IsValid(ply) then
 		ARCLib.PlayCachedURL ( url, "3d noblock", function( station,errid,errstr )
+			if not IsValid(ply) then return end
 			if IsValid(ARCPhone.PhoneRingers[pid]) then
 				ARCPhone.PhoneRingers[pid]:Stop()
 			end

@@ -78,7 +78,7 @@ function ARCPhone.PhoneSys:CloseApp(appname)
 	if app.FlatIconName then
 		tex = ARCPhone.GetIcon(app.FlatIconName)
 	else
-		tex = surface.GetTextureID("arcphone/appicons/"..k)
+		tex = surface.GetTextureID("arcphone/appicons/"..appname)
 	end
 	if !app._RTScreen then
 		app._RTScreen = ARCLib.CreateRenderTarget(app.sysname.."_screencam",self.ScreenResX,self.ScreenResY)

@@ -53,6 +53,8 @@ end
 function APP:PlayURL(url)
 	self.URLTile:SetValue(url)
 	self.Phone:SetLoading(-1)
+	--sound.PlayURL
+	--ARCLib.PlayCachedURL
 	ARCLib.PlayCachedURL( url , "noblock", function( station,errid,errstr )
 		if not self.Open then return end
 		self.Phone:SetLoading(-2)
@@ -65,7 +67,7 @@ function APP:PlayURL(url)
 			self.PlayingSong:Play()
 			self.PlayingSong:SetVolume(0.25)
 		else
-			ARCPhone.PhoneSys:AddMsgBox("Music","Failed to play music\n("..tostring(errid)..") "..tostring(errstr),"round-error-symbol")
+			ARCPhone.PhoneSys:AddMsgBox("Music","Failed to play music\n("..tostring(errid)..") "..tostring(errstr),"warning-sign")
 		end
 	end)
 end

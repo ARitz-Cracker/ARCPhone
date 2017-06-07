@@ -9,6 +9,7 @@ ARCPhone.PhoneSys.Settings.Ringtones = {}
 ARCPhone.PhoneSys.SettingChoices.Ringtones = {}
 ARCPhone.PhoneSys.Settings.Ringtones.PhoneCall = "https://www.aritzcracker.ca/arcphone/ringtones/generic1.mp3"
 ARCPhone.PhoneSys.SettingChoices.Ringtones.PhoneCall = {
+	{"Durr Plant","https://www.aritzcracker.ca/arcphone/ringtones/durr_plant.ogg"},
 	{"Default","https://www.aritzcracker.ca/arcphone/ringtones/generic1.mp3"},
 	{"You're free to do whatever","http://www.billwurtz.com/youre-free-to-do-whatever-you-want-to.mp3"},
 	{"I'm Crazy / It's raining","http://www.billwurtz.com/im-crazy-its-raining.mp3"},

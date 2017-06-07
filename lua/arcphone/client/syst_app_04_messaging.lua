@@ -67,7 +67,7 @@ function APP:UpdateCurrentConvo(timestamp,msg,sender)
 	self.SendIcon = i
 end
 
-function APP:OpenConvo(num)
+function APP:OpenConvo(num,previewText)
 	table.Empty(self.Tiles)
 	self:AddMenuOption("Attach Photo",self.Phone.ChoosePhoto,self.Phone,self.AttachPhoto,self)
 	self.Home = false
@@ -105,7 +105,7 @@ function APP:OpenConvo(num)
 	
 	len = len + 1
 	self.TextInputIcon = len
-	self.Tiles[len] = ARCPhone.NewAppTextInputTile(self,"",true,118)
+	self.Tiles[len] = ARCPhone.NewAppTextInputTile(self,previewText or "",true,118)
 	self.Tiles[len].ID = len
 	self.Tiles[len]:SetPlaceholder("Enter your message")
 	if len > 1 then

@@ -454,6 +454,7 @@ function ARCPhone.SendTextMsg(tonum,fromnum,msg)
 				return
 			end
 		end
+		if ARCPhone.SpecialSettings.EmergencyNumbers[fromnum] then return end
 		ARCPhone.SendTextMsg(fromnum,tonum,"AUTO REPLY:\nNobody is currently available for this emergency number.")
 		return
 	end

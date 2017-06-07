@@ -309,7 +309,7 @@ function ARCPHONE_APP:DrawTiles(mvx,mvy)
 		else
 			surface.SetDrawColor(ARCLib.ConvertColor(self.Phone.Settings.Personalization.CL_00_CursorColour))
 		end
-		if self._curapptime <= CurTime() then
+		if self._curapptime <= CurTime() or !self.Tiles[self.OldSelectedAppTile] then
 			surface.DrawOutlinedRect(self.Tiles[self.SelectedAppTile].x + mvx,self.Tiles[self.SelectedAppTile].y + mvy,self.Tiles[self.SelectedAppTile].w,self.Tiles[self.SelectedAppTile].h)
 		else
 			local thing = ARCLib.BetweenNumberScale(self._oldapptime,CurTime(),self._curapptime)^0.5
