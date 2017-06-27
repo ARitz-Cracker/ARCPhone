@@ -699,7 +699,8 @@ function ARCPhone.Load()
 		else
 			ARCPhone.Msg("WARNING! THE SYSTEM DIDN'T SHUT DOWN PROPERLY!")
 		end
-		
+		ARCPhone.Disk.NumberStart = tonumber(ARCPhone.Disk.NumberStart) or math.random(1000000,5000000) -- Let's hope there isn't more than 500 000 characters
+		ARCPhone.NumberStart = ARCPhone.Disk.NumberStart
 		
 		ARCLib.AddonLoadSettings("ARCPhone",backward)
 		ARCLib.AddonLoadSpecialSettings("ARCPhone")
@@ -721,6 +722,7 @@ function ARCPhone.Load()
 			ARCPhone.SpecialSettings.EmergencyNumbers[numbers[i]] = nil
 		end
 		
+		--
 		
 		local len = 0
 		for k,v in pairs(ARCPhone.SpecialSettings.EmergencyNumbers) do
@@ -732,6 +734,9 @@ function ARCPhone.Load()
 		for k,v in pairs(ARCPhone.SpecialSettings.EmergencyNumbers) do
 			net.WriteString(k)
 		end
+		net.Broadcast()
+		net.Start("arcphone_nutscript_number")
+		net.WriteUInt(ARCPhone.NumberStart,23)
 		net.Broadcast()
 		
 		ARCPhone.LogFile = ARCPhone.Dir.."/syslogs/"..os.date("%Y-%m-%d")..".log.txt"

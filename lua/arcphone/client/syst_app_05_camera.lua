@@ -61,7 +61,7 @@ function APP:ScanQRCode()
 	self.Phone:SetLoading(-1)
 	local DHTML = vgui.Create( "DHTML", frame )
 	DHTML:SetSize( 1, 1 )
-	DHTML:OpenURL( "asset://garrysmod/data/qr_decode/index.html" )
+	DHTML:OpenURL( "asset://garrysmod/data/"..self.Phone.RootDir.."/qr_decode/index.html.txt" )
 	DHTML:AddFunction( "console", "luadecode", function( err, str )
 		DHTML:Remove()
 		self.Phone:SetLoading(-2)
@@ -92,9 +92,9 @@ function APP:ScanQRCode()
 
 	DHTML:AddFunction( "console", "luaready", function()
 		self.RT:Capture("png",nil,function(data)
-			file.Write("qr_decode/qrimg.png",data)
+			file.Write(self.Phone.RootDir.."/qr_decode/qrimg.png",data)
 			--DHTML:RunJavascript( "dec(\"data:image/png;base64,"..ARCLib.basexx.to_base64(data).."\")")
-			DHTML:RunJavascript( "dec(\"asset://garrysmod/data/qr_decode/qrimg.png\")")
+			DHTML:RunJavascript( "dec(\"asset://garrysmod/data/"..self.Phone.RootDir.."/qr_decode/qrimg.png\")")
 		end)
 
 	end )
@@ -123,6 +123,22 @@ function APP:Init()
 	end
 	if !IsValid(self.RT) then
 		self.RT = ARCLib.CreateRenderTarget("arcphone_camera",ScrH()*(self.Phone.ScreenResX/self.Phone.ScreenResY),ScrH(),EyePos(),EyeAngles(),64)
+		self.RT:SetPosCallback(function()
+			if not IsValid(self) then return end
+			local ply = LocalPlayer()
+			local dist = 20
+			local leeway = ply:GetAimVector() * 5
+			local ang = ply:EyeAngles()
+			local pos
+			if self.Selfie then
+				dist = 30
+				ang:RotateAroundAxis( ang:Up(), 180 )
+			end
+			local tr = util.QuickTrace( ply:EyePos(), ply:GetAimVector() * dist, ply )
+			pos = tr.HitPos-leeway
+			
+			return pos,ang
+		end)
 	end
 	self:AddMenuOption("Scan QR Code",self.ScanQRCode,self)
 	self:AddMenuOption("Switch Camera",self.SwitchCamera,self)

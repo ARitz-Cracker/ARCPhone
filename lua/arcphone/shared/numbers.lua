@@ -4,14 +4,18 @@
 -- Any 3rd party content has been used as either public domain or with permission.
 -- © Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
 
-function ARCPhone.SteamIDToPhoneNumber(steamid)
-	return string.sub( util.SteamIDTo64(steamid), #steamid-9)
-end
-function ARCPhone.SteamIDFromPhoneNumber(number)
-	return ARCPhone.CachedPhoneNumbers[number]
-end
+-- NUT = 688
+ARCPhone.NumberStart = 1000000
 function ARCPhone.GetPhoneNumber(ply)
-	if !IsValid(ply) || !ply:IsPlayer() then return "**********" end
+	if not IsValid(ply) or not ply:IsPlayer() then return "" end
+	if (nut) then
+		local chr = ply:getChar()
+		if chr then
+			return "688"..(ARCPhone.NumberStart+chr:getID())
+		else
+			return ""
+		end
+	end
 	local steamid = ply:SteamID64()
 	return string.sub( steamid, #steamid-9)
 end

@@ -281,7 +281,7 @@ self.OptionAnimEndTime = 1]]
 			surface.DrawTexturedRect( 20+18, 2, 16, 16)
 		end
 	end
-	if ARCPhone.Settings.atmos_support then
+	if ARCPhone.Settings.phone_clock_cycle then
 		draw.SimpleText(ARCPhone.AtmosTime,"ARCPhone",self.ScreenResX-4,4, color_white, TEXT_ALIGN_RIGHT , TEXT_ALIGN_TOP  )
 	else
 		draw.SimpleText(os.date( "%H:%M"),"ARCPhone",self.ScreenResX-4,4, color_white, TEXT_ALIGN_RIGHT , TEXT_ALIGN_TOP  )
@@ -394,6 +394,9 @@ function ARCPhone.PhoneSys:Init(wep)
 	if !file.IsDir( ARCPhone.ROOTDIR.."/camera","DATA" ) then
 		file.CreateDir( ARCPhone.ROOTDIR.."/camera")
 	end
+	if !file.IsDir( ARCPhone.ROOTDIR.."/qr_decode","DATA" ) then
+		file.CreateDir( ARCPhone.ROOTDIR.."/qr_decode")
+	end
 	if !file.IsDir( ARCPhone.ROOTDIR.."/photos","DATA" ) then
 		file.CreateDir( ARCPhone.ROOTDIR.."/photos")
 	end
@@ -414,7 +417,8 @@ function ARCPhone.PhoneSys:Init(wep)
 		ARCPhone.ClientFiles = nil
 	end
 	--contactphotos
-	ARCPhone.PhoneSys:Init_DLFiles(1,0)
+	self.RootDir = ARCPhone.ROOTDIR
+	self:Init_DLFiles(1,0)
 end
 
 function ARCPhone.PhoneSys:SetValidKeys(tab)
@@ -465,11 +469,11 @@ function ARCPhone.PhoneSys:Init_DLFiles(num,retries)
 				function( body, len, headers, code )
 					if code == 200 then
 						file.Write(ARCPhone.ROOTDIR..ARCPhone.ClientFilesDL[num],util.Base64Decode(body))
-						self:SetLoading(num/#ARCPhone.ClientFilesDL)
-						ARCPhone.PhoneSys:Init_DLFiles(num+1)
 					else
 						self:AddMsgBox("HTTP Error code: "..code.." while getting "..ARCPhone.ClientFilesDL[num].."\nThis may cause graphical glitches","warning-sign")
 					end
+					self:SetLoading(num/#ARCPhone.ClientFilesDL)
+					ARCPhone.PhoneSys:Init_DLFiles(num+1)
 				end,
 				function( err )
 					if retries < 10 then

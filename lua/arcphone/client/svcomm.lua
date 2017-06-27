@@ -11,6 +11,12 @@ net.Receive( "arcphone_emerg_numbers", function(length)
 	end
 end)
 
+ARCPhone.NumberStart = 0
+net.Receive( "arcphone_nutscript_number", function(length)
+	ARCPhone.NumberStart = net.ReadUInt(23)
+end)
+
+
 local ARCPhone_PingBusy = false
 local ARCPhone_PingCallBack = {}
 local ARCPhone_PingCount = 1

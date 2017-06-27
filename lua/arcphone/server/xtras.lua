@@ -7,8 +7,17 @@ local hours = 0
 local minutes = 0
 local lastHours = 0
 local lastMinutes = 0
+local function GetTime()
+	if _G.AtmosGlobal then
+		return AtmosGlobal:GetTime()
+	elseif _G.SW then
+		return SW.Time
+	end
+	return 0
+end
+
 local atmosSupportThink = function()
-	t = AtmosGlobal:GetTime()
+	t = GetTime()
 	hours = math.floor( t )
 	minutes = math.floor(( t - hours ) * 60)
 	if hours ~= lastHours or minutes ~= lastMinutes then
@@ -20,9 +29,10 @@ local atmosSupportThink = function()
 	lastHours = hours
 	lastMinutes = minutes
 end
+
 function ARCPhone.OnSettingChanged(key,val)
-	if key == "atmos_support" then
-		if (val) and _G.AtmosGlobal then
+	if key == "phone_clock_cycle" then
+		if (val) and _G.AtmosGlobal or _G.SW then
 			hook.Add("Think","ARCPhone AtmosSupport",atmosSupportThink)
 		else
 			hook.Remove("Think","ARCPhone AtmosSupport")

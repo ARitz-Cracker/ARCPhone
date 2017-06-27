@@ -52,11 +52,13 @@ function ARCPhone.SettingsReset() --DO NOT EDIT THIS!!!!
 	ARCPhone.Settings["name_long"] = "ARitz Cracker Phone" --DO NOT EDIT THIS!!!!
 	ARCPhone.Settings["antenna_range"] = 5000 --DO NOT EDIT THIS!!!!
 	ARCPhone.Settings["antenna_strength"] = 1435 --DO NOT EDIT THIS!!!!
-	ARCPhone.Settings["jammer_range"] = 500 --DO NOT EDIT THIS!!!!
+	ARCPhone.Settings["jammer_range"] = 1000 --DO NOT EDIT THIS!!!!
 	ARCPhone.Settings["jammer_strength"] = 75 --DO NOT EDIT THIS!!!!
-	ARCPhone.Settings["max_lines"] = 20
-	ARCPhone.Settings["realistic_reception"] = true
-	ARCPhone.Settings["atmos_support"] = false
+	ARCPhone.Settings["phone_max_lines"] = 20
+	ARCPhone.Settings["phone_realistic_reception"] = true
+	ARCPhone.Settings["phone_clock_cycle"] = false
+	ARCPhone.Settings["override_text_chat"] = false
+	ARCPhone.Settings["override_voice_chat"] = false
 end
 --
 ARCPhone.SettingsReset()

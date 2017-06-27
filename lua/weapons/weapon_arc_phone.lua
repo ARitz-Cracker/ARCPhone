@@ -44,6 +44,8 @@ SWEP.WorldModel = "models/ap/phone/w_phone_model.mdl"
 SWEP.ShowViewModel = true
 SWEP.ShowWorldModel = true
 
+SWEP.IsAlwaysRaised = true -- AGGH NUTSCRAPT STRIKES AGAIN
+
 function SWEP:PrimaryAttack()
 	--self:SetNextPrimaryFire(CurTime() + 1)
 	--if SERVER then

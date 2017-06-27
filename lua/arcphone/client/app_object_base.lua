@@ -100,6 +100,10 @@ function ARCPHONE_APP:IsInForeground()
 	return self.Foreground
 end
 
+function ARCPHONE_APP:IsValid()
+	return IsValid(self.Phone)
+end
+
 
 function ARCPHONE_APP:Close()
 	self.Phone:CloseApp(self.sysname)

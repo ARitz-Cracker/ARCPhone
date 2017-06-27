@@ -5,6 +5,8 @@
 -- © Copyright 2016-2017 Aritz Beobide-Cardinal All rights reserved.
 
 --Check if the thing is running
+util.AddNetworkString("arcphone_nutscript_number")
+
 util.AddNetworkString( "arcphone_phone_settings" )
 net.Receive( "arcphone_phone_settings", function(length,ply) -- Can't wait until people exploit this to make rainbow phones.
 	local wep = ply:GetWeapon( "weapon_arc_phone" )

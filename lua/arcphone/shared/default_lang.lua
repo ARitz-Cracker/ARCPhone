@@ -116,3 +116,13 @@ ARCPhone.Msgs.Commands["antenna_spawn"] = "Spawn an antenna where you're looking
 
 ARCPhone.SettingsDesc["name"] = "The displayed \"short\" name of the addon."
 ARCPhone.SettingsDesc["name_long"] = "The displayed \"long\" name of the addon."
+ARCPhone.SettingsDesc["antenna_range"] = "This maximum range (distance) of the reception antennas"
+ARCPhone.SettingsDesc["antenna_strength"] = "How far the reception antennas radio waves can travel through walls"
+ARCPhone.SettingsDesc["jammer_range"] = "This maximum range (distance) of the cellphone jammers"
+ARCPhone.SettingsDesc["jammer_strength"] = "How far the cellphone jammer radio waves can travel through walls"
+ARCPhone.SettingsDesc["phone_max_lines"] = "How many calls can be on the server at once"
+ARCPhone.SettingsDesc["phone_realistic_reception"] = "Enabled realistic reception. (Turning this off might cause strange bugs)"
+ARCPhone.SettingsDesc["phone_clock_cycle"] = "If enabled, the phone clock will display the time of the day/night cycle on the server. (Currently supports Atmos and SimpleWeather)"
+ARCPhone.SettingsDesc["override_text_chat"] = "This forces in-game messages to only be seen by nearby players. (Unless in an ARCPhone call) Only enable this if your gamemode doesn't support this natively."
+ARCPhone.SettingsDesc["override_voice_chat"] = "This forces all in-game voice chat to be 3D and can only be heard by nearby players. (Unless in an ARCPhone call) Only enable this if your gamemode doesn't support this natively."
+ARCPhone.SettingsDesc["override_chat_distance"] = "The distance before players will"
