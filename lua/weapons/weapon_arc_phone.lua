@@ -117,6 +117,9 @@ Thanks to swep construction kit
 --]]
 
 function SWEP:Initialize()
+	if (istable(_G.ARCBank)) then
+		self.ARCBank_Permissions = bit.bor(ARCBANK_PERMISSIONS_READ--[[,ARCBANK_PERMISSIONS_READ_LOG]],ARCBANK_PERMISSIONS_TRANSFER,ARCBANK_PERMISSIONS_RANK,ARCBANK_PERMISSIONS_MEMBERS)
+	end
 	self:SetWeaponHoldType( "normal" )
 	-- other initialize code goes here
 	self.energystart = CurTime()
@@ -600,7 +603,7 @@ if CLIENT then
 else
 	
 end
-SWEP.ARCBank_Permissions = bit.bor(ARCBANK_PERMISSIONS_READ--[[,ARCBANK_PERMISSIONS_READ_LOG]],ARCBANK_PERMISSIONS_TRANSFER,ARCBANK_PERMISSIONS_RANK,ARCBANK_PERMISSIONS_MEMBERS)
 function SWEP:GetARCBankUsePlayer()
 	return self.Owner
 end
+
