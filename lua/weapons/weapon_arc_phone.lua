@@ -117,7 +117,7 @@ Thanks to swep construction kit
 --]]
 
 function SWEP:Initialize()
-	if (istable(_G.ARCBank)) then
+	if (ARCLib.IsVersion("1.4.2","ARCBank")) then
 		self.ARCBank_Permissions = bit.bor(ARCBANK_PERMISSIONS_READ--[[,ARCBANK_PERMISSIONS_READ_LOG]],ARCBANK_PERMISSIONS_TRANSFER,ARCBANK_PERMISSIONS_RANK,ARCBANK_PERMISSIONS_MEMBERS)
 	end
 	self:SetWeaponHoldType( "normal" )

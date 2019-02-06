@@ -510,7 +510,15 @@ end
 
 
 local lastback = 0;
+
+--Tiny hack I'm doing to make people happy
+local pressedContext
+local pressedBack
+
 function ARCPhone.PhoneSys:OnButton(button)
+	if (pressedContext and pressedBack and ARCPhone.PhoneSys.ControlHints > SysTime()-5) then
+		ARCPhone.PhoneSys.ControlHints = SysTime() + 5
+	end
 	local s = self.Settings.System
 	if self.ColourInputTile then
 		self:ColourInputFunc(button)
@@ -550,6 +558,7 @@ function ARCPhone.PhoneSys:OnButton(button)
 		end
 		return
 	elseif button == s.KeyContext then
+		pressedContext = true
 		self.ShowOptions = !self.ShowOptions
 		self.OptionAnimStartTime = CurTime()
 		self.OptionAnimEndTime = CurTime() + 0.35
@@ -599,6 +608,7 @@ function ARCPhone.PhoneSys:OnButton(button)
 			app:_SwitchTile(button)
 		end
 		if button == s.KeyBack then
+			pressedBack = true
 			if (CurTime() < lastback) then
 				self:Lock()
 			end

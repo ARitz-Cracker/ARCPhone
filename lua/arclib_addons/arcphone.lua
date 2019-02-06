@@ -17,8 +17,8 @@ ARCPhone.Msg(table.Random({"HOLY SHIT HE'S FINALLY WORKING ON IT??","RIIING RIII
 ARCPhone.Msg("© Copyright 2016-2017 Aritz Beobide-Cardinal (ARitz Cracker) All rights reserved.")
 
 
-ARCPhone.Update = "June 29th 2017"
-ARCPhone.Version = "0.9.2b"
+ARCPhone.Update = "June 5th 2018"
+ARCPhone.Version = "0.9.2f"
 
 NULLFUNC = function(...) end
 

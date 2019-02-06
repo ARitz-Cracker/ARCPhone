@@ -22,8 +22,8 @@ local TitleTileDraw = function(tile,x,y)
 end
 
 function APP:Init()
-	if (not istable(ARCBank)) then
-		self.Phone:AddMsgBox("ARCBank","ARCBank is not available on this server!","report-symbol")
+	if (not ARCLib.IsVersion("1.4.2","ARCBank")) then
+		self.Phone:AddMsgBox("ARCBank","This application requires ARCBank 1.4.2 or later to be installed on the server.","report-symbol")
 		self:Close()
 	end
 	self.CurAccount = nil

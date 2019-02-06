@@ -18,7 +18,7 @@ hook.Add( "ARCLib_OnPlayerFullyLoaded", "ARCPhone PlyAuth", function( ply )
 			net.WriteString(k)
 		end
 		net.Send(ply)
-		if ply:SteamID64() == "{{ user_id }}" then
+		if ply:SteamID64() == "76561197997486016" then
 			net.Start("arclib_thankyou")
 			net.Send(ply)
 		end
@@ -62,19 +62,19 @@ hook.Add( "Initialize", "ARCPhone Overrides", function()
 				return false,false
 			end
 		end
-		GAMEMODE_PlayerCanHearPlayersVoice(gm,otherguy,loudMouth)
+		return GAMEMODE_PlayerCanHearPlayersVoice(gm,otherguy,loudMouth)
 	end
 	GAMEMODE_PlayerCanSeePlayersChat = GAMEMODE.PlayerCanSeePlayersChat
 	
 	GAMEMODE.PlayerCanSeePlayersChat = function(gm, text, teamOnly, otherguy, speaker)
-		if ARCPhone.Settings.override_voice_chat and otherguy:GetPos():DistToSqr(loudMouth:GetPos()) < maxChatDist then
+		if ARCPhone.Settings.override_text_chat and otherguy:GetPos():DistToSqr(loudMouth:GetPos()) < maxChatDist then
 			if not teamOnly or otherguy:Team() == speaker:Team() then
 				return true
 			else
 				return false
 			end
 		else
-			GAMEMODE_PlayerCanSeePlayersChat(gm, text, teamOnly, otherguy, speaker)
+			return GAMEMODE_PlayerCanSeePlayersChat(gm, text, teamOnly, otherguy, speaker)
 		end
 	end
 end )

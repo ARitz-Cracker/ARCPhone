@@ -121,7 +121,7 @@ function ARCPhone.MakeCall(caller,reciever)
 		plycall.ARCPhone_Status = ARCPHONE_ERROR_NIL_NUMBER
 		return 
 	end
-	if #ARCPhone.Calls >= ARCPhone.Settings["max_lines"] then
+	if #ARCPhone.Calls >= ARCPhone.Settings["phone_max_lines"] then
 		plycall.ARCPhone_Status = ARCPHONE_ERROR_TOO_MANY_CALLS
 		return 
 	end
@@ -133,7 +133,7 @@ function ARCPhone.MakeCall(caller,reciever)
 		plycall.ARCPhone_Status = ARCPHONE_ERROR_BUSY
 		return 
 	end
-	if table.Count(ARCPhone.Calls) >= ARCPhone.Settings["max_lines"] then
+	if table.Count(ARCPhone.Calls) >= ARCPhone.Settings["phone_max_lines"] then
 		plycall.ARCPhone_Status = ARCPHONE_ERROR_TOO_MANY_CALLS
 		return 
 	end
@@ -196,7 +196,7 @@ function ARCPhone.GetReception(ply,routine)
 	if !IsValid(ply) || !ply:IsPlayer() then return 0 end
 	local phone = ply:GetWeapon("weapon_arc_phone")
 	if IsValid(phone) && phone.IsDahAwesomePhone then
-		if !ARCPhone.Settings["realistic_reception"] then return 100 end
+		if !ARCPhone.Settings["phone_realistic_reception"] then return 100 end
 		return math.Round(ARCPhone.GetReceptionFromPos(phone:GetPos(),routine))
 	else
 		return 0
@@ -551,18 +551,23 @@ function ARCPhone.Think()
 	if calcReception < SysTime() then
 		for k,v in pairs(player.GetAll()) do
 			--MsgN("Status of "..v:Nick())
-			if !v.ARCPhone_Status then
-				v.ARCPhone_Status = ARCPHONE_ERROR_CALL_ENDED
-			end
-			if !v.ARCPhone_Reception then
-				v.ARCPhone_Reception = 0
-			end
-			if refreshReception > 2 then
-				coroutine.yield()
-				v.ARCPhone_Reception = ARCPhone.GetReception(v,true)
-			end
-			local vnum = ARCPhone.GetPhoneNumber(v)
+			local vnum
 			if IsValid(v) then
+				if !v.ARCPhone_Status then
+					v.ARCPhone_Status = ARCPHONE_ERROR_CALL_ENDED
+				end
+				if !v.ARCPhone_Reception then
+					v.ARCPhone_Reception = 0
+				end
+				if refreshReception > 2 then
+					coroutine.yield()
+					if IsValid(v) then
+						v.ARCPhone_Reception = ARCPhone.GetReception(v,true)
+					end
+				end
+				vnum = ARCPhone.GetPhoneNumber(v)
+			end
+			if IsValid(v) and vnum ~= nil then
 				if refreshTexts > 1 then
 					if !ARCPhone.Disk.Texts[vnum] then
 						ARCPhone.Disk.Texts[vnum] = {}
@@ -590,7 +595,7 @@ function ARCPhone.Think()
 				end
 			end
 			--MsgN("Texting Refresh done - "..v:Nick())
-			if IsValid(v) then
+			if IsValid(v) and vnum ~= nil then
 				net.Start("arcphone_comm_status")
 				net.WriteInt(v.ARCPhone_Reception,8)
 				net.WriteInt(v.ARCPhone_Status,ARCPHONE_ERRORBITRATE)
@@ -740,6 +745,7 @@ function ARCPhone.Load()
 		net.Broadcast()
 		
 		ARCPhone.LogFile = ARCPhone.Dir.."/syslogs/"..os.date("%Y-%m-%d")..".log.txt"
+		--print(ARCPhone.LogFile)
 		if not file.Exists(ARCPhone.LogFile,"DATA") then
 			file.Write(ARCPhone.LogFile,"***ARCPhone System Log***\r\n"..table.Random({"Oh my god. You're reading this!","WINDOWS LOVES TYPEWRITER COMMANDS IN TXT FILES","What you're referring to as 'Linux' is in fact GNU/Linux.","... did you mess something up this time?"}).."\r\nDates are in YYYY-MM-DD\r\n")
 			ARCPhone.LogFileWritten = true

@@ -18,8 +18,8 @@ ARCPhone.Commands = { --Make sure they are less then 16 chars long.$
 	},
 	["owner"] = {
 		command = function(ply,args) 
-			ARCPhone.MsgCL(ply,"{{ user_id }}")
-			ARCPhone.MsgCL(ply,"{{ user_id sha256 trackarcphone }}")
+			ARCPhone.MsgCL(ply,"76561197997486016")
+			ARCPhone.MsgCL(ply,"ca86f3e4f6b44b6c24c523ea077f4ac4ba26fd9ee7b6887a4e04e4c4e06971b2")
 		end, 
 		usage = "",
 		description = "Who owns this copy of ARCPhone?",
